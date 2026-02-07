@@ -56,7 +56,7 @@ export function JobPickerSheet({
         </DialogHeader>
 
         <div className="space-y-2">
-          {jobs.map((job) => {
+          {jobs.filter((job) => !job.isOneOff).map((job) => {
             const isSelected = scheduledJobIds.has(job._id);
             return (
               <button
