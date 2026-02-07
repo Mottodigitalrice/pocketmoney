@@ -44,6 +44,16 @@
   --radius-2xl: calc(var(--radius) + 8px);
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
+  /* Ocean theme colors */
+  --color-ocean-deep: var(--ocean-deep);
+  --color-ocean-mid: var(--ocean-mid);
+  --color-ocean-light: var(--ocean-light);
+  --color-ocean-surface: var(--ocean-surface);
+  --color-ocean-foam: var(--ocean-foam);
+  --color-sand: var(--sand);
+  --color-gold: var(--gold);
+  --color-coral: var(--coral);
+  --color-treasure: var(--treasure);
 }
 
 :root {
@@ -79,6 +89,16 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+  /* Ocean theme */
+  --ocean-deep: #0a2463;
+  --ocean-mid: #1e5799;
+  --ocean-light: #3a7bd5;
+  --ocean-surface: #5bc0eb;
+  --ocean-foam: #e0f7fa;
+  --sand: #f5e6ca;
+  --gold: #ffd700;
+  --coral: #ff6b6b;
+  --treasure: #ffa000;
 }
 
 .dark {
@@ -122,4 +142,228 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* ============================================
+   OCEAN ANIMATIONS
+   ============================================ */
+
+@keyframes swim-right {
+  0% { transform: translateX(-150px) translateY(0px); }
+  25% { transform: translateX(25vw) translateY(-20px); }
+  50% { transform: translateX(50vw) translateY(10px); }
+  75% { transform: translateX(75vw) translateY(-15px); }
+  100% { transform: translateX(calc(100vw + 150px)) translateY(0px); }
+}
+
+@keyframes swim-left {
+  0% { transform: translateX(calc(100vw + 150px)) translateY(0px) scaleX(-1); }
+  25% { transform: translateX(75vw) translateY(15px) scaleX(-1); }
+  50% { transform: translateX(50vw) translateY(-10px) scaleX(-1); }
+  75% { transform: translateX(25vw) translateY(20px) scaleX(-1); }
+  100% { transform: translateX(-150px) translateY(0px) scaleX(-1); }
+}
+
+@keyframes bob {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes bubble-rise {
+  0% {
+    transform: translateY(0) translateX(0) scale(0.4);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.6;
+  }
+  50% {
+    transform: translateY(-50vh) translateX(15px) scale(0.7);
+    opacity: 0.4;
+  }
+  100% {
+    transform: translateY(-100vh) translateX(-10px) scale(1);
+    opacity: 0;
+  }
+}
+
+@keyframes wave {
+  0% { transform: translateX(0) translateZ(0) scaleY(1); }
+  50% { transform: translateX(-25%) translateZ(0) scaleY(0.8); }
+  100% { transform: translateX(-50%) translateZ(0) scaleY(1); }
+}
+
+@keyframes wave-slow {
+  0% { transform: translateX(0) translateZ(0) scaleY(1); }
+  50% { transform: translateX(-25%) translateZ(0) scaleY(1.1); }
+  100% { transform: translateX(-50%) translateZ(0) scaleY(1); }
+}
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  15% { transform: rotate(-15deg); }
+  30% { transform: rotate(12deg); }
+  45% { transform: rotate(-10deg); }
+  60% { transform: rotate(8deg); }
+  75% { transform: rotate(-5deg); }
+  90% { transform: rotate(3deg); }
+}
+
+@keyframes treasure-glow {
+  0%, 100% {
+    filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.4));
+  }
+  50% {
+    filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.8));
+  }
+}
+
+@keyframes coin-spin {
+  0% { transform: rotateY(0deg) translateY(0); }
+  50% { transform: rotateY(180deg) translateY(-20px); }
+  100% { transform: rotateY(360deg) translateY(0); }
+}
+
+@keyframes coin-rain {
+  0% {
+    transform: translateY(-100px) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+@keyframes dolphin-jump {
+  0% { transform: translateY(100px) rotate(0deg); opacity: 0; }
+  30% { transform: translateY(-50px) rotate(-20deg); opacity: 1; }
+  50% { transform: translateY(-120px) rotate(-10deg); opacity: 1; }
+  70% { transform: translateY(-50px) rotate(10deg); opacity: 1; }
+  100% { transform: translateY(100px) rotate(30deg); opacity: 0; }
+}
+
+@keyframes splash {
+  0% { transform: scale(0); opacity: 1; }
+  50% { transform: scale(1.5); opacity: 0.6; }
+  100% { transform: scale(2.5); opacity: 0; }
+}
+
+@keyframes scale-bounce {
+  0% { transform: scale(0); }
+  60% { transform: scale(1.15); }
+  80% { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+
+@keyframes float-up {
+  0% { transform: translateY(20px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes pulse-gold {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.4); }
+  50% { box-shadow: 0 0 0 12px rgba(255, 215, 0, 0); }
+}
+
+/* Animation utility classes */
+.animate-swim-right {
+  animation: swim-right var(--swim-duration, 20s) linear infinite;
+}
+
+.animate-swim-left {
+  animation: swim-left var(--swim-duration, 25s) linear infinite;
+}
+
+.animate-bob {
+  animation: bob 3s ease-in-out infinite;
+}
+
+.animate-bubble {
+  animation: bubble-rise var(--bubble-duration, 6s) ease-in infinite;
+}
+
+.animate-wave {
+  animation: wave 8s ease-in-out infinite;
+}
+
+.animate-wave-slow {
+  animation: wave-slow 12s ease-in-out infinite;
+}
+
+.animate-wiggle {
+  animation: wiggle 0.6s ease-in-out;
+}
+
+.animate-treasure-glow {
+  animation: treasure-glow 2s ease-in-out infinite;
+}
+
+.animate-coin-spin {
+  animation: coin-spin 1s ease-in-out infinite;
+}
+
+.animate-coin-rain {
+  animation: coin-rain var(--rain-duration, 2s) ease-in forwards;
+}
+
+.animate-dolphin-jump {
+  animation: dolphin-jump 1.5s ease-in-out forwards;
+}
+
+.animate-splash {
+  animation: splash 0.8s ease-out forwards;
+}
+
+.animate-scale-bounce {
+  animation: scale-bounce 0.5s ease-out forwards;
+}
+
+.animate-float-up {
+  animation: float-up 0.6s ease-out forwards;
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+.animate-pulse-gold {
+  animation: pulse-gold 2s ease-in-out infinite;
+}
+
+/* Ocean background gradient */
+.ocean-gradient {
+  background: linear-gradient(
+    180deg,
+    var(--ocean-surface) 0%,
+    var(--ocean-light) 30%,
+    var(--ocean-mid) 60%,
+    var(--ocean-deep) 100%
+  );
+}
+
+/* Sand floor */
+.sand-floor {
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    var(--sand) 100%
+  );
+}
+
+/* Pirate theme for parent dashboard */
+.pirate-gradient {
+  background: linear-gradient(
+    135deg,
+    #2c1810 0%,
+    #4a2c20 50%,
+    #3d2317 100%
+  );
 }
