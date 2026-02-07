@@ -111,22 +111,22 @@ export function PocketMoneyProvider({ children }: { children: ReactNode }) {
   const rawJobs = useQuery(
     api.functions.jobs.getByFamily,
     userIdForQueries ? { userId: userIdForQueries } : "skip"
-  ) ?? [];
+  );
 
   const rawInstances = useQuery(
     api.functions.jobInstances.getByFamily,
     userIdForQueries ? { userId: userIdForQueries } : "skip"
-  ) ?? [];
+  );
 
   const rawScheduledJobs = useQuery(
     api.functions.scheduledJobs.getByFamily,
     userIdForQueries ? { userId: userIdForQueries } : "skip"
-  ) ?? [];
+  );
 
   // Map Convex documents to app types
   const jobs: Job[] = useMemo(
     () =>
-      rawJobs.map((j: typeof rawJobs[number]) => ({
+      (rawJobs ?? []).map((j: NonNullable<typeof rawJobs>[number]) => ({
         _id: j._id,
         userId: j.userId,
         title: j.title,
@@ -142,7 +142,7 @@ export function PocketMoneyProvider({ children }: { children: ReactNode }) {
 
   const jobInstances: JobInstance[] = useMemo(
     () =>
-      rawInstances.map((i: typeof rawInstances[number]) => ({
+      (rawInstances ?? []).map((i: NonNullable<typeof rawInstances>[number]) => ({
         _id: i._id,
         userId: i.userId,
         jobId: i.jobId,
@@ -159,7 +159,7 @@ export function PocketMoneyProvider({ children }: { children: ReactNode }) {
 
   const scheduledJobs: ScheduledJob[] = useMemo(
     () =>
-      rawScheduledJobs.map((s: typeof rawScheduledJobs[number]) => ({
+      (rawScheduledJobs ?? []).map((s: NonNullable<typeof rawScheduledJobs>[number]) => ({
         _id: s._id,
         userId: s.userId,
         jobId: s.jobId,
@@ -198,7 +198,13 @@ export function PocketMoneyProvider({ children }: { children: ReactNode }) {
   const removeScheduledJobMutation = useMutation(api.functions.scheduledJobs.remove);
   const clearScheduledDayMutation = useMutation(api.functions.scheduledJobs.clearDay);
 
-  const isLoading = !clerkLoaded || (!!user && (convexUser === undefined || rawChildren === undefined));
+  const isLoading = !clerkLoaded || (!!user && (
+    convexUser === undefined ||
+    rawChildren === undefined ||
+    rawJobs === undefined ||
+    rawInstances === undefined ||
+    rawScheduledJobs === undefined
+  ));
 
   // Job library mutations
   const addJob = useCallback(
