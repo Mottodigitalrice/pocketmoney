@@ -5,7 +5,35 @@ import { useUser } from "@clerk/nextjs";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import type { Id } from "../../../convex/_generated/dataModel";
-import { Job, JobInstance, JobInstanceWithJob, Child } from "@/types";
+import { Job, JobInstance, JobInstanceWithJob, Child, ScheduledJob, ScheduledJobWithJob } from "@/types";
+
+// Helper to get today's date as YYYY-MM-DD in local timezone
+function getLocalDateString(date: Date = new Date()): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+// Get the Monday of the week containing the given date
+function getWeekStart(date: Date = new Date()): Date {
+  const d = new Date(date);
+  const day = d.getDay();
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Monday
+  d.setDate(diff);
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
+// Get all dates in the week (Mon-Sun)
+function getWeekDates(date: Date = new Date()): string[] {
+  const monday = getWeekStart(date);
+  return Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    return getLocalDateString(d);
+  });
+}
 
 interface PocketMoneyContextType {
   isLoading: boolean;
@@ -13,35 +41,51 @@ interface PocketMoneyContextType {
   familyChildren: Child[];
   jobs: Job[];
   jobInstances: JobInstance[];
+  scheduledJobs: ScheduledJob[];
+  // Job library CRUD
   addJob: (job: {
     title: string;
     titleJa?: string;
     yenAmount: number;
-    assignedTo: string;
-    dailyLimit: number;
-    weeklyLimit: number;
     icon: string;
     titleKey?: string;
-  }) => void;
+    isOneOff?: boolean;
+  }) => Promise<string | undefined>;
   editJob: (id: string, updates: Partial<Job>) => void;
   deleteJob: (id: string) => void;
-  startJob: (jobId: string, childId: string) => void;
+  // Scheduling
+  scheduleJob: (jobId: string, childId: string, date: string) => void;
+  scheduleJobBatch: (entries: { jobId: string; childId: string; date: string }[]) => void;
+  removeScheduledJob: (scheduledJobId: string) => void;
+  clearScheduledDay: (childId: string, date: string) => void;
+  // Quick assign: schedule a job for today for a child
+  quickAssign: (jobId: string, childId: string) => void;
+  // One-off: create a temporary job + schedule it for today
+  createOneOff: (title: string, titleJa: string | undefined, yenAmount: number, icon: string, childId: string) => void;
+  // Job instance lifecycle
+  startJob: (jobId: string, childId: string, scheduledJobId?: string) => void;
   completeJob: (instanceId: string) => void;
   approveJob: (instanceId: string) => void;
   rejectJob: (instanceId: string) => void;
-  getJobsForChild: (childId: string) => Job[];
-  getInstancesForChild: (childId: string) => JobInstance[];
-  getAvailableJobs: (childId: string) => Job[];
+  // Derived data
+  getScheduledJobsForChildDate: (childId: string, date: string) => ScheduledJobWithJob[];
+  getScheduledJobsForWeek: (childId: string, weekStart?: Date) => ScheduledJobWithJob[];
+  getTodayAvailableJobs: (childId: string) => ScheduledJobWithJob[];
   getInProgressJobs: (childId: string) => JobInstanceWithJob[];
   getCompletedJobs: (childId: string) => JobInstanceWithJob[];
   getPendingApprovals: () => JobInstanceWithJob[];
   getWeeklyEarnings: (childId: string) => number;
   getWeeklyPotential: (childId: string) => number;
+  getInstancesForChild: (childId: string) => JobInstance[];
   getJobById: (id: string) => Job | undefined;
   getChildById: (id: string) => Child | undefined;
+  // Child management
   addChild: (name: string, icon: string) => void;
   editChild: (childId: string, name: string, icon: string) => void;
   deleteChild: (childId: string) => void;
+  // Utilities
+  getLocalDateString: (date?: Date) => string;
+  getWeekDates: (date?: Date) => string[];
 }
 
 export const PocketMoneyContext = createContext<PocketMoneyContextType | null>(null);
@@ -74,6 +118,11 @@ export function PocketMoneyProvider({ children }: { children: ReactNode }) {
     userIdForQueries ? { userId: userIdForQueries } : "skip"
   ) ?? [];
 
+  const rawScheduledJobs = useQuery(
+    api.functions.scheduledJobs.getByFamily,
+    userIdForQueries ? { userId: userIdForQueries } : "skip"
+  ) ?? [];
+
   // Map Convex documents to app types
   const jobs: Job[] = useMemo(
     () =>
@@ -84,10 +133,8 @@ export function PocketMoneyProvider({ children }: { children: ReactNode }) {
         titleJa: j.titleJa,
         titleKey: j.titleKey,
         yenAmount: j.yenAmount,
-        assignedTo: j.assignedTo,
-        dailyLimit: j.dailyLimit,
-        weeklyLimit: j.weeklyLimit,
         icon: j.icon,
+        isOneOff: j.isOneOff,
         createdAt: j.createdAt,
       })),
     [rawJobs]
@@ -100,6 +147,7 @@ export function PocketMoneyProvider({ children }: { children: ReactNode }) {
         userId: i.userId,
         jobId: i.jobId,
         childId: i.childId,
+        scheduledJobId: i.scheduledJobId,
         status: i.status,
         startedAt: i.startedAt,
         completedAt: i.completedAt,
@@ -107,6 +155,19 @@ export function PocketMoneyProvider({ children }: { children: ReactNode }) {
         createdAt: i.createdAt,
       })),
     [rawInstances]
+  );
+
+  const scheduledJobs: ScheduledJob[] = useMemo(
+    () =>
+      rawScheduledJobs.map((s: typeof rawScheduledJobs[number]) => ({
+        _id: s._id,
+        userId: s.userId,
+        jobId: s.jobId,
+        childId: s.childId,
+        date: s.date,
+        createdAt: s.createdAt,
+      })),
+    [rawScheduledJobs]
   );
 
   const mappedChildren: Child[] = useMemo(
@@ -132,33 +193,34 @@ export function PocketMoneyProvider({ children }: { children: ReactNode }) {
   const createChildMutation = useMutation(api.functions.children.create);
   const updateChildMutation = useMutation(api.functions.children.update);
   const removeChildMutation = useMutation(api.functions.children.remove);
+  const createScheduledJobMutation = useMutation(api.functions.scheduledJobs.create);
+  const createScheduledJobBatchMutation = useMutation(api.functions.scheduledJobs.createBatch);
+  const removeScheduledJobMutation = useMutation(api.functions.scheduledJobs.remove);
+  const clearScheduledDayMutation = useMutation(api.functions.scheduledJobs.clearDay);
 
   const isLoading = !clerkLoaded || (!!user && (convexUser === undefined || rawChildren === undefined));
 
-  // Job mutations
+  // Job library mutations
   const addJob = useCallback(
-    (job: {
+    async (job: {
       title: string;
       titleJa?: string;
       yenAmount: number;
-      assignedTo: string;
-      dailyLimit: number;
-      weeklyLimit: number;
       icon: string;
       titleKey?: string;
+      isOneOff?: boolean;
     }) => {
       if (!userIdForQueries) return;
-      createJobMutation({
+      const id = await createJobMutation({
         userId: userIdForQueries,
         title: job.title,
         titleJa: job.titleJa,
         yenAmount: job.yenAmount,
-        assignedTo: job.assignedTo,
-        dailyLimit: job.dailyLimit,
-        weeklyLimit: job.weeklyLimit,
         icon: job.icon,
         titleKey: job.titleKey,
+        isOneOff: job.isOneOff,
       });
+      return id;
     },
     [userIdForQueries, createJobMutation]
   );
@@ -169,9 +231,6 @@ export function PocketMoneyProvider({ children }: { children: ReactNode }) {
         jobId: id as Id<"jobs">,
         title: updates.title,
         yenAmount: updates.yenAmount,
-        assignedTo: updates.assignedTo,
-        dailyLimit: updates.dailyLimit,
-        weeklyLimit: updates.weeklyLimit,
         icon: updates.icon,
       });
     },
@@ -185,14 +244,93 @@ export function PocketMoneyProvider({ children }: { children: ReactNode }) {
     [removeJobMutation]
   );
 
+  // Scheduling mutations
+  const scheduleJob = useCallback(
+    (jobId: string, childId: string, date: string) => {
+      if (!userIdForQueries) return;
+      createScheduledJobMutation({
+        userId: userIdForQueries,
+        jobId: jobId as Id<"jobs">,
+        childId: childId as Id<"children">,
+        date,
+      });
+    },
+    [userIdForQueries, createScheduledJobMutation]
+  );
+
+  const scheduleJobBatch = useCallback(
+    (entries: { jobId: string; childId: string; date: string }[]) => {
+      if (!userIdForQueries) return;
+      createScheduledJobBatchMutation({
+        userId: userIdForQueries,
+        entries: entries.map((e) => ({
+          jobId: e.jobId as Id<"jobs">,
+          childId: e.childId as Id<"children">,
+          date: e.date,
+        })),
+      });
+    },
+    [userIdForQueries, createScheduledJobBatchMutation]
+  );
+
+  const removeScheduledJob = useCallback(
+    (scheduledJobId: string) => {
+      removeScheduledJobMutation({ scheduledJobId: scheduledJobId as Id<"scheduledJobs"> });
+    },
+    [removeScheduledJobMutation]
+  );
+
+  const clearScheduledDay = useCallback(
+    (childId: string, date: string) => {
+      clearScheduledDayMutation({
+        childId: childId as Id<"children">,
+        date,
+      });
+    },
+    [clearScheduledDayMutation]
+  );
+
+  // Quick assign: schedule a library job for today
+  const quickAssign = useCallback(
+    (jobId: string, childId: string) => {
+      scheduleJob(jobId, childId, getLocalDateString());
+    },
+    [scheduleJob]
+  );
+
+  // One-off: create a temporary job + schedule for today
+  const createOneOff = useCallback(
+    async (title: string, titleJa: string | undefined, yenAmount: number, icon: string, childId: string) => {
+      if (!userIdForQueries) return;
+      const jobId = await createJobMutation({
+        userId: userIdForQueries,
+        title,
+        titleJa,
+        yenAmount,
+        icon,
+        isOneOff: true,
+      });
+      if (jobId) {
+        createScheduledJobMutation({
+          userId: userIdForQueries,
+          jobId,
+          childId: childId as Id<"children">,
+          date: getLocalDateString(),
+        });
+      }
+    },
+    [userIdForQueries, createJobMutation, createScheduledJobMutation]
+  );
+
   // Job instance mutations
   const startJob = useCallback(
-    (jobId: string, childId: string) => {
+    (jobId: string, childId: string, scheduledJobId?: string) => {
       if (!userIdForQueries) return;
       startJobMutation({
         userId: userIdForQueries,
         jobId: jobId as Id<"jobs">,
         childId: childId as Id<"children">,
+        scheduledJobId: scheduledJobId as Id<"scheduledJobs"> | undefined,
       });
     },
     [userIdForQueries, startJobMutation]
@@ -257,32 +395,54 @@ export function PocketMoneyProvider({ children }: { children: ReactNode }) {
     [mappedChildren]
   );
 
-  const getJobsForChild = useCallback(
-    (childId: string) =>
-      jobs.filter((j) => j.assignedTo === "all" || j.assignedTo === childId),
-    [jobs]
-  );
-
   const getInstancesForChild = useCallback(
     (childId: string) => jobInstances.filter((i) => i.childId === childId),
     [jobInstances]
   );
 
-  const getAvailableJobs = useCallback(
-    (childId: string) => {
-      const childJobs = getJobsForChild(childId);
-      const activeInstanceJobIds = new Set(
+  // Get scheduled jobs for a child on a specific date, with job details attached
+  const getScheduledJobsForChildDate = useCallback(
+    (childId: string, date: string): ScheduledJobWithJob[] =>
+      scheduledJobs
+        .filter((s) => s.childId === childId && s.date === date)
+        .map((s) => ({ ...s, job: jobs.find((j) => j._id === s.jobId)! }))
+        .filter((s) => s.job),
+    [scheduledJobs, jobs]
+  );
+
+  // Get all scheduled jobs for a child in a given week
+  const getScheduledJobsForWeek = useCallback(
+    (childId: string, weekStart?: Date): ScheduledJobWithJob[] => {
+      const dates = getWeekDates(weekStart);
+      return scheduledJobs
+        .filter((s) => s.childId === childId && dates.includes(s.date))
+        .map((s) => ({ ...s, job: jobs.find((j) => j._id === s.jobId)! }))
+        .filter((s) => s.job);
+    },
+    [scheduledJobs, jobs]
+  );
+
+  // Get today's scheduled jobs that haven't been started yet
+  const getTodayAvailableJobs = useCallback(
+    (childId: string): ScheduledJobWithJob[] => {
+      const today = getLocalDateString();
+      const todayScheduled = getScheduledJobsForChildDate(childId, today);
+
+      // Find which scheduled jobs already have active instances
+      const activeScheduledJobIds = new Set(
         jobInstances
           .filter(
             (i) =>
               i.childId === childId &&
+              i.scheduledJobId &&
               (i.status === "in_progress" || i.status === "completed")
           )
-          .map((i) => i.jobId)
+          .map((i) => i.scheduledJobId)
       );
-      return childJobs.filter((j) => !activeInstanceJobIds.has(j._id));
+
+      return todayScheduled.filter((s) => !activeScheduledJobIds.has(s._id));
     },
-    [getJobsForChild, jobInstances]
+    [getScheduledJobsForChildDate, jobInstances]
   );
 
   const getInProgressJobs = useCallback(
@@ -331,12 +491,13 @@ export function PocketMoneyProvider({ children }: { children: ReactNode }) {
     [jobInstances, jobs]
   );
 
+  // Weekly potential = sum of all scheduled jobs for this week
   const getWeeklyPotential = useCallback(
     (childId: string) => {
-      const childJobs = getJobsForChild(childId);
-      return childJobs.reduce((sum, j) => sum + j.yenAmount * j.weeklyLimit, 0);
+      const weekScheduled = getScheduledJobsForWeek(childId);
+      return weekScheduled.reduce((sum, s) => sum + s.job.yenAmount, 0);
     },
-    [getJobsForChild]
+    [getScheduledJobsForWeek]
   );
 
   const value = useMemo(
@@ -346,26 +507,36 @@ export function PocketMoneyProvider({ children }: { children: ReactNode }) {
       familyChildren: mappedChildren,
       jobs,
       jobInstances,
+      scheduledJobs,
       addJob,
       editJob,
       deleteJob,
+      scheduleJob,
+      scheduleJobBatch,
+      removeScheduledJob,
+      clearScheduledDay,
+      quickAssign,
+      createOneOff,
       startJob,
       completeJob,
       approveJob,
       rejectJob,
-      getJobsForChild,
-      getInstancesForChild,
-      getAvailableJobs,
+      getScheduledJobsForChildDate,
+      getScheduledJobsForWeek,
+      getTodayAvailableJobs,
       getInProgressJobs,
       getCompletedJobs,
       getPendingApprovals,
       getWeeklyEarnings,
       getWeeklyPotential,
+      getInstancesForChild,
       getJobById,
       getChildById,
       addChild,
       editChild,
       deleteChild,
+      getLocalDateString,
+      getWeekDates,
     }),
     [
       isLoading,
@@ -373,21 +544,29 @@ export function PocketMoneyProvider({ children }: { children: ReactNode }) {
       mappedChildren,
       jobs,
       jobInstances,
+      scheduledJobs,
       addJob,
       editJob,
       deleteJob,
+      scheduleJob,
+      scheduleJobBatch,
+      removeScheduledJob,
+      clearScheduledDay,
+      quickAssign,
+      createOneOff,
       startJob,
       completeJob,
       approveJob,
       rejectJob,
-      getJobsForChild,
-      getInstancesForChild,
-      getAvailableJobs,
+      getScheduledJobsForChildDate,
+      getScheduledJobsForWeek,
+      getTodayAvailableJobs,
       getInProgressJobs,
       getCompletedJobs,
       getPendingApprovals,
       getWeeklyEarnings,
       getWeeklyPotential,
+      getInstancesForChild,
       getJobById,
       getChildById,
       addChild,

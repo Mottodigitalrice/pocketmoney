@@ -3,13 +3,14 @@
 import { useState } from "react";
 import { ParentHeader } from "@/components/features/parent-dashboard/ParentHeader";
 import { ApprovalQueue } from "@/components/features/parent-dashboard/ApprovalQueue";
+import { WeekPlanner } from "@/components/features/parent-dashboard/WeekPlanner";
 import { JobManager } from "@/components/features/parent-dashboard/JobManager";
 import { ChildOverview } from "@/components/features/parent-dashboard/ChildOverview";
 import { ChildManager } from "@/components/features/parent-dashboard/ChildManager";
 import { usePocketMoney } from "@/hooks/use-pocket-money";
 import { useTranslation } from "@/hooks/use-translation";
 
-type Tab = "approvals" | "jobs" | "overview" | "children";
+type Tab = "approvals" | "planner" | "jobs" | "overview" | "children";
 
 export default function ParentPage() {
   const [activeTab, setActiveTab] = useState<Tab>("approvals");
@@ -18,6 +19,7 @@ export default function ParentPage() {
 
   const tabs: { id: Tab; label: string }[] = [
     { id: "approvals", label: t("tab_approvals") },
+    { id: "planner", label: t("tab_planner") },
     { id: "jobs", label: t("tab_jobs") },
     { id: "overview", label: t("tab_overview") },
     { id: "children", label: t("tab_children") },
@@ -47,6 +49,7 @@ export default function ParentPage() {
       {/* Tab content */}
       <div className="mx-4 mt-6 sm:mx-8">
         {activeTab === "approvals" && <ApprovalQueue />}
+        {activeTab === "planner" && <WeekPlanner />}
         {activeTab === "jobs" && <JobManager />}
         {activeTab === "overview" && (
           <div className="space-y-6">

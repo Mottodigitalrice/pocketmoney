@@ -23,18 +23,20 @@ export const getByChild = query({
   },
 });
 
-// Start a new job instance
+// Start a new job instance (optionally from a scheduled job)
 export const start = mutation({
   args: {
     userId: v.id("users"),
     jobId: v.id("jobs"),
     childId: v.id("children"),
+    scheduledJobId: v.optional(v.id("scheduledJobs")),
   },
   handler: async (ctx, args) => {
     return await ctx.db.insert("jobInstances", {
       userId: args.userId,
       jobId: args.jobId,
       childId: args.childId,
+      scheduledJobId: args.scheduledJobId,
       status: "in_progress",
       startedAt: Date.now(),
       createdAt: Date.now(),

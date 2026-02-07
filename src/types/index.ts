@@ -31,8 +31,6 @@ export interface Child {
   createdAt: number;
 }
 
-export type JobAssignment = "all" | string; // "all" or child _id
-
 export interface Job {
   _id: string;
   userId: string;
@@ -40,11 +38,22 @@ export interface Job {
   titleJa?: string;
   titleKey?: string;
   yenAmount: number;
-  assignedTo: JobAssignment;
-  dailyLimit: number;
-  weeklyLimit: number;
   icon: string;
+  isOneOff?: boolean;
   createdAt: number;
+}
+
+export interface ScheduledJob {
+  _id: string;
+  userId: string;
+  jobId: string;
+  childId: string;
+  date: string; // "YYYY-MM-DD"
+  createdAt: number;
+}
+
+export interface ScheduledJobWithJob extends ScheduledJob {
+  job: Job;
 }
 
 export type JobStatus =
@@ -58,6 +67,7 @@ export interface JobInstance {
   userId: string;
   jobId: string;
   childId: string;
+  scheduledJobId?: string;
   status: JobStatus;
   startedAt?: number;
   completedAt?: number;

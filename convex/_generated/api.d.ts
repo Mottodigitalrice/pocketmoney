@@ -11,6 +11,7 @@
 import type * as functions_children from "../functions/children.js";
 import type * as functions_jobInstances from "../functions/jobInstances.js";
 import type * as functions_jobs from "../functions/jobs.js";
+import type * as functions_scheduledJobs from "../functions/scheduledJobs.js";
 import type * as functions_users from "../functions/users.js";
 
 import type {
@@ -23,6 +24,7 @@ declare const fullApi: ApiFromModules<{
   "functions/children": typeof functions_children;
   "functions/jobInstances": typeof functions_jobInstances;
   "functions/jobs": typeof functions_jobs;
+  "functions/scheduledJobs": typeof functions_scheduledJobs;
   "functions/users": typeof functions_users;
 }>;
 
