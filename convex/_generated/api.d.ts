@@ -8,7 +8,9 @@
  * @module
  */
 
-import type * as functions_items from "../functions/items.js";
+import type * as functions_children from "../functions/children.js";
+import type * as functions_jobInstances from "../functions/jobInstances.js";
+import type * as functions_jobs from "../functions/jobs.js";
 import type * as functions_users from "../functions/users.js";
 
 import type {
@@ -18,7 +20,9 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
-  "functions/items": typeof functions_items;
+  "functions/children": typeof functions_children;
+  "functions/jobInstances": typeof functions_jobInstances;
+  "functions/jobs": typeof functions_jobs;
   "functions/users": typeof functions_users;
 }>;
 

@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ChildId } from "@/types";
-import { CURRENCY } from "@/lib/constants";
+import { CURRENCY, CHILD_ICON_CONFIG } from "@/lib/constants";
+import { usePocketMoney } from "@/hooks/use-pocket-money";
+import type { ChildIcon } from "@/types";
+import { useTranslation } from "@/hooks/use-translation";
 
 interface DolphinCelebrationProps {
   yenAmount: number;
-  childId: ChildId;
+  childId: string;
   onClose: () => void;
 }
 
@@ -20,6 +22,10 @@ interface Coin {
 export function DolphinCelebration({ yenAmount, childId, onClose }: DolphinCelebrationProps) {
   const [coins, setCoins] = useState<Coin[]>([]);
   const [showText, setShowText] = useState(false);
+  const { t } = useTranslation();
+  const { getChildById } = usePocketMoney();
+  const child = getChildById(childId);
+  const iconConfig = child ? CHILD_ICON_CONFIG[child.icon as ChildIcon] : null;
 
   useEffect(() => {
     const generated: Coin[] = Array.from({ length: 20 }, (_, i) => ({
@@ -63,7 +69,7 @@ export function DolphinCelebration({ yenAmount, childId, onClose }: DolphinCeleb
       {/* Jumping creature */}
       <div className="animate-dolphin-jump absolute" style={{ bottom: "30%" }}>
         <span className="text-8xl">
-          {childId === "tyler" ? "🐬" : "🦈"}
+          {iconConfig?.emoji ?? "🐟"}
         </span>
       </div>
 
@@ -76,13 +82,13 @@ export function DolphinCelebration({ yenAmount, childId, onClose }: DolphinCeleb
       {showText && (
         <div className="animate-scale-bounce text-center">
           <p className="text-6xl font-extrabold text-white drop-shadow-lg sm:text-8xl">
-            GREAT JOB!
+            {t("celebration_great_job")}
           </p>
           <p className="mt-4 text-4xl font-bold text-amber-300 drop-shadow sm:text-5xl">
             {CURRENCY}{yenAmount}
           </p>
           <p className="mt-2 text-lg text-white/80">
-            Waiting for Mummy or Daddy to check
+            {t("celebration_waiting")}
           </p>
         </div>
       )}

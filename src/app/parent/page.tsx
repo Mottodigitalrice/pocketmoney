@@ -5,16 +5,22 @@ import { ParentHeader } from "@/components/features/parent-dashboard/ParentHeade
 import { ApprovalQueue } from "@/components/features/parent-dashboard/ApprovalQueue";
 import { JobManager } from "@/components/features/parent-dashboard/JobManager";
 import { ChildOverview } from "@/components/features/parent-dashboard/ChildOverview";
+import { ChildManager } from "@/components/features/parent-dashboard/ChildManager";
+import { usePocketMoney } from "@/hooks/use-pocket-money";
+import { useTranslation } from "@/hooks/use-translation";
 
-type Tab = "approvals" | "jobs" | "overview";
+type Tab = "approvals" | "jobs" | "overview" | "children";
 
 export default function ParentPage() {
   const [activeTab, setActiveTab] = useState<Tab>("approvals");
+  const { t } = useTranslation();
+  const { familyChildren, addChild, editChild, deleteChild } = usePocketMoney();
 
-  const tabs: { id: Tab; label: string; icon: string }[] = [
-    { id: "approvals", label: "Approvals", icon: "✅" },
-    { id: "jobs", label: "Jobs", icon: "📜" },
-    { id: "overview", label: "Overview", icon: "👀" },
+  const tabs: { id: Tab; label: string }[] = [
+    { id: "approvals", label: t("tab_approvals") },
+    { id: "jobs", label: t("tab_jobs") },
+    { id: "overview", label: t("tab_overview") },
+    { id: "children", label: t("tab_children") },
   ];
 
   return (
@@ -33,7 +39,6 @@ export default function ParentPage() {
                 : "bg-amber-900/40 text-amber-300/70 hover:bg-amber-800/40 hover:text-amber-200"
             }`}
           >
-            <span className="mr-1">{tab.icon}</span>
             {tab.label}
           </button>
         ))}
@@ -45,9 +50,29 @@ export default function ParentPage() {
         {activeTab === "jobs" && <JobManager />}
         {activeTab === "overview" && (
           <div className="space-y-6">
-            <ChildOverview childId="jayden" />
-            <ChildOverview childId="tyler" />
+            {familyChildren.map((child) => (
+              <ChildOverview key={child._id} childId={child._id} />
+            ))}
+            {familyChildren.length === 0 && (
+              <div className="flex flex-col items-center justify-center rounded-2xl border border-amber-700/20 bg-amber-900/20 py-12 text-center">
+                <span className="mb-3 text-5xl">👶</span>
+                <p className="text-lg font-semibold text-amber-200">
+                  {t("children_empty")}
+                </p>
+                <p className="text-sm text-amber-300/60">
+                  {t("children_empty_subtitle")}
+                </p>
+              </div>
+            )}
           </div>
+        )}
+        {activeTab === "children" && (
+          <ChildManager
+            children={familyChildren}
+            onAdd={addChild}
+            onEdit={editChild}
+            onDelete={deleteChild}
+          />
         )}
       </div>
     </div>

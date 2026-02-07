@@ -1,19 +1,32 @@
 "use client";
 
-import { Job, KidJobInstance, ChildId } from "@/types";
+import { Job, JobInstance } from "@/types";
 import { Button } from "@/components/ui/button";
-import { CURRENCY, CHILDREN } from "@/lib/constants";
+import { CURRENCY, CHILD_ICON_CONFIG } from "@/lib/constants";
+import { usePocketMoney } from "@/hooks/use-pocket-money";
+import { useTranslation } from "@/hooks/use-translation";
+import type { ChildIcon } from "@/types";
+import type { TranslationKey } from "@/lib/i18n/translations";
 
 interface ApprovalCardProps {
-  instance: KidJobInstance & { job: Job };
+  instance: JobInstance & { job: Job };
   onApprove: () => void;
   onReject: () => void;
 }
 
 export function ApprovalCard({ instance, onApprove, onReject }: ApprovalCardProps) {
-  const child = CHILDREN[instance.childId as ChildId];
+  const { t, locale } = useTranslation();
+  const { getChildById } = usePocketMoney();
+  const child = getChildById(instance.childId);
+  const iconConfig = child
+    ? CHILD_ICON_CONFIG[child.icon as ChildIcon]
+    : null;
+
   const completedTime = instance.completedAt
-    ? new Date(instance.completedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+    ? new Date(instance.completedAt).toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      })
     : "";
 
   return (
@@ -22,14 +35,22 @@ export function ApprovalCard({ instance, onApprove, onReject }: ApprovalCardProp
         <div className="flex items-center gap-3">
           <span className="text-3xl">{instance.job.icon}</span>
           <div>
-            <h3 className="font-bold text-amber-100">{instance.job.title}</h3>
+            <h3 className="font-bold text-amber-100">
+              {instance.job.titleKey
+                ? t(instance.job.titleKey as TranslationKey)
+                : locale === "ja" && instance.job.titleJa
+                  ? instance.job.titleJa
+                  : instance.job.title}
+            </h3>
             <p className="text-sm text-amber-300/70">
-              {child.name} ({instance.childId === "jayden" ? "🦈" : "🐬"}) - {completedTime}
+              {child?.name ?? "Unknown"} ({iconConfig?.emoji ?? "👤"}) -{" "}
+              {completedTime}
             </p>
           </div>
         </div>
         <span className="rounded-full bg-amber-400/20 px-3 py-1 text-sm font-bold text-amber-300">
-          {CURRENCY}{instance.job.yenAmount}
+          {CURRENCY}
+          {instance.job.yenAmount}
         </span>
       </div>
 
@@ -38,14 +59,14 @@ export function ApprovalCard({ instance, onApprove, onReject }: ApprovalCardProp
           onClick={onApprove}
           className="flex-1 rounded-lg bg-green-600 font-bold text-white hover:bg-green-700"
         >
-          Approve ✅
+          {t("approval_approve")}
         </Button>
         <Button
           onClick={onReject}
           variant="outline"
           className="flex-1 rounded-lg border-red-500/50 font-bold text-red-400 hover:bg-red-500/10"
         >
-          Try Again 🔄
+          {t("approval_reject")}
         </Button>
       </div>
     </div>

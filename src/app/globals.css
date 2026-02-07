@@ -148,43 +148,9 @@
    OCEAN ANIMATIONS
    ============================================ */
 
-@keyframes swim-right {
-  0% { transform: translateX(-150px) translateY(0px); }
-  25% { transform: translateX(25vw) translateY(-20px); }
-  50% { transform: translateX(50vw) translateY(10px); }
-  75% { transform: translateX(75vw) translateY(-15px); }
-  100% { transform: translateX(calc(100vw + 150px)) translateY(0px); }
-}
-
-@keyframes swim-left {
-  0% { transform: translateX(calc(100vw + 150px)) translateY(0px) scaleX(-1); }
-  25% { transform: translateX(75vw) translateY(15px) scaleX(-1); }
-  50% { transform: translateX(50vw) translateY(-10px) scaleX(-1); }
-  75% { transform: translateX(25vw) translateY(20px) scaleX(-1); }
-  100% { transform: translateX(-150px) translateY(0px) scaleX(-1); }
-}
-
 @keyframes bob {
   0%, 100% { transform: translateY(0px); }
   50% { transform: translateY(-8px); }
-}
-
-@keyframes bubble-rise {
-  0% {
-    transform: translateY(0) translateX(0) scale(0.4);
-    opacity: 0;
-  }
-  10% {
-    opacity: 0.6;
-  }
-  50% {
-    transform: translateY(-50vh) translateX(15px) scale(0.7);
-    opacity: 0.4;
-  }
-  100% {
-    transform: translateY(-100vh) translateX(-10px) scale(1);
-    opacity: 0;
-  }
 }
 
 @keyframes wave {
@@ -196,6 +162,12 @@
 @keyframes wave-slow {
   0% { transform: translateX(0) translateZ(0) scaleY(1); }
   50% { transform: translateX(-25%) translateZ(0) scaleY(1.1); }
+  100% { transform: translateX(-50%) translateZ(0) scaleY(1); }
+}
+
+@keyframes wave-slowest {
+  0% { transform: translateX(0) translateZ(0) scaleY(1); }
+  50% { transform: translateX(-25%) translateZ(0) scaleY(1.05); }
   100% { transform: translateX(-50%) translateZ(0) scaleY(1); }
 }
 
@@ -272,20 +244,8 @@
 }
 
 /* Animation utility classes */
-.animate-swim-right {
-  animation: swim-right var(--swim-duration, 20s) linear infinite;
-}
-
-.animate-swim-left {
-  animation: swim-left var(--swim-duration, 25s) linear infinite;
-}
-
 .animate-bob {
   animation: bob 3s ease-in-out infinite;
-}
-
-.animate-bubble {
-  animation: bubble-rise var(--bubble-duration, 6s) ease-in infinite;
 }
 
 .animate-wave {
@@ -294,6 +254,10 @@
 
 .animate-wave-slow {
   animation: wave-slow 12s ease-in-out infinite;
+}
+
+.animate-wave-slowest {
+  animation: wave-slowest 18s ease-in-out infinite;
 }
 
 .animate-wiggle {

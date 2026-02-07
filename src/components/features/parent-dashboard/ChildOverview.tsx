@@ -1,15 +1,18 @@
 "use client";
 
-import { ChildId } from "@/types";
 import { usePocketMoney } from "@/hooks/use-pocket-money";
-import { CURRENCY, CHILDREN } from "@/lib/constants";
+import { useTranslation } from "@/hooks/use-translation";
+import { CURRENCY, CHILD_ICON_CONFIG } from "@/lib/constants";
+import type { ChildIcon } from "@/types";
 
 interface ChildOverviewProps {
-  childId: ChildId;
+  childId: string;
 }
 
 export function ChildOverview({ childId }: ChildOverviewProps) {
+  const { t } = useTranslation();
   const {
+    getChildById,
     getWeeklyEarnings,
     getWeeklyPotential,
     getInProgressJobs,
@@ -17,7 +20,10 @@ export function ChildOverview({ childId }: ChildOverviewProps) {
     getInstancesForChild,
   } = usePocketMoney();
 
-  const child = CHILDREN[childId];
+  const child = getChildById(childId);
+  if (!child) return null;
+
+  const iconConfig = CHILD_ICON_CONFIG[child.icon as ChildIcon];
   const earned = getWeeklyEarnings(childId);
   const potential = getWeeklyPotential(childId);
   const inProgress = getInProgressJobs(childId);
@@ -27,44 +33,52 @@ export function ChildOverview({ childId }: ChildOverviewProps) {
 
   return (
     <div className="overflow-hidden rounded-2xl border border-amber-700/30 bg-amber-900/30 p-5 backdrop-blur-sm">
-      <div className="flex items-center gap-3 mb-4">
-        <span className="text-3xl">{childId === "jayden" ? "🦈" : "🐬"}</span>
+      <div className="mb-4 flex items-center gap-3">
+        <span className="text-3xl">{iconConfig?.emoji ?? "👤"}</span>
         <div>
           <h3 className="text-lg font-bold text-amber-100">{child.name}</h3>
           <p className="text-sm text-amber-300/70">
-            {childId === "jayden" ? "Great White Shark" : "Dolphin"} - Age {child.age}
+            {iconConfig?.label ?? child.icon}
           </p>
         </div>
       </div>
 
-      {/* Stats */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <div className="rounded-xl bg-amber-800/30 p-3 text-center">
           <p className="text-2xl font-extrabold text-amber-100">
-            {CURRENCY}{earned.toLocaleString()}
+            {CURRENCY}
+            {earned.toLocaleString()}
           </p>
-          <p className="text-xs text-amber-300/60">Earned</p>
+          <p className="text-xs text-amber-300/60">{t("overview_earned")}</p>
         </div>
         <div className="rounded-xl bg-amber-800/30 p-3 text-center">
           <p className="text-2xl font-extrabold text-amber-100">
-            {CURRENCY}{potential.toLocaleString()}
+            {CURRENCY}
+            {potential.toLocaleString()}
           </p>
-          <p className="text-xs text-amber-300/60">Possible</p>
+          <p className="text-xs text-amber-300/60">{t("overview_possible")}</p>
         </div>
         <div className="rounded-xl bg-amber-800/30 p-3 text-center">
-          <p className="text-2xl font-extrabold text-blue-300">{inProgress.length}</p>
-          <p className="text-xs text-amber-300/60">In Progress</p>
+          <p className="text-2xl font-extrabold text-blue-300">
+            {inProgress.length}
+          </p>
+          <p className="text-xs text-amber-300/60">
+            {t("overview_in_progress")}
+          </p>
         </div>
         <div className="rounded-xl bg-amber-800/30 p-3 text-center">
-          <p className="text-2xl font-extrabold text-green-300">{approved.length}</p>
-          <p className="text-xs text-amber-300/60">Completed</p>
+          <p className="text-2xl font-extrabold text-green-300">
+            {approved.length}
+          </p>
+          <p className="text-xs text-amber-300/60">
+            {t("overview_completed")}
+          </p>
         </div>
       </div>
 
-      {/* Pending approvals for this child */}
       {completed.length > 0 && (
         <p className="mt-3 text-sm text-amber-400">
-          ⏳ {completed.length} job{completed.length > 1 ? "s" : ""} waiting for approval
+          {t("overview_waiting", { count: String(completed.length) })}
         </p>
       )}
     </div>

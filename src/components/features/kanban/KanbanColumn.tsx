@@ -1,16 +1,28 @@
 "use client";
 
 import { ReactNode } from "react";
+import { useTranslation } from "@/hooks/use-translation";
 
 interface KanbanColumnProps {
   title: string;
   icon: string;
   count: number;
   color: string;
+  columnType: "available" | "doing" | "done";
   children: ReactNode;
 }
 
-export function KanbanColumn({ title, icon, count, color, children }: KanbanColumnProps) {
+export function KanbanColumn({ title, icon, count, color, columnType, children }: KanbanColumnProps) {
+  const { t } = useTranslation();
+
+  const emptyIcon = columnType === "available" ? "🎯" : columnType === "doing" ? "🏃" : "🎉";
+  const emptyMessage =
+    columnType === "available"
+      ? t("kanban_empty_available")
+      : columnType === "doing"
+      ? t("kanban_empty_doing")
+      : t("kanban_empty_done");
+
   return (
     <div className="flex flex-col">
       {/* Column header */}
@@ -30,16 +42,8 @@ export function KanbanColumn({ title, icon, count, color, children }: KanbanColu
       {/* Empty state */}
       {count === 0 && (
         <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-white/30 py-8 text-white/60">
-          <span className="text-3xl mb-2">
-            {title === "Available Jobs" ? "🎯" : title === "I'm Doing It!" ? "🏃" : "🎉"}
-          </span>
-          <p className="text-sm font-medium">
-            {title === "Available Jobs"
-              ? "All jobs taken!"
-              : title === "I'm Doing It!"
-              ? "Pick a job to start!"
-              : "Complete jobs to see them here!"}
-          </p>
+          <span className="text-3xl mb-2">{emptyIcon}</span>
+          <p className="text-sm font-medium">{emptyMessage}</p>
         </div>
       )}
     </div>

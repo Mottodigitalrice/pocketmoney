@@ -3,7 +3,7 @@
 export type Status = "active" | "completed" | "archived";
 
 export interface User {
-  id: string;
+  _id: string;
   clerkId: string;
   email: string;
   name?: string;
@@ -11,47 +11,60 @@ export interface User {
   createdAt: number;
 }
 
-export interface Item {
-  id: string;
-  userId: string;
-  title: string;
-  description?: string;
-  status: Status;
-  createdAt: number;
-  updatedAt: number;
-}
-
 // PocketMoney types
 
-export type ChildId = "jayden" | "tyler";
+export type ChildIcon =
+  | "shark"
+  | "dolphin"
+  | "turtle"
+  | "octopus"
+  | "starfish"
+  | "whale"
+  | "crab"
+  | "fish";
 
-export type JobAssignment = "both" | ChildId;
+export interface Child {
+  _id: string;
+  userId: string;
+  name: string;
+  icon: ChildIcon;
+  createdAt: number;
+}
+
+export type JobAssignment = "all" | string; // "all" or child _id
 
 export interface Job {
-  id: string;
+  _id: string;
+  userId: string;
   title: string;
+  titleJa?: string;
+  titleKey?: string;
   yenAmount: number;
   assignedTo: JobAssignment;
   dailyLimit: number;
   weeklyLimit: number;
   icon: string;
+  createdAt: number;
 }
 
-export type JobStatus = "available" | "in_progress" | "completed" | "approved" | "rejected";
+export type JobStatus =
+  | "in_progress"
+  | "completed"
+  | "approved"
+  | "rejected";
 
-export interface KidJobInstance {
-  id: string;
+export interface JobInstance {
+  _id: string;
+  userId: string;
   jobId: string;
-  childId: ChildId;
+  childId: string;
   status: JobStatus;
   startedAt?: number;
   completedAt?: number;
   approvedAt?: number;
+  createdAt: number;
 }
 
-export interface Child {
-  id: ChildId;
-  name: string;
-  age: number;
-  creature: "shark" | "dolphin";
+export interface JobInstanceWithJob extends JobInstance {
+  job: Job;
 }

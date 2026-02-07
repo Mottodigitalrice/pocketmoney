@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { CURRENCY } from "@/lib/constants";
+import { useTranslation } from "@/hooks/use-translation";
 
 interface TreasureChestAnimationProps {
   totalYen: number;
@@ -19,6 +20,7 @@ export function TreasureChestAnimation({ totalYen, onClose }: TreasureChestAnima
   const [coins, setCoins] = useState<FlyingCoin[]>([]);
   const [showTotal, setShowTotal] = useState(false);
   const [countUp, setCountUp] = useState(0);
+  const { t } = useTranslation();
 
   useEffect(() => {
     setCoins(
@@ -86,11 +88,11 @@ export function TreasureChestAnimation({ totalYen, onClose }: TreasureChestAnima
       {/* Total */}
       {showTotal && (
         <div className="animate-scale-bounce text-center" style={{ animationDelay: "0.3s" }}>
-          <p className="text-2xl font-bold text-amber-300">Your Treasure</p>
+          <p className="text-2xl font-bold text-amber-300">{t("treasure_your_treasure")}</p>
           <p className="mt-2 text-7xl font-extrabold text-white drop-shadow-lg sm:text-8xl">
             {CURRENCY}{countUp.toLocaleString()}
           </p>
-          <p className="mt-4 text-lg text-amber-200/80">Tap anywhere to close</p>
+          <p className="mt-4 text-lg text-amber-200/80">{t("treasure_tap_to_close")}</p>
         </div>
       )}
     </div>

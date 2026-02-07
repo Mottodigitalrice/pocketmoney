@@ -4,6 +4,8 @@ import { useState } from "react";
 import { Job, JobStatus } from "@/types";
 import { Button } from "@/components/ui/button";
 import { CURRENCY } from "@/lib/constants";
+import { useTranslation } from "@/hooks/use-translation";
+import type { TranslationKey } from "@/lib/i18n/translations";
 
 interface JobCardProps {
   job: Job;
@@ -15,6 +17,7 @@ interface JobCardProps {
 
 export function JobCard({ job, status, onStart, onComplete }: JobCardProps) {
   const [bouncing, setBouncing] = useState(false);
+  const { t, locale } = useTranslation();
 
   const handleAction = () => {
     setBouncing(true);
@@ -40,25 +43,29 @@ export function JobCard({ job, status, onStart, onComplete }: JobCardProps) {
       }`}
       style={{ animationDuration: `${3 + Math.random() * 2}s` }}
     >
-      {/* Yen badge */}
       <div className="absolute right-3 top-3 flex items-center gap-1 rounded-full bg-amber-100 px-3 py-1 text-sm font-bold text-amber-800">
-        {CURRENCY}{job.yenAmount}
+        {CURRENCY}
+        {job.yenAmount}
       </div>
 
-      {/* Icon + Title */}
       <div className="mb-3 flex items-center gap-3">
         <span className="text-3xl">{job.icon}</span>
-        <h3 className="pr-16 text-lg font-bold text-gray-800">{job.title}</h3>
+        <h3 className="pr-16 text-lg font-bold text-gray-800">
+          {job.titleKey
+            ? t(job.titleKey as TranslationKey)
+            : locale === "ja" && job.titleJa
+              ? job.titleJa
+              : job.title}
+        </h3>
       </div>
 
-      {/* Action Button */}
       {status === "available" && (
         <Button
           onClick={handleAction}
           className="w-full rounded-xl bg-blue-500 py-6 text-lg font-bold text-white hover:bg-blue-600 active:scale-95"
           size="lg"
         >
-          Let&apos;s Do It! 💪
+          {t("job_start")}
         </Button>
       )}
 
@@ -68,14 +75,14 @@ export function JobCard({ job, status, onStart, onComplete }: JobCardProps) {
           className="w-full rounded-xl bg-green-500 py-6 text-lg font-bold text-white hover:bg-green-600 active:scale-95"
           size="lg"
         >
-          I Did It! ✅
+          {t("job_complete")}
         </Button>
       )}
 
       {status === "completed" && (
         <div className="flex items-center justify-center gap-2 rounded-xl bg-amber-50 py-3 text-amber-700">
           <span className="text-lg">⏳</span>
-          <span className="font-semibold">Waiting for Mummy or Daddy</span>
+          <span className="font-semibold">{t("job_waiting")}</span>
         </div>
       )}
     </div>

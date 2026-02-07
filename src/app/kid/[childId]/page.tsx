@@ -1,10 +1,11 @@
 "use client";
 
 import { use } from "react";
-import { ChildId } from "@/types";
 import { KidHeader } from "@/components/features/kid-dashboard/KidHeader";
 import { WeeklyTracker } from "@/components/features/kid-dashboard/WeeklyTracker";
 import { KanbanBoard } from "@/components/features/kanban/KanbanBoard";
+import { usePocketMoney } from "@/hooks/use-pocket-money";
+import { useTranslation } from "@/hooks/use-translation";
 
 interface KidPageProps {
   params: Promise<{ childId: string }>;
@@ -12,25 +13,34 @@ interface KidPageProps {
 
 export default function KidPage({ params }: KidPageProps) {
   const { childId } = use(params);
+  const { t } = useTranslation();
+  const { getChildById, isLoading } = usePocketMoney();
 
-  // Validate childId
-  if (childId !== "jayden" && childId !== "tyler") {
+  const child = getChildById(childId);
+
+  if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center text-white">
-        <p className="text-2xl">Who are you? 🤔</p>
+        <div className="animate-pulse text-2xl">Loading...</div>
       </div>
     );
   }
 
-  const validChildId = childId as ChildId;
+  if (!child) {
+    return (
+      <div className="flex min-h-screen items-center justify-center text-white">
+        <p className="text-2xl">{t("kid_invalid_child")}</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen pb-8">
-      <KidHeader childId={validChildId} />
+      <KidHeader childId={childId} />
       <div className="mt-4 space-y-6">
-        <WeeklyTracker childId={validChildId} />
+        <WeeklyTracker childId={childId} />
         <div className="px-4 sm:px-8">
-          <KanbanBoard childId={validChildId} />
+          <KanbanBoard childId={childId} />
         </div>
       </div>
     </div>

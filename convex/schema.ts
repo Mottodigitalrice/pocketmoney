@@ -1,9 +1,9 @@
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
-// This is a starter schema - modify based on project needs
 export default defineSchema({
-  // Users table (synced with Clerk)
+  // Users/Families table (synced with Clerk)
+  // Each user represents one family account
   users: defineTable({
     clerkId: v.string(),
     email: v.string(),
@@ -14,19 +14,46 @@ export default defineSchema({
     .index("by_clerk_id", ["clerkId"])
     .index("by_email", ["email"]),
 
-  // Generic items table (replace with actual data model)
-  items: defineTable({
+  // Children belonging to a family
+  children: defineTable({
+    userId: v.id("users"),
+    name: v.string(),
+    icon: v.string(), // avatar key: "shark", "dolphin", "turtle", "octopus", "starfish", "whale", "crab", "fish"
+    createdAt: v.number(),
+  }).index("by_user", ["userId"]),
+
+  // Jobs available for a family
+  jobs: defineTable({
     userId: v.id("users"),
     title: v.string(),
-    description: v.optional(v.string()),
-    status: v.union(
-      v.literal("active"),
-      v.literal("completed"),
-      v.literal("archived")
-    ),
+    titleJa: v.optional(v.string()),
+    titleKey: v.optional(v.string()),
+    yenAmount: v.number(),
+    assignedTo: v.string(), // "all" or a child's _id string
+    dailyLimit: v.number(),
+    weeklyLimit: v.number(),
+    icon: v.string(),
     createdAt: v.number(),
-    updatedAt: v.number(),
+  }).index("by_user", ["userId"]),
+
+  // Individual job completions
+  jobInstances: defineTable({
+    userId: v.id("users"),
+    jobId: v.id("jobs"),
+    childId: v.id("children"),
+    status: v.union(
+      v.literal("in_progress"),
+      v.literal("completed"),
+      v.literal("approved"),
+      v.literal("rejected")
+    ),
+    startedAt: v.optional(v.number()),
+    completedAt: v.optional(v.number()),
+    approvedAt: v.optional(v.number()),
+    createdAt: v.number(),
   })
     .index("by_user", ["userId"])
-    .index("by_status", ["status"]),
+    .index("by_child", ["childId"])
+    .index("by_job", ["jobId"])
+    .index("by_child_status", ["childId", "status"]),
 });

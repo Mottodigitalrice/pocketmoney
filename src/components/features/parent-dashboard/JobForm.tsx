@@ -1,10 +1,13 @@
 "use client";
 
-import { useState } from "react";
-import { Job, JobAssignment } from "@/types";
+import { useState, useEffect } from "react";
+import { Job, Child } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useTranslation } from "@/hooks/use-translation";
+import { CHILD_ICON_CONFIG } from "@/lib/constants";
+import type { ChildIcon } from "@/types";
 import {
   Dialog,
   DialogContent,
@@ -15,49 +18,136 @@ import {
 interface JobFormProps {
   open: boolean;
   onClose: () => void;
-  onSave: (job: Omit<Job, "id">) => void;
+  onSave: (job: {
+    title: string;
+    titleJa?: string;
+    yenAmount: number;
+    assignedTo: string;
+    dailyLimit: number;
+    weeklyLimit: number;
+    icon: string;
+  }) => void;
   editingJob?: Job;
+  children: Child[];
 }
 
-const ICONS = ["👕", "🧸", "🛏️", "🍽️", "🌱", "👟", "🐾", "📚", "🧹", "🧺", "🏠", "🛋️", "🪥", "🎒", "🛒", "🪟", "♻️", "👨‍🍳", "🧽", "🪣"];
+const ICONS = [
+  "👕", "🧸", "🛏️", "🍽️", "🌱", "👟", "🐾", "📚", "🧹", "🧺",
+  "🏠", "🛋️", "🪥", "🎒", "🛒", "🪟", "♻️", "👨‍🍳", "🧽", "🪣",
+];
 
-export function JobForm({ open, onClose, onSave, editingJob }: JobFormProps) {
-  const [title, setTitle] = useState(editingJob?.title ?? "");
-  const [yenAmount, setYenAmount] = useState(editingJob?.yenAmount ?? 100);
-  const [assignedTo, setAssignedTo] = useState<JobAssignment>(editingJob?.assignedTo ?? "both");
-  const [dailyLimit, setDailyLimit] = useState(editingJob?.dailyLimit ?? 1);
-  const [weeklyLimit, setWeeklyLimit] = useState(editingJob?.weeklyLimit ?? 7);
-  const [icon, setIcon] = useState(editingJob?.icon ?? "👕");
+export function JobForm({
+  open,
+  onClose,
+  onSave,
+  editingJob,
+  children: familyChildren,
+}: JobFormProps) {
+  const { t, locale } = useTranslation();
+  const [title, setTitle] = useState("");
+  const [yenAmount, setYenAmount] = useState(100);
+  const [assignedTo, setAssignedTo] = useState("all");
+  const [dailyLimit, setDailyLimit] = useState(1);
+  const [weeklyLimit, setWeeklyLimit] = useState(7);
+  const [icon, setIcon] = useState("👕");
+  const [isSaving, setIsSaving] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Reset form when opening/closing or when editingJob changes
+  useEffect(() => {
+    if (open) {
+      setTitle(editingJob?.title ?? "");
+      setYenAmount(editingJob?.yenAmount ?? 100);
+      setAssignedTo(editingJob?.assignedTo ?? "all");
+      setDailyLimit(editingJob?.dailyLimit ?? 1);
+      setWeeklyLimit(editingJob?.weeklyLimit ?? 7);
+      setIcon(editingJob?.icon ?? "👕");
+    }
+  }, [open, editingJob]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title.trim()) return;
-    onSave({ title, yenAmount, assignedTo, dailyLimit, weeklyLimit, icon });
-    onClose();
+    if (!title.trim() || isSaving) return;
+
+    setIsSaving(true);
+    try {
+      let titleEn = title.trim();
+      let titleJa: string | undefined;
+
+      // Auto-translate the title to the other language
+      try {
+        const res = await fetch("/api/translate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text: title.trim(), from: locale }),
+        });
+        if (res.ok) {
+          const { translated } = await res.json();
+          if (locale === "ja") {
+            // User typed in Japanese - translated is English
+            titleJa = title.trim();
+            titleEn = translated;
+          } else {
+            // User typed in English - translated is Japanese
+            titleJa = translated;
+          }
+        }
+      } catch {
+        // Translation failed silently - save with original title only
+      }
+
+      onSave({
+        title: titleEn,
+        titleJa,
+        yenAmount,
+        assignedTo,
+        dailyLimit,
+        weeklyLimit,
+        icon,
+      });
+      onClose();
+    } finally {
+      setIsSaving(false);
+    }
   };
+
+  // Build assignment options: "All Children" + each child
+  const assignmentOptions = [
+    { value: "all", label: t("job_form_assigned_both") },
+    ...familyChildren.map((child) => {
+      const iconConfig = CHILD_ICON_CONFIG[child.icon as ChildIcon];
+      return {
+        value: child._id,
+        label: `${iconConfig?.emoji ?? ""} ${child.name}`,
+      };
+    }),
+  ];
 
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
       <DialogContent className="border-amber-700/50 bg-amber-950 text-amber-100 sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="text-amber-100">
-            {editingJob ? "Edit Job" : "Add New Job"}
+            {editingJob ? t("job_form_edit_title") : t("job_form_add_title")}
           </DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <Label className="text-amber-200">Job Name</Label>
+            <Label className="text-amber-200">
+              {t("job_form_name_label")}
+            </Label>
             <Input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="e.g. Clean up toys"
+              placeholder={t("job_form_name_placeholder")}
               className="border-amber-700/50 bg-amber-900/50 text-amber-100 placeholder:text-amber-500"
             />
           </div>
 
           <div>
-            <Label className="text-amber-200">Icon</Label>
+            <Label className="text-amber-200">
+              {t("job_form_icon_label")}
+            </Label>
             <div className="mt-1 flex flex-wrap gap-2">
               {ICONS.map((ic) => (
                 <button
@@ -77,7 +167,9 @@ export function JobForm({ open, onClose, onSave, editingJob }: JobFormProps) {
           </div>
 
           <div>
-            <Label className="text-amber-200">Yen Amount (¥)</Label>
+            <Label className="text-amber-200">
+              {t("job_form_yen_label")}
+            </Label>
             <Input
               type="number"
               value={yenAmount}
@@ -89,13 +181,11 @@ export function JobForm({ open, onClose, onSave, editingJob }: JobFormProps) {
           </div>
 
           <div>
-            <Label className="text-amber-200">Assigned To</Label>
-            <div className="mt-1 flex gap-2">
-              {[
-                { value: "both" as const, label: "Both Kids" },
-                { value: "jayden" as const, label: "🦈 Jayden" },
-                { value: "tyler" as const, label: "🐬 Tyler" },
-              ].map((opt) => (
+            <Label className="text-amber-200">
+              {t("job_form_assigned_label")}
+            </Label>
+            <div className="mt-1 flex flex-wrap gap-2">
+              {assignmentOptions.map((opt) => (
                 <button
                   type="button"
                   key={opt.value}
@@ -114,7 +204,9 @@ export function JobForm({ open, onClose, onSave, editingJob }: JobFormProps) {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label className="text-amber-200">Daily Limit</Label>
+              <Label className="text-amber-200">
+                {t("job_form_daily_label")}
+              </Label>
               <Input
                 type="number"
                 value={dailyLimit}
@@ -124,7 +216,9 @@ export function JobForm({ open, onClose, onSave, editingJob }: JobFormProps) {
               />
             </div>
             <div>
-              <Label className="text-amber-200">Weekly Limit</Label>
+              <Label className="text-amber-200">
+                {t("job_form_weekly_label")}
+              </Label>
               <Input
                 type="number"
                 value={weeklyLimit}
@@ -142,13 +236,18 @@ export function JobForm({ open, onClose, onSave, editingJob }: JobFormProps) {
               onClick={onClose}
               className="flex-1 border-amber-700/50 text-amber-300 hover:bg-amber-800/40"
             >
-              Cancel
+              {t("job_form_cancel")}
             </Button>
             <Button
               type="submit"
-              className="flex-1 bg-amber-600 font-bold text-white hover:bg-amber-700"
+              disabled={isSaving}
+              className="flex-1 bg-amber-600 font-bold text-white hover:bg-amber-700 disabled:opacity-60"
             >
-              {editingJob ? "Save Changes" : "Add Job"}
+              {isSaving
+                ? "..."
+                : editingJob
+                  ? t("job_form_save")
+                  : t("job_form_add")}
             </Button>
           </div>
         </form>

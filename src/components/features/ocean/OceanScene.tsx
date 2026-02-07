@@ -2,6 +2,7 @@
 
 import { BubbleEffect } from "./BubbleEffect";
 import { WaveAnimation } from "./WaveAnimation";
+import { LightRays } from "./LightRays";
 import { CreaturePool } from "../sea-creatures/CreaturePool";
 
 interface OceanSceneProps {
@@ -14,6 +15,7 @@ export function OceanScene({ children, subtle = false, showCreatures = true }: O
   return (
     <div className="ocean-gradient relative min-h-screen overflow-hidden">
       <WaveAnimation position="top" />
+      <LightRays />
       <BubbleEffect count={subtle ? 8 : 15} />
       {showCreatures && <CreaturePool />}
       {/* Sand floor */}

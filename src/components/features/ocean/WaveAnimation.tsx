@@ -31,6 +31,18 @@ export function WaveAnimation({ position = "top" }: { position?: "top" | "bottom
           fill="rgba(255,255,255,0.08)"
         />
       </svg>
+      {/* Third wave layer for depth */}
+      <svg
+        className="animate-wave-slowest absolute bottom-0 h-full"
+        style={{ width: "200%", animationDelay: "-7s" }}
+        viewBox="0 0 1440 60"
+        preserveAspectRatio="none"
+      >
+        <path
+          d="M0,40 C300,20 500,50 800,30 C1100,10 1300,45 1440,40 C1740,20 1940,50 2240,30 C2540,10 2740,45 2880,40 L2880,60 L0,60 Z"
+          fill="rgba(255,255,255,0.04)"
+        />
+      </svg>
     </div>
   );
 }
