@@ -50,7 +50,7 @@ export function JobCard({ job, status, onStart, onComplete }: JobCardProps) {
 
       <div className="mb-3 flex items-center gap-3">
         <span className="text-3xl">{job.icon}</span>
-        <h3 className="pr-16 text-lg font-bold text-gray-800">
+        <h3 className="line-clamp-2 pr-16 text-lg font-bold text-gray-800">
           {job.titleKey
             ? t(job.titleKey as TranslationKey)
             : locale === "ja" && job.titleJa

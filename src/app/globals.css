@@ -322,6 +322,16 @@
   );
 }
 
+/* Hide scrollbar for horizontal scroll containers */
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
 /* Pirate theme for parent dashboard */
 .pirate-gradient {
   background: linear-gradient(

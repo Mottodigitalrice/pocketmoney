@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { usePocketMoney } from "@/hooks/use-pocket-money";
 import { useTranslation } from "@/hooks/use-translation";
 import { KanbanColumn } from "./KanbanColumn";
@@ -24,6 +24,8 @@ export function KanbanBoard({ childId }: KanbanBoardProps) {
 
   const [celebrating, setCelebrating] = useState(false);
   const [celebrationYen, setCelebrationYen] = useState(0);
+  const [activeColumn, setActiveColumn] = useState(0);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   const available = getAvailableJobs(childId);
   const inProgress = getInProgressJobs(childId);
@@ -38,60 +40,113 @@ export function KanbanBoard({ childId }: KanbanBoardProps) {
     }
   };
 
+  // Track scroll position to update dot indicators
+  const handleScroll = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const scrollLeft = el.scrollLeft;
+    const columnWidth = el.scrollWidth / 3;
+    const newActive = Math.round(scrollLeft / columnWidth);
+    setActiveColumn(Math.min(newActive, 2));
+  }, []);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    el.addEventListener("scroll", handleScroll, { passive: true });
+    return () => el.removeEventListener("scroll", handleScroll);
+  }, [handleScroll]);
+
+  // Scroll to column when dot is tapped
+  const scrollToColumn = (index: number) => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const columnWidth = el.scrollWidth / 3;
+    el.scrollTo({ left: columnWidth * index, behavior: "smooth" });
+  };
+
+  const columnColors = ["bg-blue-500", "bg-amber-500", "bg-green-500"];
+
   return (
     <>
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-        <KanbanColumn
-          title={t("kanban_available")}
-          icon="⭐"
-          count={available.length}
-          color="bg-blue-500/80"
-          columnType="available"
-        >
-          {available.map((job) => (
-            <JobCard
-              key={job._id}
-              job={job}
-              status="available"
-              onStart={() => startJob(job._id, childId)}
-            />
-          ))}
-        </KanbanColumn>
+      {/* Scrollable kanban container */}
+      <div
+        ref={scrollRef}
+        className="hide-scrollbar flex gap-4 overflow-x-auto snap-x snap-mandatory md:grid md:grid-cols-3 md:gap-6 md:overflow-visible"
+      >
+        <div className="min-w-[85vw] snap-start md:min-w-0">
+          <KanbanColumn
+            title={t("kanban_available")}
+            icon="⭐"
+            count={available.length}
+            color="bg-blue-500/80"
+            columnType="available"
+          >
+            {available.map((job) => (
+              <JobCard
+                key={job._id}
+                job={job}
+                status="available"
+                onStart={() => startJob(job._id, childId)}
+              />
+            ))}
+          </KanbanColumn>
+        </div>
 
-        <KanbanColumn
-          title={t("kanban_doing")}
-          icon="💪"
-          count={inProgress.length}
-          color="bg-amber-500/80"
-          columnType="doing"
-        >
-          {inProgress.map((inst) => (
-            <JobCard
-              key={inst._id}
-              job={inst.job}
-              status="in_progress"
-              instanceId={inst._id}
-              onComplete={() => handleComplete(inst._id, inst.jobId)}
-            />
-          ))}
-        </KanbanColumn>
+        <div className="min-w-[85vw] snap-start md:min-w-0">
+          <KanbanColumn
+            title={t("kanban_doing")}
+            icon="💪"
+            count={inProgress.length}
+            color="bg-amber-500/80"
+            columnType="doing"
+          >
+            {inProgress.map((inst) => (
+              <JobCard
+                key={inst._id}
+                job={inst.job}
+                status="in_progress"
+                instanceId={inst._id}
+                onComplete={() => handleComplete(inst._id, inst.jobId)}
+              />
+            ))}
+          </KanbanColumn>
+        </div>
 
-        <KanbanColumn
-          title={t("kanban_done")}
-          icon="🎉"
-          count={completed.length}
-          color="bg-green-500/80"
-          columnType="done"
-        >
-          {completed.map((inst) => (
-            <JobCard
-              key={inst._id}
-              job={inst.job}
-              status="completed"
-              instanceId={inst._id}
-            />
-          ))}
-        </KanbanColumn>
+        <div className="min-w-[85vw] snap-start md:min-w-0">
+          <KanbanColumn
+            title={t("kanban_done")}
+            icon="🎉"
+            count={completed.length}
+            color="bg-green-500/80"
+            columnType="done"
+          >
+            {completed.map((inst) => (
+              <JobCard
+                key={inst._id}
+                job={inst.job}
+                status="completed"
+                instanceId={inst._id}
+              />
+            ))}
+          </KanbanColumn>
+        </div>
+      </div>
+
+      {/* Dot indicators - mobile only */}
+      <div className="mt-4 flex items-center justify-center gap-2 md:hidden">
+        {[0, 1, 2].map((i) => (
+          <button
+            key={i}
+            onClick={() => scrollToColumn(i)}
+            className={`h-2.5 rounded-full transition-all duration-300 ${
+              activeColumn === i
+                ? `w-6 ${columnColors[i]}`
+                : "w-2.5 bg-white/30"
+            }`}
+            aria-label={`Column ${i + 1}`}
+          />
+        ))}
       </div>
 
       {celebrating && (

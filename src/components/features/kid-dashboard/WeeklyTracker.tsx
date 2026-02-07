@@ -26,13 +26,13 @@ export function WeeklyTracker({ childId }: WeeklyTrackerProps) {
         onClick={() => setShowTreasure(true)}
       >
         <div className="animate-treasure-glow overflow-hidden rounded-2xl border-2 border-amber-400/50 bg-gradient-to-r from-amber-900/80 to-amber-800/80 p-4 backdrop-blur-sm">
-          <div className="flex items-center gap-4">
-            <div className="text-5xl">🏴‍☠️</div>
-            <div className="flex-1">
+          <div className="flex items-center gap-3 sm:gap-4">
+            <div className="text-3xl sm:text-5xl">🏴‍☠️</div>
+            <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-amber-200">
                 {t("weekly_treasure_title")}
               </p>
-              <p className="text-3xl font-extrabold text-amber-100">
+              <p className="text-2xl font-extrabold text-amber-100 sm:text-3xl">
                 {CURRENCY}
                 {earned.toLocaleString()}
               </p>
@@ -49,7 +49,7 @@ export function WeeklyTracker({ childId }: WeeklyTrackerProps) {
                 })}
               </p>
             </div>
-            <div className="text-4xl">💰</div>
+            <div className="text-2xl sm:text-4xl">💰</div>
           </div>
         </div>
       </div>

@@ -59,7 +59,7 @@ export function KidHeader({ childId }: KidHeaderProps) {
           <ChildHeaderAvatar icon={child.icon} />
         </div>
         <div className="text-right">
-          <h1 className="text-2xl font-extrabold text-white drop-shadow-lg sm:text-3xl">
+          <h1 className="truncate text-2xl font-extrabold text-white drop-shadow-lg sm:text-3xl">
             {t("kid_header_jobs", { name: child.name })}
           </h1>
           <p className="text-sm text-white/70">
