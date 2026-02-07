@@ -36,7 +36,7 @@ export function JobManager() {
     setFormOpen(true);
   };
 
-  const handleSave = (jobData: {
+  const handleSave = async (jobData: {
     title: string;
     titleJa?: string;
     yenAmount: number;
@@ -45,7 +45,7 @@ export function JobManager() {
     if (editing) {
       editJob(editing._id, jobData);
     } else {
-      addJob(jobData);
+      await addJob(jobData);
     }
   };
 
@@ -81,7 +81,7 @@ export function JobManager() {
       </div>
 
       <div className="space-y-2">
-        {jobs.map((job) => (
+        {jobs.filter((job) => !job.isOneOff).map((job) => (
           <div
             key={job._id}
             className="flex items-center gap-3 rounded-xl border border-amber-700/20 bg-amber-900/30 p-3 backdrop-blur-sm"

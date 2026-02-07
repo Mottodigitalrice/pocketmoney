@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react";
 import { usePocketMoney } from "@/hooks/use-pocket-money";
 import { useTranslation } from "@/hooks/use-translation";
-import { CURRENCY, CHILD_ICON_CONFIG, DAYS_OF_WEEK, DAYS_OF_WEEK_JA } from "@/lib/constants";
+import { CHILD_ICON_CONFIG, DAYS_OF_WEEK, DAYS_OF_WEEK_JA } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 import { JobPickerSheet } from "./JobPickerSheet";
 import type { ChildIcon } from "@/types";
@@ -15,6 +15,7 @@ export function WeekPlanner() {
     familyChildren,
     getScheduledJobsForChildDate,
     getWeekDates,
+    getLocalDateString,
     removeScheduledJob,
   } = usePocketMoney();
 
@@ -31,6 +32,7 @@ export function WeekPlanner() {
     return getWeekDates(base);
   }, [weekOffset, getWeekDates]);
 
+  const todayStr = getLocalDateString();
   const dayLabels = locale === "ja" ? DAYS_OF_WEEK_JA : DAYS_OF_WEEK;
 
   const handleCellTap = (childId: string, date: string, dayLabel: string, childName: string) => {
@@ -103,7 +105,7 @@ export function WeekPlanner() {
             <div />
             {dayLabels.map((day, i) => {
               const dateStr = weekDates[i];
-              const isToday = dateStr === getWeekDates()[new Date().getDay() === 0 ? 6 : new Date().getDay() - 1];
+              const isToday = dateStr === todayStr;
               return (
                 <div
                   key={day}
