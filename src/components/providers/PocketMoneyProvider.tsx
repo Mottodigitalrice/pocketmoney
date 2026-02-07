@@ -58,10 +58,11 @@ export function PocketMoneyProvider({ children }: { children: ReactNode }) {
   const userIdForQueries = convexUser?._id;
 
   // Query family data from Convex
-  const familyChildren = useQuery(
+  const rawChildren = useQuery(
     api.functions.children.getByFamily,
     userIdForQueries ? { userId: userIdForQueries } : "skip"
-  ) ?? [];
+  );
+  const familyChildren = rawChildren ?? [];
 
   const rawJobs = useQuery(
     api.functions.jobs.getByFamily,
@@ -132,7 +133,7 @@ export function PocketMoneyProvider({ children }: { children: ReactNode }) {
   const updateChildMutation = useMutation(api.functions.children.update);
   const removeChildMutation = useMutation(api.functions.children.remove);
 
-  const isLoading = !clerkLoaded || (!!user && convexUser === undefined);
+  const isLoading = !clerkLoaded || (!!user && (convexUser === undefined || rawChildren === undefined));
 
   // Job mutations
   const addJob = useCallback(
