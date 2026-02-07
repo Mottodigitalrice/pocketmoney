@@ -13,7 +13,7 @@ interface OceanSceneProps {
 
 export function OceanScene({ children, subtle = false, showCreatures = true }: OceanSceneProps) {
   return (
-    <div className="ocean-gradient relative min-h-screen overflow-hidden">
+    <div className="ocean-gradient relative min-h-screen overflow-x-hidden">
       <WaveAnimation position="top" />
       <LightRays />
       <BubbleEffect count={subtle ? 8 : 15} />

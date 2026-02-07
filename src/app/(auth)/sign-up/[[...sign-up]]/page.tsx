@@ -14,9 +14,9 @@ export default function SignUpPage() {
         <LanguageToggle />
       </div>
 
-      <div className="flex min-h-screen flex-col items-center justify-center px-4 py-12">
+      <div className="flex min-h-dvh flex-col items-center justify-start px-4 pt-16 pb-12 sm:justify-center sm:pt-12">
         <div className="mb-6 text-center">
-          <h1 className="text-4xl font-extrabold text-white drop-shadow-lg sm:text-5xl">
+          <h1 className="text-3xl font-extrabold text-white drop-shadow-lg sm:text-4xl md:text-5xl">
             {t("auth_sign_up_title")}
           </h1>
           <p className="mt-2 text-lg text-amber-200/80 drop-shadow">
