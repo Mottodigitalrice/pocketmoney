@@ -706,9 +706,6 @@ export default function OnboardingPage() {
             title: titleEn,
             titleJa,
             yenAmount: job.yenAmount,
-            assignedTo: "all",
-            dailyLimit: 1,
-            weeklyLimit: 7,
             icon: job.icon,
           });
         }

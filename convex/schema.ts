@@ -22,25 +22,40 @@ export default defineSchema({
     createdAt: v.number(),
   }).index("by_user", ["userId"]),
 
-  // Jobs available for a family
+  // Job library - reusable job templates
   jobs: defineTable({
     userId: v.id("users"),
     title: v.string(),
     titleJa: v.optional(v.string()),
     titleKey: v.optional(v.string()),
     yenAmount: v.number(),
-    assignedTo: v.string(), // "all" or a child's _id string
-    dailyLimit: v.number(),
-    weeklyLimit: v.number(),
     icon: v.string(),
+    isOneOff: v.optional(v.boolean()),
+    // Legacy fields kept optional for migration
+    assignedTo: v.optional(v.string()),
+    dailyLimit: v.optional(v.number()),
+    weeklyLimit: v.optional(v.number()),
     createdAt: v.number(),
   }).index("by_user", ["userId"]),
+
+  // Scheduled job assignments - links jobs to children on specific dates
+  scheduledJobs: defineTable({
+    userId: v.id("users"),
+    jobId: v.id("jobs"),
+    childId: v.id("children"),
+    date: v.string(), // "YYYY-MM-DD" format
+    createdAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_child_date", ["childId", "date"])
+    .index("by_job", ["jobId"]),
 
   // Individual job completions
   jobInstances: defineTable({
     userId: v.id("users"),
     jobId: v.id("jobs"),
     childId: v.id("children"),
+    scheduledJobId: v.optional(v.id("scheduledJobs")),
     status: v.union(
       v.literal("in_progress"),
       v.literal("completed"),
@@ -55,5 +70,6 @@ export default defineSchema({
     .index("by_user", ["userId"])
     .index("by_child", ["childId"])
     .index("by_job", ["jobId"])
-    .index("by_child_status", ["childId", "status"]),
+    .index("by_child_status", ["childId", "status"])
+    .index("by_scheduled_job", ["scheduledJobId"]),
 });

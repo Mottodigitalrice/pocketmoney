@@ -54,6 +54,7 @@ const ja = {
 
   // Parent tabs
   tab_approvals: "しょうにん ✅",
+  tab_planner: "よてい 📅",
   tab_jobs: "おしごと 📜",
   tab_overview: "まとめ 👀",
 
@@ -72,13 +73,10 @@ const ja = {
   approval_reject: "もう一回 🔄",
 
   // Job manager
-  job_manager_title: "すべてのお仕事 ({{count}})",
+  job_manager_title: "おしごとライブラリ ({{count}})",
   job_manager_new: "+ 新しいお仕事",
-  job_manager_both: "両方",
-  job_manager_jayden_only: "🦈 Jaydenだけ",
-  job_manager_tyler_only: "🐬 Tylerだけ",
-  job_manager_daily: "{{count}}/日",
-  job_manager_weekly: "{{count}}/週",
+  job_manager_quick_assign: "今日わりあてる",
+  job_manager_choose_child: "だれに",
 
   // Job form
   job_form_edit_title: "お仕事を編集",
@@ -87,15 +85,37 @@ const ja = {
   job_form_name_placeholder: "例: おもちゃを片付ける",
   job_form_icon_label: "アイコン",
   job_form_yen_label: "金額 (¥)",
-  job_form_assigned_label: "だれの",
-  job_form_assigned_both: "両方",
-  job_form_assigned_jayden: "🦈 Jayden",
-  job_form_assigned_tyler: "🐬 Tyler",
-  job_form_daily_label: "1日の上限",
-  job_form_weekly_label: "1週間の上限",
   job_form_cancel: "キャンセル",
   job_form_save: "保存",
   job_form_add: "追加",
+
+  // Week planner
+  planner_title: "しゅうかんよてい",
+  planner_this_week: "こんしゅう",
+  planner_next_week: "らいしゅう",
+  planner_prev_week: "せんしゅう",
+  planner_tap_to_add: "タップしてお仕事を追加",
+  planner_add_jobs: "お仕事を追加",
+  planner_no_children: "まずクルーを追加してね!",
+  planner_empty_day: "なし",
+  planner_select_jobs: "{{day}}の{{name}}のおしごと",
+  planner_done: "かんりょう",
+  planner_clear_day: "クリア",
+
+  // Quick assign
+  quick_assign_title: "今日わりあてる",
+  quick_assign_who: "だれに",
+
+  // One-off task
+  oneoff_title: "いちどきりのおしごと",
+  oneoff_subtitle: "ライブラリにはほぞんされません",
+  oneoff_name_placeholder: "例: ちらかしたのをかたづけて",
+  oneoff_assign_to: "だれに",
+  oneoff_create: "つくってわりあてる",
+
+  // Kanban (updated)
+  kanban_no_jobs_today: "今日のお仕事はないよ!",
+  kanban_no_jobs_hint: "ママかパパにお仕事を追加してもらおう!",
 
   // Child overview
   overview_earned: "かせいだ",

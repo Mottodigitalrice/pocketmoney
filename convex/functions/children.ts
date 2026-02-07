@@ -64,6 +64,19 @@ export const remove = mutation({
       if (exists) await ctx.db.delete(instance._id);
     }
 
+    // Delete all scheduled jobs for this child
+    const scheduled = await ctx.db
+      .query("scheduledJobs")
+      .withIndex("by_user", (q) => q.eq("userId", child.userId))
+      .collect();
+
+    for (const sj of scheduled) {
+      if (sj.childId === args.childId) {
+        const exists = await ctx.db.get(sj._id);
+        if (exists) await ctx.db.delete(sj._id);
+      }
+    }
+
     await ctx.db.delete(args.childId);
   },
 });

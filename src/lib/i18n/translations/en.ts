@@ -54,6 +54,7 @@ const en = {
 
   // Parent tabs
   tab_approvals: "Approvals ✅",
+  tab_planner: "Planner 📅",
   tab_jobs: "Jobs 📜",
   tab_overview: "Overview 👀",
 
@@ -72,13 +73,10 @@ const en = {
   approval_reject: "Try Again 🔄",
 
   // Job manager
-  job_manager_title: "All Jobs ({{count}})",
+  job_manager_title: "Job Library ({{count}})",
   job_manager_new: "+ New Job",
-  job_manager_both: "Both kids",
-  job_manager_jayden_only: "🦈 Jayden only",
-  job_manager_tyler_only: "🐬 Tyler only",
-  job_manager_daily: "{{count}}/day",
-  job_manager_weekly: "{{count}}/week",
+  job_manager_quick_assign: "Assign Today",
+  job_manager_choose_child: "Choose who",
 
   // Job form
   job_form_edit_title: "Edit Job",
@@ -87,15 +85,37 @@ const en = {
   job_form_name_placeholder: "e.g. Clean up toys",
   job_form_icon_label: "Icon",
   job_form_yen_label: "Yen Amount (¥)",
-  job_form_assigned_label: "Assigned To",
-  job_form_assigned_both: "Both Kids",
-  job_form_assigned_jayden: "🦈 Jayden",
-  job_form_assigned_tyler: "🐬 Tyler",
-  job_form_daily_label: "Daily Limit",
-  job_form_weekly_label: "Weekly Limit",
   job_form_cancel: "Cancel",
   job_form_save: "Save Changes",
   job_form_add: "Add Job",
+
+  // Week planner
+  planner_title: "Week Planner",
+  planner_this_week: "This Week",
+  planner_next_week: "Next Week",
+  planner_prev_week: "Previous Week",
+  planner_tap_to_add: "Tap to add jobs",
+  planner_add_jobs: "Add Jobs",
+  planner_no_children: "Add crew members first!",
+  planner_empty_day: "No jobs",
+  planner_select_jobs: "Select jobs for {{name}} on {{day}}",
+  planner_done: "Done",
+  planner_clear_day: "Clear Day",
+
+  // Quick assign
+  quick_assign_title: "Assign Today",
+  quick_assign_who: "Assign to",
+
+  // One-off task
+  oneoff_title: "Quick Task",
+  oneoff_subtitle: "One-time job, won't be saved to your library",
+  oneoff_name_placeholder: "e.g. Clean up that mess",
+  oneoff_assign_to: "Assign to",
+  oneoff_create: "Create & Assign",
+
+  // Kanban (updated)
+  kanban_no_jobs_today: "No jobs scheduled for today!",
+  kanban_no_jobs_hint: "Ask Mummy or Daddy to add some!",
 
   // Child overview
   overview_earned: "Earned",

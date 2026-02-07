@@ -14,7 +14,7 @@ interface KanbanBoardProps {
 export function KanbanBoard({ childId }: KanbanBoardProps) {
   const { t } = useTranslation();
   const {
-    getAvailableJobs,
+    getTodayAvailableJobs,
     getInProgressJobs,
     getCompletedJobs,
     startJob,
@@ -27,9 +27,13 @@ export function KanbanBoard({ childId }: KanbanBoardProps) {
   const [activeColumn, setActiveColumn] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const available = getAvailableJobs(childId);
+  const available = getTodayAvailableJobs(childId);
   const inProgress = getInProgressJobs(childId);
   const completed = getCompletedJobs(childId);
+
+  const handleStart = (jobId: string, scheduledJobId: string) => {
+    startJob(jobId, childId, scheduledJobId);
+  };
 
   const handleComplete = (instanceId: string, jobId: string) => {
     completeJob(instanceId);
@@ -67,6 +71,23 @@ export function KanbanBoard({ childId }: KanbanBoardProps) {
 
   const columnColors = ["bg-blue-500", "bg-amber-500", "bg-green-500"];
 
+  // Show empty state if no jobs scheduled today at all
+  const hasNoJobsToday = available.length === 0 && inProgress.length === 0 && completed.length === 0;
+
+  if (hasNoJobsToday) {
+    return (
+      <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-blue-300/30 py-12 text-center">
+        <span className="mb-3 text-5xl">📅</span>
+        <p className="text-lg font-semibold text-white/80">
+          {t("kanban_no_jobs_today")}
+        </p>
+        <p className="text-sm text-white/50">
+          {t("kanban_no_jobs_hint")}
+        </p>
+      </div>
+    );
+  }
+
   return (
     <>
       {/* Scrollable kanban container */}
@@ -82,12 +103,12 @@ export function KanbanBoard({ childId }: KanbanBoardProps) {
             color="bg-blue-500/80"
             columnType="available"
           >
-            {available.map((job) => (
+            {available.map((sj) => (
               <JobCard
-                key={job._id}
-                job={job}
+                key={sj._id}
+                job={sj.job}
                 status="available"
-                onStart={() => startJob(job._id, childId)}
+                onStart={() => handleStart(sj.jobId, sj._id)}
               />
             ))}
           </KanbanColumn>
