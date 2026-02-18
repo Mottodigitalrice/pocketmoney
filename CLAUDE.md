@@ -1,6 +1,10 @@
-# Executive AI Agent Template
+# Pocket Money
 
 > Claude Code exclusive. No other AI tools.
+
+## MOTTO Digital Context
+
+This project is managed via the MOTTO Digital Executive Assistant. Task tracking, project status, and deliverables live in Notion. Use the MOTTO API (`https://vps.mottodigital.jp` with `X-API-Key: $MOTTO_API_KEY`) to read/update tasks and project status. See the parent repo's CLAUDE.md for full API docs and task handoff protocol.
 
 ## Who You Are
 
