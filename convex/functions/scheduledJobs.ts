@@ -77,6 +77,64 @@ export const createBatch = mutation({
   },
 });
 
+export const quickAddForToday = mutation({
+  args: {
+    userId: v.id("users"),
+    jobId: v.id("jobs"),
+    childIds: v.array(v.id("children")),
+    date: v.string(),
+    preApprove: v.boolean(),
+  },
+  handler: async (ctx, args) => {
+    const now = Date.now();
+    const ids = [];
+
+    for (let i = 0; i < args.childIds.length; i++) {
+      const childId = args.childIds[i];
+      const timestamp = now + i;
+
+      if (args.preApprove) {
+        const instanceId = await ctx.db.insert("jobInstances", {
+          userId: args.userId,
+          jobId: args.jobId,
+          childId,
+          status: "approved",
+          startedAt: timestamp,
+          completedAt: timestamp,
+          approvedAt: timestamp,
+          createdAt: timestamp,
+        });
+        ids.push(instanceId);
+        continue;
+      }
+
+      const existingEntries = await ctx.db
+        .query("scheduledJobs")
+        .withIndex("by_child_date", (q) =>
+          q.eq("childId", childId).eq("date", args.date)
+        )
+        .collect();
+
+      const duplicate = existingEntries.find((entry) => entry.jobId === args.jobId);
+      if (duplicate) {
+        ids.push(duplicate._id);
+        continue;
+      }
+
+      const scheduledId = await ctx.db.insert("scheduledJobs", {
+        userId: args.userId,
+        jobId: args.jobId,
+        childId,
+        date: args.date,
+        createdAt: timestamp,
+      });
+      ids.push(scheduledId);
+    }
+
+    return ids;
+  },
+});
+
 // Remove a scheduled job
 export const remove = mutation({
   args: { scheduledJobId: v.id("scheduledJobs") },

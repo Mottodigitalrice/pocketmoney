@@ -26,10 +26,20 @@ const en = {
   kid_header_shark: "Great White Shark",
   kid_header_dolphin: "Dolphin",
   kid_header_age: "Age {{age}}",
+  kid_upcoming_title: "Still Coming This Week",
+  kid_upcoming_empty: "No more jobs planned for this week yet.",
+  kid_history_title: "Treasure History",
+  kid_history_this_week: "This Week",
+  kid_history_prev_week: "Previous Week",
+  kid_history_next_week: "Next Week",
+  kid_history_empty: "No treasure earned this week yet.",
+  kid_history_jobs: "{{count}} job(s)",
 
   // Weekly tracker
   weekly_treasure_title: "This Week's Treasure",
   weekly_progress: "¥{{earned}} of ¥{{total}} possible",
+  treasure_grand_total: "Grand Treasure",
+  treasure_this_week: "This Week",
 
   // Treasure chest
   treasure_your_treasure: "Your Treasure",
@@ -53,6 +63,7 @@ const en = {
   celebration_waiting: "Waiting for Mummy or Daddy to check",
 
   // Parent tabs
+  tab_quick_add: "Quick Add ⚡",
   tab_approvals: "Approvals ✅",
   tab_planner: "Planner 📅",
   tab_jobs: "Jobs 📜",
@@ -62,6 +73,9 @@ const en = {
   parent_home: "Home",
   parent_header_title: "Captain's Bridge",
   parent_header_subtitle: "Mummy & Daddy's Command Center",
+  parent_captain_code: "Captain's Code",
+  parent_captain_code_on: "On",
+  parent_captain_code_off: "Off",
 
   // Approval queue
   approval_all_clear: "All clear, Captain!",
@@ -94,6 +108,7 @@ const en = {
   planner_this_week: "This Week",
   planner_next_week: "Next Week",
   planner_prev_week: "Previous Week",
+  planner_today: "Today",
   planner_tap_to_add: "Tap to add jobs",
   planner_add_jobs: "Add Jobs",
   planner_no_children: "Add crew members first!",
@@ -105,6 +120,17 @@ const en = {
   // Quick assign
   quick_assign_title: "Assign Today",
   quick_assign_who: "Assign to",
+
+  // Quick add today
+  quick_add_title: "Quick Add Today",
+  quick_add_subtitle: "Tap a job, pick who it's for, and add it to today in a couple of taps.",
+  quick_add_empty_jobs: "Add some jobs to your library first.",
+  quick_add_empty_children: "Add your crew first before assigning jobs.",
+  quick_add_choose_who: "Who is this for?",
+  quick_add_preapprove: "Pre-approve and pay now",
+  quick_add_preapprove_hint: "Skips the kid list and approval queue, and adds the treasure straight away.",
+  quick_add_confirm: "Add Jobs",
+  quick_add_assigning: "Adding...",
 
   // One-off task
   oneoff_title: "Quick Task",

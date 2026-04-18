@@ -3,6 +3,7 @@
 import { SignIn } from "@clerk/nextjs";
 import { OceanScene } from "@/components/features/ocean/OceanScene";
 import { LanguageToggle } from "@/components/shared/LanguageToggle";
+import { hasClerkEnv } from "@/lib/env";
 import { useTranslation } from "@/hooks/use-translation";
 
 export default function SignInPage() {
@@ -24,14 +25,20 @@ export default function SignInPage() {
           </p>
         </div>
 
-        <SignIn
-          appearance={{
-            elements: {
-              rootBox: "mx-auto",
-              card: "bg-stone-900/90 border border-amber-800/40 shadow-2xl backdrop-blur-sm",
-            },
-          }}
-        />
+        {hasClerkEnv ? (
+          <SignIn
+            appearance={{
+              elements: {
+                rootBox: "mx-auto",
+                card: "bg-stone-900/90 border border-amber-800/40 shadow-2xl backdrop-blur-sm",
+              },
+            }}
+          />
+        ) : (
+          <div className="rounded-2xl border border-amber-800/40 bg-stone-900/90 px-6 py-5 text-center text-amber-100 shadow-2xl backdrop-blur-sm">
+            Clerk environment variables are required before sign-in can be used.
+          </div>
+        )}
       </div>
     </OceanScene>
   );

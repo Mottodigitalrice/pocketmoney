@@ -11,11 +11,12 @@ interface WeeklyTrackerProps {
 }
 
 export function WeeklyTracker({ childId }: WeeklyTrackerProps) {
-  const { getWeeklyEarnings, getWeeklyPotential } = usePocketMoney();
+  const { getWeeklyEarnings, getWeeklyPotential, getLifetimeEarnings } = usePocketMoney();
   const [showTreasure, setShowTreasure] = useState(false);
   const { t } = useTranslation();
 
   const earned = getWeeklyEarnings(childId);
+  const lifetime = getLifetimeEarnings(childId);
   const potential = getWeeklyPotential(childId);
   const percentage = potential > 0 ? Math.round((earned / potential) * 100) : 0;
 
@@ -29,13 +30,26 @@ export function WeeklyTracker({ childId }: WeeklyTrackerProps) {
           <div className="flex items-center gap-3 sm:gap-4">
             <div className="text-3xl sm:text-5xl">🏴‍☠️</div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-amber-200">
-                {t("weekly_treasure_title")}
-              </p>
-              <p className="text-2xl font-extrabold text-amber-100 sm:text-3xl">
-                {CURRENCY}
-                {earned.toLocaleString()}
-              </p>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <p className="text-sm font-medium text-amber-200">
+                    {t("treasure_grand_total")}
+                  </p>
+                  <p className="text-2xl font-extrabold text-amber-100 sm:text-3xl">
+                    {CURRENCY}
+                    {lifetime.toLocaleString()}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-amber-200">
+                    {t("treasure_this_week")}
+                  </p>
+                  <p className="text-2xl font-extrabold text-amber-100 sm:text-3xl">
+                    {CURRENCY}
+                    {earned.toLocaleString()}
+                  </p>
+                </div>
+              </div>
               <div className="mt-2 h-3 overflow-hidden rounded-full bg-amber-950">
                 <div
                   className="h-full rounded-full bg-gradient-to-r from-amber-400 to-yellow-300 transition-all duration-1000"
@@ -56,7 +70,7 @@ export function WeeklyTracker({ childId }: WeeklyTrackerProps) {
 
       {showTreasure && (
         <TreasureChestAnimation
-          totalYen={earned}
+          totalYen={lifetime}
           onClose={() => setShowTreasure(false)}
         />
       )}

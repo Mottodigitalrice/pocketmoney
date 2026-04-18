@@ -26,10 +26,20 @@ const ja = {
   kid_header_shark: "ホオジロザメ",
   kid_header_dolphin: "イルカ",
   kid_header_age: "{{age}}さい",
+  kid_upcoming_title: "こんしゅうのこれから",
+  kid_upcoming_empty: "こんしゅうのこれからのおしごとはまだないよ。",
+  kid_history_title: "たからものれきし",
+  kid_history_this_week: "こんしゅう",
+  kid_history_prev_week: "せんしゅう",
+  kid_history_next_week: "らいしゅう",
+  kid_history_empty: "こんしゅうはまだたからものをもらってないよ。",
+  kid_history_jobs: "{{count}}こ",
 
   // Weekly tracker
   weekly_treasure_title: "こんしゅうのたからもの",
   weekly_progress: "¥{{total}}のうち¥{{earned}}",
+  treasure_grand_total: "ぜんぶのたからもの",
+  treasure_this_week: "こんしゅう",
 
   // Treasure chest
   treasure_your_treasure: "きみのたからもの",
@@ -53,6 +63,7 @@ const ja = {
   celebration_waiting: "ママかパパがチェックするのをまってね",
 
   // Parent tabs
+  tab_quick_add: "今日すぐ追加 ⚡",
   tab_approvals: "しょうにん ✅",
   tab_planner: "よてい 📅",
   tab_jobs: "おしごと 📜",
@@ -62,6 +73,9 @@ const ja = {
   parent_home: "ホーム",
   parent_header_title: "船長のブリッジ",
   parent_header_subtitle: "ママ & パパのコマンドセンター",
+  parent_captain_code: "船長コード",
+  parent_captain_code_on: "オン",
+  parent_captain_code_off: "オフ",
 
   // Approval queue
   approval_all_clear: "全部OKです、船長!",
@@ -94,6 +108,7 @@ const ja = {
   planner_this_week: "こんしゅう",
   planner_next_week: "らいしゅう",
   planner_prev_week: "せんしゅう",
+  planner_today: "きょう",
   planner_tap_to_add: "タップしてお仕事を追加",
   planner_add_jobs: "お仕事を追加",
   planner_no_children: "まずクルーを追加してね!",
@@ -105,6 +120,17 @@ const ja = {
   // Quick assign
   quick_assign_title: "今日わりあてる",
   quick_assign_who: "だれに",
+
+  // Quick add today
+  quick_add_title: "今日すぐ追加",
+  quick_add_subtitle: "おしごとをタップして、だれにするかえらぶだけ。すぐ今日のリストに追加できます。",
+  quick_add_empty_jobs: "まずおしごとライブラリにおしごとを追加してね。",
+  quick_add_empty_children: "まずクルーを追加してからおしごとをわりあててね。",
+  quick_add_choose_who: "だれにする?",
+  quick_add_preapprove: "すぐ承認しておこづかいにする",
+  quick_add_preapprove_hint: "子どものリストと承認待ちをスキップして、すぐにたからものへ追加します。",
+  quick_add_confirm: "追加する",
+  quick_add_assigning: "追加中...",
 
   // One-off task
   oneoff_title: "いちどきりのおしごと",

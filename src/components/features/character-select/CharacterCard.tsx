@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, ReactNode } from "react";
+import { useState, ReactNode } from "react";
 import Link from "next/link";
 
 interface CharacterCardProps {
@@ -22,11 +22,7 @@ export function CharacterCard({
   borderColor,
   onClick,
 }: CharacterCardProps) {
-  const [animDelay, setAnimDelay] = useState(0);
-
-  useEffect(() => {
-    setAnimDelay(Math.random() * 2);
-  }, []);
+  const [animDelay] = useState(() => Math.random() * 2);
 
   const cardContent = (
     <div

@@ -2,7 +2,7 @@
 
 import { useRandomCreatures } from "@/hooks/use-random-creatures";
 import { SwimmingCreature } from "./SwimmingCreature";
-import { useEffect, useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 
 interface CreatureConfig {
   direction: "left" | "right";
@@ -27,25 +27,29 @@ function generateConfig(index: number, total: number): CreatureConfig {
 
 export function CreaturePool() {
   const creatures = useRandomCreatures(5);
-  const [configs, setConfigs] = useState<CreatureConfig[]>([]);
+  const [respawnSeeds, setRespawnSeeds] = useState<number[]>([]);
 
-  useEffect(() => {
-    if (creatures.length === 0) return;
-    setConfigs(creatures.map((_, i) => generateConfig(i, creatures.length)));
-  }, [creatures]);
+  const configs = useMemo(
+    () =>
+      creatures.map((_, i) => {
+        const seed = respawnSeeds[i] ?? i;
+        return {
+          ...generateConfig(i, creatures.length),
+          key: seed,
+        };
+      }),
+    [creatures, respawnSeeds]
+  );
 
   const handleRespawn = useCallback(
     (index: number) => {
-      setConfigs((prev) => {
+      setRespawnSeeds((prev) => {
         const next = [...prev];
-        next[index] = {
-          ...generateConfig(index, creatures.length),
-          delay: Math.random() * 2, // short delay on respawn
-        };
+        next[index] = Date.now() + index;
         return next;
       });
     },
-    [creatures.length]
+    []
   );
 
   if (creatures.length === 0 || configs.length === 0) return null;

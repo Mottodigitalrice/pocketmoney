@@ -14,15 +14,21 @@ export const LanguageContext = createContext<LanguageContextType | null>(null);
 
 const STORAGE_KEY = "pocketmoney-lang";
 
+function getInitialLocale(): Locale {
+  if (typeof window === "undefined") {
+    return "ja";
+  }
+
+  const stored = localStorage.getItem(STORAGE_KEY);
+  return stored === "en" || stored === "ja" ? stored : "ja";
+}
+
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>("ja");
+  const [locale, setLocaleState] = useState<Locale>(getInitialLocale);
 
   useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY) as Locale | null;
-    if (stored === "en" || stored === "ja") {
-      setLocaleState(stored);
-    }
-  }, []);
+    document.documentElement.lang = locale;
+  }, [locale]);
 
   const setLocale = useCallback((newLocale: Locale) => {
     setLocaleState(newLocale);

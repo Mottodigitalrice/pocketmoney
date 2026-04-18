@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { ChildIcon } from "@/types";
 import { CHILD_ICON_CONFIG } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
@@ -23,21 +23,10 @@ interface ChildFormProps {
 const iconKeys = Object.keys(CHILD_ICON_CONFIG) as ChildIcon[];
 
 export function ChildForm({ open, onClose, onSave, editingChild }: ChildFormProps) {
-  const [name, setName] = useState("");
-  const [selectedIcon, setSelectedIcon] = useState<ChildIcon>("shark");
-
-  // Pre-fill form when editing or reset when adding
-  useEffect(() => {
-    if (open) {
-      if (editingChild) {
-        setName(editingChild.name);
-        setSelectedIcon(editingChild.icon as ChildIcon);
-      } else {
-        setName("");
-        setSelectedIcon("shark");
-      }
-    }
-  }, [open, editingChild]);
+  const [name, setName] = useState(() => editingChild?.name ?? "");
+  const [selectedIcon, setSelectedIcon] = useState<ChildIcon>(
+    () => (editingChild?.icon as ChildIcon | undefined) ?? "shark"
+  );
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

@@ -1,23 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { motion } from "motion/react";
 
-interface Bubble {
-  id: number;
-  left: number;
-  size: number;
-  duration: number;
-  delay: number;
-  isBig: boolean;
-  wobbleX: number[];
-}
-
 export function BubbleEffect({ count = 15 }: { count?: number }) {
-  const [bubbles, setBubbles] = useState<Bubble[]>([]);
-
-  useEffect(() => {
-    const generated: Bubble[] = Array.from({ length: count }, (_, i) => {
+  const [bubbles] = useState(() =>
+    Array.from({ length: count }, (_, i) => {
       const isBig = Math.random() < 0.1; // 1 in 10 is a big bubble
       const wobbleAmount = 8 + Math.random() * 12;
       return {
@@ -29,9 +17,8 @@ export function BubbleEffect({ count = 15 }: { count?: number }) {
         isBig,
         wobbleX: [0, wobbleAmount, -wobbleAmount * 0.7, wobbleAmount * 0.4, 0],
       };
-    });
-    setBubbles(generated);
-  }, [count]);
+    })
+  );
 
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden">

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { ParentHeader } from "@/components/features/parent-dashboard/ParentHeader";
+import { QuickAddToday } from "@/components/features/parent-dashboard/QuickAddToday";
 import { ApprovalQueue } from "@/components/features/parent-dashboard/ApprovalQueue";
 import { WeekPlanner } from "@/components/features/parent-dashboard/WeekPlanner";
 import { JobManager } from "@/components/features/parent-dashboard/JobManager";
@@ -10,14 +11,15 @@ import { ChildManager } from "@/components/features/parent-dashboard/ChildManage
 import { usePocketMoney } from "@/hooks/use-pocket-money";
 import { useTranslation } from "@/hooks/use-translation";
 
-type Tab = "approvals" | "planner" | "jobs" | "overview" | "children";
+type Tab = "quick_add" | "approvals" | "planner" | "jobs" | "overview" | "children";
 
 export default function ParentPage() {
-  const [activeTab, setActiveTab] = useState<Tab>("approvals");
+  const [activeTab, setActiveTab] = useState<Tab>("quick_add");
   const { t } = useTranslation();
   const { familyChildren, addChild, editChild, deleteChild } = usePocketMoney();
 
   const tabs: { id: Tab; label: string }[] = [
+    { id: "quick_add", label: t("tab_quick_add") },
     { id: "approvals", label: t("tab_approvals") },
     { id: "planner", label: t("tab_planner") },
     { id: "jobs", label: t("tab_jobs") },
@@ -48,6 +50,7 @@ export default function ParentPage() {
 
       {/* Tab content */}
       <div className="mx-4 mt-6 sm:mx-8">
+        {activeTab === "quick_add" && <QuickAddToday />}
         {activeTab === "approvals" && <ApprovalQueue />}
         {activeTab === "planner" && <WeekPlanner />}
         {activeTab === "jobs" && <JobManager />}
@@ -71,7 +74,7 @@ export default function ParentPage() {
         )}
         {activeTab === "children" && (
           <ChildManager
-            children={familyChildren}
+            crewMembers={familyChildren}
             onAdd={addChild}
             onEdit={editChild}
             onDelete={deleteChild}

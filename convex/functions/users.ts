@@ -72,8 +72,24 @@ export const upsertFromClerk = mutation({
         email: args.email,
         name: args.name,
         imageUrl: args.imageUrl,
+        captainCodeEnabled: false,
         createdAt: Date.now(),
       });
     }
+  },
+});
+
+export const setCaptainCodeEnabled = mutation({
+  args: {
+    userId: v.id("users"),
+    enabled: v.boolean(),
+  },
+  handler: async (ctx, args) => {
+    const user = await ctx.db.get(args.userId);
+    if (!user) return;
+
+    await ctx.db.patch(args.userId, {
+      captainCodeEnabled: args.enabled,
+    });
   },
 });

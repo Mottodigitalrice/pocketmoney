@@ -12,6 +12,7 @@ import { LanguageToggle } from "@/components/shared/LanguageToggle";
 import { MathChallenge } from "@/components/features/parent-dashboard/MathChallenge";
 import { useTranslation } from "@/hooks/use-translation";
 import { usePocketMoney } from "@/hooks/use-pocket-money";
+import { hasClerkEnv } from "@/lib/env";
 import { ROUTES, CHILD_ICON_CONFIG } from "@/lib/constants";
 import type { ChildIcon } from "@/types";
 
@@ -34,8 +35,16 @@ function ChildAvatar({ icon }: { icon: string }) {
 }
 
 export default function HomePage() {
+  if (!hasClerkEnv) {
+    return <HomePageInnerWithoutClerk />;
+  }
+
+  return <HomePageInner />;
+}
+
+function HomePageInner() {
   const { t } = useTranslation();
-  const { familyChildren, isLoading, userId } = usePocketMoney();
+  const { familyChildren, isLoading, userId, captainCodeEnabled } = usePocketMoney();
   const router = useRouter();
   const { signOut } = useClerk();
   const [mathOpen, setMathOpen] = useState(false);
@@ -54,6 +63,15 @@ export default function HomePage() {
 
   const handleMathSuccess = () => {
     setMathOpen(false);
+    router.push(ROUTES.parent);
+  };
+
+  const handleParentCardClick = () => {
+    if (captainCodeEnabled) {
+      setMathOpen(true);
+      return;
+    }
+
     router.push(ROUTES.parent);
   };
 
@@ -116,7 +134,7 @@ export default function HomePage() {
               name={t("home_parent_name")}
               subtitle={t("home_parent_subtitle")}
               href="#"
-              onClick={() => setMathOpen(true)}
+              onClick={handleParentCardClick}
               avatar={<PirateAvatar />}
               bgColor="bg-amber-900/80"
               borderColor="border-amber-600"
@@ -147,11 +165,136 @@ export default function HomePage() {
       </div>
 
       {/* Math Challenge Dialog */}
-      <MathChallenge
-        open={mathOpen}
-        onSuccess={handleMathSuccess}
-        onClose={() => setMathOpen(false)}
-      />
+      {mathOpen && (
+        <MathChallenge
+          open={mathOpen}
+          onSuccess={handleMathSuccess}
+          onClose={() => setMathOpen(false)}
+        />
+      )}
+    </OceanScene>
+  );
+}
+
+function HomePageInnerWithoutClerk() {
+  const { t } = useTranslation();
+  const { familyChildren, isLoading, userId, captainCodeEnabled } = usePocketMoney();
+  const router = useRouter();
+  const [mathOpen, setMathOpen] = useState(false);
+
+  const handleLogout = () => {
+    router.push(ROUTES.signIn);
+  };
+
+  useEffect(() => {
+    if (!isLoading && userId && familyChildren.length === 0) {
+      router.push(ROUTES.onboarding);
+    }
+  }, [isLoading, userId, familyChildren.length, router]);
+
+  const handleMathSuccess = () => {
+    setMathOpen(false);
+    router.push(ROUTES.parent);
+  };
+
+  const handleParentCardClick = () => {
+    if (captainCodeEnabled) {
+      setMathOpen(true);
+      return;
+    }
+
+    router.push(ROUTES.parent);
+  };
+
+  if (isLoading || (userId && familyChildren.length === 0)) {
+    return (
+      <OceanScene>
+        <div className="flex min-h-screen items-center justify-center">
+          <p className="animate-pulse text-2xl text-white/60">...</p>
+        </div>
+      </OceanScene>
+    );
+  }
+
+  return (
+    <OceanScene>
+      <div className="absolute left-4 top-4 z-30">
+        <button
+          onClick={handleLogout}
+          className="flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1.5 text-sm font-bold text-white backdrop-blur-sm transition-all hover:bg-white/30 active:scale-95"
+        >
+          <span className="text-base">🚪</span>
+          <span className="hidden sm:inline">{t("auth_logout")}</span>
+        </button>
+      </div>
+
+      <div className="absolute right-4 top-4 z-30">
+        <LanguageToggle />
+      </div>
+
+      <div className="flex min-h-screen flex-col items-center justify-center px-4 py-12">
+        <div className="mb-12 text-center">
+          <h1 className="animate-float-up text-5xl font-extrabold tracking-tight text-white drop-shadow-lg sm:text-7xl">
+            {t("app_name")}
+          </h1>
+          <p
+            className="animate-float-up mt-4 text-xl font-medium text-white/80 drop-shadow"
+            style={{ animationDelay: "0.2s" }}
+          >
+            {t("home_who_are_you")}
+          </p>
+        </div>
+
+        <div
+          className={`grid w-full max-w-4xl grid-cols-1 gap-8 ${
+            familyChildren.length === 1
+              ? "sm:grid-cols-2 max-w-2xl"
+              : familyChildren.length === 2
+                ? "sm:grid-cols-3"
+                : "sm:grid-cols-2 lg:grid-cols-4"
+          }`}
+        >
+          <div className="animate-float-up" style={{ animationDelay: "0.3s" }}>
+            <CharacterCard
+              name={t("home_parent_name")}
+              subtitle={t("home_parent_subtitle")}
+              href="#"
+              onClick={handleParentCardClick}
+              avatar={<PirateAvatar />}
+              bgColor="bg-amber-900/80"
+              borderColor="border-amber-600"
+            />
+          </div>
+
+          {familyChildren.map((child, idx) => {
+            const iconConfig = CHILD_ICON_CONFIG[child.icon as ChildIcon];
+            return (
+              <div
+                key={child._id}
+                className="animate-float-up"
+                style={{ animationDelay: `${0.5 + idx * 0.2}s` }}
+              >
+                <CharacterCard
+                  name={child.name}
+                  subtitle={iconConfig?.label ?? child.icon}
+                  href={ROUTES.kid(child._id)}
+                  avatar={<ChildAvatar icon={child.icon} />}
+                  bgColor={iconConfig?.bgColor ?? "bg-blue-800/80"}
+                  borderColor={iconConfig?.borderColor ?? "border-blue-400"}
+                />
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {mathOpen && (
+        <MathChallenge
+          open={mathOpen}
+          onSuccess={handleMathSuccess}
+          onClose={() => setMathOpen(false)}
+        />
+      )}
     </OceanScene>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -51,19 +51,6 @@ export function MathChallenge({ open, onSuccess, onClose }: MathChallengeProps) 
   const [problem, setProblem] = useState<Problem>(generateProblem);
   const [userAnswer, setUserAnswer] = useState("");
   const [error, setError] = useState(false);
-
-  const resetChallenge = useCallback(() => {
-    setProblem(generateProblem());
-    setUserAnswer("");
-    setError(false);
-  }, []);
-
-  // Reset when the dialog opens
-  useEffect(() => {
-    if (open) {
-      resetChallenge();
-    }
-  }, [open, resetChallenge]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

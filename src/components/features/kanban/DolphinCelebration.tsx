@@ -20,7 +20,14 @@ interface Coin {
 }
 
 export function DolphinCelebration({ yenAmount, childId, onClose }: DolphinCelebrationProps) {
-  const [coins, setCoins] = useState<Coin[]>([]);
+  const [coins] = useState<Coin[]>(() =>
+    Array.from({ length: 20 }, (_, i) => ({
+      id: i,
+      left: 10 + Math.random() * 80,
+      delay: Math.random() * 1,
+      duration: 1.5 + Math.random() * 1.5,
+    }))
+  );
   const [showText, setShowText] = useState(false);
   const { t } = useTranslation();
   const { getChildById } = usePocketMoney();
@@ -28,14 +35,6 @@ export function DolphinCelebration({ yenAmount, childId, onClose }: DolphinCeleb
   const iconConfig = child ? CHILD_ICON_CONFIG[child.icon as ChildIcon] : null;
 
   useEffect(() => {
-    const generated: Coin[] = Array.from({ length: 20 }, (_, i) => ({
-      id: i,
-      left: 10 + Math.random() * 80,
-      delay: Math.random() * 1,
-      duration: 1.5 + Math.random() * 1.5,
-    }));
-    setCoins(generated);
-
     const textTimer = setTimeout(() => setShowText(true), 500);
     const closeTimer = setTimeout(onClose, 3500);
 

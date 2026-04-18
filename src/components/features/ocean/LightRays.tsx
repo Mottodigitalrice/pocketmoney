@@ -1,23 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { motion } from "motion/react";
 
-interface Ray {
-  id: number;
-  left: number;
-  width: number;
-  rotation: number;
-  duration: number;
-  delay: number;
-  maxOpacity: number;
-}
-
 export function LightRays() {
-  const [rays, setRays] = useState<Ray[]>([]);
-
-  useEffect(() => {
-    setRays(
+  const [rays] = useState(() =>
       Array.from({ length: 5 }, (_, i) => ({
         id: i,
         left: 15 + i * 18 + Math.random() * 8, // spread across top
@@ -27,8 +14,7 @@ export function LightRays() {
         delay: Math.random() * 5,
         maxOpacity: 0.04 + Math.random() * 0.06, // 0.04-0.10 very subtle
       }))
-    );
-  }, []);
+  );
 
   if (rays.length === 0) return null;
 

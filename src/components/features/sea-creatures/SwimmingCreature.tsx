@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { motion, useAnimationControls } from "motion/react";
 import { CreatureType } from "@/hooks/use-random-creatures";
 import { SeaTurtle } from "./SeaTurtle";
@@ -75,13 +75,13 @@ interface SwimmingCreatureProps {
 
 // Bubble burst particle component
 function BubbleBurst({ x, y, onDone }: { x: number; y: number; onDone: () => void }) {
-  const particles = useRef(
-    Array.from({ length: 5 }, () => ({
+  const [particles] = useState(() =>
+      Array.from({ length: 5 }, () => ({
       dx: (Math.random() - 0.5) * 40,
       dy: (Math.random() - 0.5) * 40,
       size: 4 + Math.random() * 6,
     }))
-  ).current;
+  );
 
   return (
     <div className="pointer-events-none fixed z-50" style={{ left: x, top: y }}>
@@ -117,14 +117,17 @@ export function SwimmingCreature({
 }: SwimmingCreatureProps) {
   const [isReacting, setIsReacting] = useState(false);
   const [burst, setBurst] = useState<{ x: number; y: number } | null>(null);
-  const [mounted, setMounted] = useState(false);
-  const [viewportWidth, setViewportWidth] = useState(1200);
+  const [viewportWidth, setViewportWidth] = useState(() =>
+    typeof window === "undefined" ? 1200 : window.innerWidth
+  );
   const reactionControls = useAnimationControls();
   const CreatureComponent = CREATURE_COMPONENTS[type];
 
   useEffect(() => {
-    setMounted(true);
-    setViewportWidth(window.innerWidth);
+    const handleResize = () => setViewportWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const handleClick = useCallback(
@@ -147,8 +150,6 @@ export function SwimmingCreature({
     },
     [isReacting, type, reactionControls]
   );
-
-  if (!mounted) return null;
 
   const isRight = direction === "right";
   const startX = isRight ? -150 : viewportWidth + 150;

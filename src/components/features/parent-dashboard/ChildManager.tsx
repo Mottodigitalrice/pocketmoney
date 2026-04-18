@@ -7,14 +7,14 @@ import { Button } from "@/components/ui/button";
 import { ChildForm } from "./ChildForm";
 
 interface ChildManagerProps {
-  children: Child[];
+  crewMembers: Child[];
   onAdd: (name: string, icon: string) => void;
   onEdit: (childId: string, name: string, icon: string) => void;
   onDelete: (childId: string) => void;
 }
 
 export function ChildManager({
-  children,
+  crewMembers,
   onAdd,
   onEdit,
   onDelete,
@@ -51,7 +51,7 @@ export function ChildManager({
         <div className="flex items-center gap-2">
           <span className="text-xl">👥</span>
           <h2 className="text-lg font-bold text-amber-100">
-            Crew Members ({children.length})
+            Crew Members ({crewMembers.length})
           </h2>
         </div>
         <Button
@@ -63,7 +63,7 @@ export function ChildManager({
       </div>
 
       {/* Child list or empty state */}
-      {children.length === 0 ? (
+      {crewMembers.length === 0 ? (
         <div className="flex flex-col items-center gap-3 rounded-2xl border border-amber-700/30 bg-amber-900/30 p-10 text-center backdrop-blur-sm">
           <span className="text-5xl">🏴‍☠️</span>
           <p className="text-lg font-semibold text-amber-200">
@@ -81,7 +81,7 @@ export function ChildManager({
         </div>
       ) : (
         <div className="space-y-2">
-          {children.map((child) => {
+          {crewMembers.map((child) => {
             const iconConfig = CHILD_ICON_CONFIG[child.icon as ChildIcon];
             return (
               <div
@@ -136,6 +136,7 @@ export function ChildManager({
 
       {/* Child form dialog */}
       <ChildForm
+        key={`${editingChild?.id ?? "new"}-${formOpen ? "open" : "closed"}`}
         open={formOpen}
         onClose={() => setFormOpen(false)}
         onSave={handleSave}

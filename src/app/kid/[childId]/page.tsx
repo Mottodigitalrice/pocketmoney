@@ -3,6 +3,8 @@
 import { use } from "react";
 import { KidHeader } from "@/components/features/kid-dashboard/KidHeader";
 import { WeeklyTracker } from "@/components/features/kid-dashboard/WeeklyTracker";
+import { UpcomingWeekPreview } from "@/components/features/kid-dashboard/UpcomingWeekPreview";
+import { TreasureHistoryCalendar } from "@/components/features/kid-dashboard/TreasureHistoryCalendar";
 import { KanbanBoard } from "@/components/features/kanban/KanbanBoard";
 import { usePocketMoney } from "@/hooks/use-pocket-money";
 import { useTranslation } from "@/hooks/use-translation";
@@ -39,9 +41,11 @@ export default function KidPage({ params }: KidPageProps) {
       <KidHeader childId={childId} />
       <div className="mt-4 space-y-6">
         <WeeklyTracker childId={childId} />
+        <UpcomingWeekPreview childId={childId} />
         <div className="px-4 sm:px-8">
           <KanbanBoard childId={childId} />
         </div>
+        <TreasureHistoryCalendar childId={childId} />
       </div>
     </div>
   );

@@ -6,6 +6,7 @@ import { useUser } from "@clerk/nextjs";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { CHILD_ICON_CONFIG } from "@/lib/constants";
+import { hasAppDataEnv } from "@/lib/env";
 import { LanguageToggle } from "@/components/shared/LanguageToggle";
 import { useTranslation } from "@/hooks/use-translation";
 import type { ChildIcon } from "@/types";
@@ -215,12 +216,12 @@ function ChildFormCard({
 // ---------------------------------------------------------------------------
 
 function StepAddChildren({
-  children: localChildren,
+  crewMembers: localChildren,
   setChildren,
   onNext,
   onBack,
 }: {
-  children: LocalChild[];
+  crewMembers: LocalChild[];
   setChildren: React.Dispatch<React.SetStateAction<LocalChild[]>>;
   onNext: () => void;
   onBack: () => void;
@@ -512,13 +513,13 @@ function StepAddJobs({
 // ---------------------------------------------------------------------------
 
 function StepDone({
-  children: localChildren,
+  crewMembers: localChildren,
   jobs: localJobs,
   onBack,
   onComplete,
   isSaving,
 }: {
-  children: LocalChild[];
+  crewMembers: LocalChild[];
   jobs: LocalJob[];
   onBack: () => void;
   onComplete: () => void;
@@ -622,6 +623,31 @@ function StepDone({
 // ---------------------------------------------------------------------------
 
 export default function OnboardingPage() {
+  const { t } = useTranslation();
+
+  if (!hasAppDataEnv) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center px-4 text-center text-white">
+        <div className="absolute right-4 top-4 z-30">
+          <LanguageToggle />
+        </div>
+        <div className="max-w-md space-y-4">
+          <p className="text-5xl">🏴‍☠️</p>
+          <h1 className="text-3xl font-extrabold drop-shadow-lg sm:text-4xl">
+            {t("onboarding_welcome")}
+          </h1>
+          <p className="text-white/75">
+            PocketMoney onboarding needs Clerk and Convex environment variables before it can run.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return <OnboardingPageInner />;
+}
+
+function OnboardingPageInner() {
   const router = useRouter();
   const { user } = useUser();
   const { locale } = useTranslation();
@@ -740,7 +766,7 @@ export default function OnboardingPage() {
         {step === 0 && <StepWelcome onNext={() => goToStep(1)} />}
         {step === 1 && (
           <StepAddChildren
-            children={localChildren}
+            crewMembers={localChildren}
             setChildren={setLocalChildren}
             onNext={() => goToStep(2)}
             onBack={() => goToStep(0)}
@@ -756,7 +782,7 @@ export default function OnboardingPage() {
         )}
         {step === 3 && (
           <StepDone
-            children={localChildren}
+            crewMembers={localChildren}
             jobs={localJobs}
             onBack={() => goToStep(2)}
             onComplete={handleComplete}

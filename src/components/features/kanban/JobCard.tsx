@@ -17,6 +17,7 @@ interface JobCardProps {
 
 export function JobCard({ job, status, onStart, onComplete }: JobCardProps) {
   const [bouncing, setBouncing] = useState(false);
+  const [animationDuration] = useState(() => 3 + Math.random() * 2);
   const { t, locale } = useTranslation();
 
   const handleAction = () => {
@@ -41,7 +42,7 @@ export function JobCard({ job, status, onStart, onComplete }: JobCardProps) {
           ? "border-amber-400"
           : "border-green-400"
       }`}
-      style={{ animationDuration: `${3 + Math.random() * 2}s` }}
+      style={{ animationDuration: `${animationDuration}s` }}
     >
       <div className="absolute right-3 top-3 flex items-center gap-1 rounded-full bg-amber-100 px-3 py-1 text-sm font-bold text-amber-800">
         {CURRENCY}

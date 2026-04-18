@@ -14,6 +14,7 @@ interface FlyingCoin {
   left: number;
   delay: number;
   size: number;
+  duration: number;
 }
 
 interface Sparkle {
@@ -28,32 +29,29 @@ export function TreasureChestAnimation({
   totalYen,
   onClose,
 }: TreasureChestAnimationProps) {
-  const [coins, setCoins] = useState<FlyingCoin[]>([]);
-  const [sparkles, setSparkles] = useState<Sparkle[]>([]);
+  const [coins] = useState<FlyingCoin[]>(() =>
+    Array.from({ length: 30 }, (_, i) => ({
+      id: i,
+      left: 5 + Math.random() * 90,
+      delay: Math.random() * 1.5,
+      size: 20 + Math.random() * 20,
+      duration: 2 + Math.random(),
+    }))
+  );
+  const [sparkles] = useState<Sparkle[]>(() =>
+    Array.from({ length: 15 }, (_, i) => ({
+      id: i,
+      x: 10 + Math.random() * 80,
+      y: 20 + Math.random() * 50,
+      delay: Math.random() * 3,
+      duration: 1 + Math.random() * 2,
+    }))
+  );
   const [showTotal, setShowTotal] = useState(false);
   const [countUp, setCountUp] = useState(0);
   const { t } = useTranslation();
 
   useEffect(() => {
-    setCoins(
-      Array.from({ length: 30 }, (_, i) => ({
-        id: i,
-        left: 5 + Math.random() * 90,
-        delay: Math.random() * 1.5,
-        size: 20 + Math.random() * 20,
-      }))
-    );
-
-    setSparkles(
-      Array.from({ length: 15 }, (_, i) => ({
-        id: i,
-        x: 10 + Math.random() * 80,
-        y: 20 + Math.random() * 50,
-        delay: Math.random() * 3,
-        duration: 1 + Math.random() * 2,
-      }))
-    );
-
     const showTimer = setTimeout(() => setShowTotal(true), 800);
     return () => clearTimeout(showTimer);
   }, []);
@@ -61,10 +59,7 @@ export function TreasureChestAnimation({
   // Count-up effect
   useEffect(() => {
     if (!showTotal) return;
-    if (totalYen === 0) {
-      setCountUp(0);
-      return;
-    }
+    if (totalYen === 0) return;
 
     const steps = 20;
     const increment = totalYen / steps;
@@ -109,7 +104,7 @@ export function TreasureChestAnimation({
             top: -50,
             fontSize: coin.size,
             animationDelay: `${coin.delay}s`,
-            animationDuration: `${2 + Math.random()}s`,
+            animationDuration: `${coin.duration}s`,
           }}
         >
           🪙
