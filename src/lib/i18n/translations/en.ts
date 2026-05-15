@@ -47,6 +47,7 @@ const en = {
   treasure_tap_to_close: "Tap anywhere to close",
 
   // Kanban
+  kanban_columns_label: "Job board columns",
   kanban_available: "Available Jobs",
   kanban_doing: "I'm Doing It!",
   kanban_done: "Done!",
@@ -65,6 +66,7 @@ const en = {
   celebration_waiting: "Waiting for Mummy or Daddy to check",
 
   // Parent tabs
+  tab_navigation_label: "Parent dashboard sections",
   tab_quick_add: "Quick Add ⚡",
   tab_approvals: "Approvals ✅",
   tab_planner: "Planner 📅",

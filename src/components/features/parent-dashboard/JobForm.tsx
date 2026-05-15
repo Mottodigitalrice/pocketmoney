@@ -113,28 +113,39 @@ export function JobForm({
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <Label className="text-amber-200">
+            <Label htmlFor="job-form-title" className="text-amber-200">
               {t("job_form_name_label")}
             </Label>
             <Input
+              id="job-form-title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder={t("job_form_name_placeholder")}
-              className="border-amber-700/50 bg-amber-900/50 text-amber-100 placeholder:text-amber-500"
+              className="border-amber-700/50 bg-amber-900/50 text-amber-100 placeholder:text-amber-500 focus-visible:ring-2 focus-visible:ring-amber-400"
             />
           </div>
 
           <div>
-            <Label className="text-amber-200">
+            {/* F19 a11y: the icon picker is a group of toggle buttons. Use a
+                non-form `<span>` (not Label) for the heading and wrap in a
+                role=group with aria-label so each button is announced as a
+                pressable option within a labelled set. */}
+            <span className="text-sm font-medium leading-none text-amber-200">
               {t("job_form_icon_label")}
-            </Label>
-            <div className="mt-1 flex flex-wrap gap-2">
+            </span>
+            <div
+              role="group"
+              aria-label={t("job_form_icon_label")}
+              className="mt-1 flex flex-wrap gap-2"
+            >
               {ICONS.map((ic) => (
                 <button
                   type="button"
                   key={ic}
                   onClick={() => setIcon(ic)}
-                  className={`rounded-lg p-2 text-xl transition-all ${
+                  aria-label={`${t("job_form_icon_label")} ${ic}`}
+                  aria-pressed={icon === ic}
+                  className={`rounded-lg p-2 text-xl transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 ${
                     icon === ic
                       ? "bg-amber-600 ring-2 ring-amber-400"
                       : "bg-amber-800/40 hover:bg-amber-800/60"
@@ -147,16 +158,17 @@ export function JobForm({
           </div>
 
           <div>
-            <Label className="text-amber-200">
+            <Label htmlFor="job-form-yen" className="text-amber-200">
               {t("job_form_yen_label")}
             </Label>
             <Input
+              id="job-form-yen"
               type="number"
               value={yenAmount}
               onChange={(e) => setYenAmount(Number(e.target.value))}
               min={10}
               step={10}
-              className="border-amber-700/50 bg-amber-900/50 text-amber-100"
+              className="border-amber-700/50 bg-amber-900/50 text-amber-100 focus-visible:ring-2 focus-visible:ring-amber-400"
             />
           </div>
 
@@ -180,17 +192,23 @@ export function JobForm({
           </div>
 
           <div className="space-y-3 rounded-xl border border-amber-700/25 bg-amber-900/25 p-3">
-            <Label className="text-amber-200">
+            <span className="text-sm font-medium leading-none text-amber-200">
               {t("job_form_recurrence_label")}
-            </Label>
-            <div className="grid grid-cols-2 gap-2">
+            </span>
+            <div
+              role="radiogroup"
+              aria-label={t("job_form_recurrence_label")}
+              className="grid grid-cols-2 gap-2"
+            >
               {(["none", "daily", "weekdays", "specificDays"] as RecurrenceType[]).map(
                 (type) => (
                   <button
                     key={type}
                     type="button"
+                    role="radio"
+                    aria-checked={recurrenceType === type}
                     onClick={() => setRecurrenceType(type)}
-                    className={`rounded-lg border px-3 py-2 text-sm font-semibold transition-all ${
+                    className={`rounded-lg border px-3 py-2 text-sm font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 ${
                       recurrenceType === type
                         ? "border-amber-400 bg-amber-600 text-white"
                         : "border-amber-700/30 bg-amber-950/30 text-amber-300 hover:bg-amber-800/40"
@@ -203,7 +221,11 @@ export function JobForm({
             </div>
 
             {recurrenceType === "specificDays" && (
-              <div className="flex flex-wrap gap-2">
+              <div
+                role="group"
+                aria-label={t("job_form_recurrence_label")}
+                className="flex flex-wrap gap-2"
+              >
                 {DAYS.map((day, index) => {
                   const selected = recurrenceDays.includes(index);
                   return (
@@ -211,7 +233,8 @@ export function JobForm({
                       key={day}
                       type="button"
                       onClick={() => toggleRecurrenceDay(index)}
-                      className={`rounded-full border px-3 py-1 text-xs font-bold transition-all ${
+                      aria-pressed={selected}
+                      className={`rounded-full border px-3 py-1 text-xs font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 ${
                         selected
                           ? "border-amber-400 bg-amber-600 text-white"
                           : "border-amber-700/30 bg-amber-950/30 text-amber-300 hover:bg-amber-800/40"
@@ -225,13 +248,19 @@ export function JobForm({
             )}
 
             {recurrenceType !== "none" && (
-              <div className="grid grid-cols-2 gap-2">
+              <div
+                role="radiogroup"
+                aria-label={t("planner_priority")}
+                className="grid grid-cols-2 gap-2"
+              >
                 {(["optional", "mustDo"] as JobPriority[]).map((priority) => (
                   <button
                     key={priority}
                     type="button"
+                    role="radio"
+                    aria-checked={recurrencePriority === priority}
                     onClick={() => setRecurrencePriority(priority)}
-                    className={`rounded-lg border px-3 py-2 text-sm font-bold transition-all ${
+                    className={`rounded-lg border px-3 py-2 text-sm font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 ${
                       recurrencePriority === priority
                         ? "border-amber-400 bg-amber-600 text-white"
                         : "border-amber-700/30 bg-amber-950/30 text-amber-300 hover:bg-amber-800/40"

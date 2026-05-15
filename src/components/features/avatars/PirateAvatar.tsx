@@ -1,8 +1,19 @@
 "use client";
 
-export function PirateAvatar({ className = "" }: { className?: string }) {
+// F19 a11y: see DolphinAvatar for rationale on role/aria-label.
+export function PirateAvatar({
+  className = "",
+  label = "Pirate avatar",
+}: { className?: string; label?: string }) {
   return (
-    <svg viewBox="0 0 120 120" className={className} width="120" height="120">
+    <svg
+      viewBox="0 0 120 120"
+      className={className}
+      width="120"
+      height="120"
+      role="img"
+      aria-label={label}
+    >
       {/* Hat */}
       <path
         d="M20,45 Q25,15 60,10 Q95,15 100,45 L20,45"

@@ -45,14 +45,26 @@ export function DolphinCelebration({ yenAmount, childId, onClose }: DolphinCeleb
   }, [onClose]);
 
   return (
+    // F19 a11y: announce the celebration politely (it's ephemeral) and let
+    // keyboard users dismiss with Escape. role=dialog without aria-modal so
+    // SR users hear the celebration text but focus isn't trapped (the
+    // celebration self-dismisses after 3.5s).
     <div
+      role="status"
+      aria-live="polite"
+      aria-label={t("celebration_great_job")}
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
       onClick={onClose}
+      onKeyDown={(e) => {
+        if (e.key === "Escape") onClose();
+      }}
+      tabIndex={-1}
     >
-      {/* Coin rain */}
+      {/* Coin rain — decorative only, hide from AT. */}
       {coins.map((coin) => (
         <div
           key={coin.id}
+          aria-hidden="true"
           className="animate-coin-rain absolute text-3xl"
           style={{
             left: `${coin.left}%`,
@@ -66,7 +78,7 @@ export function DolphinCelebration({ yenAmount, childId, onClose }: DolphinCeleb
       ))}
 
       {/* Jumping creature */}
-      <div className="animate-dolphin-jump absolute" style={{ bottom: "30%" }}>
+      <div className="animate-dolphin-jump absolute" aria-hidden="true" style={{ bottom: "30%" }}>
         <span className="text-8xl">
           {iconConfig?.emoji ?? "🐟"}
         </span>

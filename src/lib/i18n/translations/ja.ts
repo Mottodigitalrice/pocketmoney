@@ -47,6 +47,7 @@ const ja = {
   treasure_tap_to_close: "どこかをタップしてとじる",
 
   // Kanban
+  kanban_columns_label: "おしごとボードのれつ",
   kanban_available: "できるおしごと",
   kanban_doing: "やっているよ!",
   kanban_done: "おわった!",
@@ -66,6 +67,7 @@ const ja = {
   celebration_waiting: "ママかパパがチェックするのをまってね",
 
   // Parent tabs
+  tab_navigation_label: "親のダッシュボードのセクション",
   tab_quick_add: "今日すぐ追加 ⚡",
   tab_approvals: "しょうにん ✅",
   tab_planner: "よてい 📅",

@@ -1,8 +1,20 @@
 "use client";
 
-export function DolphinAvatar({ className = "" }: { className?: string }) {
+// F19 a11y: SVG avatars need an accessible name. `role="img"` + `aria-label`
+// turns the decorative shapes into a single labelled image for AT.
+export function DolphinAvatar({
+  className = "",
+  label = "Dolphin avatar",
+}: { className?: string; label?: string }) {
   return (
-    <svg viewBox="0 0 120 120" className={className} width="120" height="120">
+    <svg
+      viewBox="0 0 120 120"
+      className={className}
+      width="120"
+      height="120"
+      role="img"
+      aria-label={label}
+    >
       {/* Body circle */}
       <circle cx="60" cy="60" r="45" fill="#42A5F5" />
       {/* Belly */}

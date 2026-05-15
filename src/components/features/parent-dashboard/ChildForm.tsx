@@ -51,20 +51,32 @@ export function ChildForm({ open, onClose, onSave, editingChild }: ChildFormProp
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* Name field */}
           <div>
-            <Label className="text-amber-200">{t("child_form_name_label")}</Label>
+            <Label htmlFor="child-form-name" className="text-amber-200">
+              {t("child_form_name_label")}
+            </Label>
             <Input
+              id="child-form-name"
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder={t("child_form_name_placeholder")}
-              className="mt-1 border-amber-700/50 bg-amber-900/50 text-amber-100 placeholder:text-amber-500"
+              className="mt-1 border-amber-700/50 bg-amber-900/50 text-amber-100 placeholder:text-amber-500 focus-visible:ring-2 focus-visible:ring-amber-400"
               autoFocus
             />
           </div>
 
           {/* Icon selection grid */}
           <div>
-            <Label className="text-amber-200">{t("child_form_icon_label")}</Label>
-            <div className="mt-2 grid grid-cols-4 gap-2">
+            {/* F19 a11y: heading for the toggle-button group below. Use a
+                non-form span (not Label) — the buttons each have their own
+                aria-label, and the radiogroup wraps the lot. */}
+            <span className="text-sm font-medium leading-none text-amber-200">
+              {t("child_form_icon_label")}
+            </span>
+            <div
+              role="radiogroup"
+              aria-label={t("child_form_icon_label")}
+              className="mt-2 grid grid-cols-4 gap-2"
+            >
               {iconKeys.map((key) => {
                 const config = CHILD_ICON_CONFIG[key];
                 const isSelected = selectedIcon === key;
@@ -75,16 +87,17 @@ export function ChildForm({ open, onClose, onSave, editingChild }: ChildFormProp
                   <button
                     type="button"
                     key={key}
+                    role="radio"
                     onClick={() => setSelectedIcon(key)}
                     aria-label={iconLabel}
-                    aria-pressed={isSelected}
-                    className={`flex flex-col items-center gap-1 rounded-xl p-3 transition-all ${
+                    aria-checked={isSelected}
+                    className={`flex flex-col items-center gap-1 rounded-xl p-3 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 ${
                       isSelected
                         ? "bg-amber-600 ring-2 ring-amber-400"
                         : "bg-amber-800/40 hover:bg-amber-800/60"
                     }`}
                   >
-                    <span className="text-2xl">{config.emoji}</span>
+                    <span className="text-2xl" aria-hidden="true">{config.emoji}</span>
                     <span className="text-xs font-medium text-amber-200">
                       {iconLabel}
                     </span>

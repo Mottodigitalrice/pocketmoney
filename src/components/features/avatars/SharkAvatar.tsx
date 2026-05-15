@@ -1,8 +1,19 @@
 "use client";
 
-export function SharkAvatar({ className = "" }: { className?: string }) {
+// F19 a11y: see DolphinAvatar for rationale on role/aria-label.
+export function SharkAvatar({
+  className = "",
+  label = "Shark avatar",
+}: { className?: string; label?: string }) {
   return (
-    <svg viewBox="0 0 120 120" className={className} width="120" height="120">
+    <svg
+      viewBox="0 0 120 120"
+      className={className}
+      width="120"
+      height="120"
+      role="img"
+      aria-label={label}
+    >
       {/* Body circle */}
       <circle cx="60" cy="60" r="45" fill="#607D8B" />
       {/* Belly */}

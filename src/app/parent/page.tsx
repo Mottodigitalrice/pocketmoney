@@ -43,19 +43,31 @@ export default function ParentPage() {
     <div className="min-h-screen pb-8">
       <ParentHeader />
 
-      {/* Tab bar */}
-      <div className="hide-scrollbar mx-4 mt-6 flex gap-2 overflow-x-auto sm:mx-8">
+      {/* Tab bar — F19 a11y: role=tablist + role=tab + aria-selected, plus
+          focus-visible rings and tabpanel wiring for screen readers. */}
+      <div
+        role="tablist"
+        aria-label={t("tab_navigation_label")}
+        className="hide-scrollbar mx-4 mt-6 flex gap-2 overflow-x-auto sm:mx-8"
+      >
         {tabs.map((tab) => (
           <button
             key={tab.id}
+            role="tab"
+            id={`parent-tab-${tab.id}`}
+            aria-selected={activeTab === tab.id}
+            aria-controls={`parent-panel-${tab.id}`}
+            tabIndex={activeTab === tab.id ? 0 : -1}
             onClick={() => {
               setActiveTab(tab.id);
               window.history.replaceState(null, "", `#${tab.id}`);
             }}
-            className={`whitespace-nowrap rounded-xl px-4 py-3 text-center text-sm font-bold transition-all sm:flex-1 sm:text-base ${
+            // F19 a11y: bumped inactive-tab text from amber-300/70 (≈3.5:1)
+            // to amber-200 (≈6.5:1) on the amber-900/40 backdrop.
+            className={`whitespace-nowrap rounded-xl px-4 py-3 text-center text-sm font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 sm:flex-1 sm:text-base ${
               activeTab === tab.id
                 ? "bg-amber-600 text-white shadow-lg"
-                : "bg-amber-900/40 text-amber-300/70 hover:bg-amber-800/40 hover:text-amber-200"
+                : "bg-amber-900/40 text-amber-200 hover:bg-amber-800/40 hover:text-amber-100"
             }`}
           >
             {tab.label}
@@ -64,7 +76,12 @@ export default function ParentPage() {
       </div>
 
       {/* Tab content */}
-      <div className="mx-4 mt-6 sm:mx-8">
+      <div
+        role="tabpanel"
+        id={`parent-panel-${activeTab}`}
+        aria-labelledby={`parent-tab-${activeTab}`}
+        className="mx-4 mt-6 sm:mx-8"
+      >
         {activeTab === "quick_add" && <QuickAddToday />}
         {activeTab === "approvals" && <ApprovalQueue />}
         {activeTab === "planner" && <WeekPlanner />}

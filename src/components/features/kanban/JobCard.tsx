@@ -134,7 +134,10 @@ export function JobCard({
               <p className="mb-2 text-sm font-bold text-sky-800">
                 {t("photo_proof_required")}
               </p>
-              <label className="block cursor-pointer rounded-lg bg-white px-3 py-2 text-center text-sm font-bold text-sky-700 shadow-sm ring-1 ring-sky-200">
+              {/* F19 a11y: visible focus-within ring on the file picker.
+                  The native input is sr-only, so we ring the wrapping label
+                  whenever the hidden input takes focus via keyboard. */}
+              <label className="block cursor-pointer rounded-lg bg-white px-3 py-2 text-center text-sm font-bold text-sky-700 shadow-sm ring-1 ring-sky-200 focus-within:outline-none focus-within:ring-2 focus-within:ring-amber-400">
                 <input
                   type="file"
                   accept="image/*"
@@ -157,6 +160,10 @@ export function JobCard({
           {error && (
             <div
               data-testid="job-card-error"
+              // F19 a11y: announce errors politely so screen-reader users
+              // hear "photo proof required" without a focus jump.
+              role="status"
+              aria-live="polite"
               className="rounded-lg bg-red-50 px-3 py-2 text-sm font-semibold text-red-700"
             >
               <p>{error}</p>

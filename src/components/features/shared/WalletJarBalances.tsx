@@ -157,16 +157,20 @@ export function WalletJarBalances({
               // the keyframes when the balance increases again.
               {...(token > 0 ? { "data-pulse-token": token } : {})}
             >
-              <p className={compact ? "text-xl" : "text-2xl"}>{config.icon}</p>
+              <p className={compact ? "text-xl" : "text-2xl"} aria-hidden="true">{config.icon}</p>
               <p
                 className={`mt-1 font-extrabold ${config.color} ${
                   compact ? "text-lg" : "text-2xl"
                 }`}
               >
+                <span className="sr-only">{t(config.labelKey)}: </span>
                 {CURRENCY}
                 {balances[jar].toLocaleString()}
               </p>
-              <p className="text-xs font-semibold uppercase tracking-wide text-amber-200/60">
+              {/* F19 a11y: bumped from text-amber-200/60 (~3.1:1 on dark
+                  backdrop, fails WCAG AA) to text-amber-100/90 which
+                  composites to ~5.5:1 over the panel backdrop. */}
+              <p className="text-xs font-semibold uppercase tracking-wide text-amber-100/90">
                 {t(config.labelKey)}
               </p>
 
@@ -201,7 +205,9 @@ export function WalletJarBalances({
           data-balance={total}
           className="rounded-xl border border-amber-500/20 bg-amber-950/40 px-3 py-2 text-center"
         >
-            <p className="text-xs font-semibold uppercase tracking-wide text-amber-300/70">
+            {/* F19 a11y: bumped from text-amber-300/70 (~3.6:1) to /90 (~5:1)
+                so the small uppercase caption meets WCAG AA on this card. */}
+            <p className="text-xs font-semibold uppercase tracking-wide text-amber-200/90">
             {t("wallet_total")}
           </p>
           <p className="text-xl font-extrabold text-amber-100">

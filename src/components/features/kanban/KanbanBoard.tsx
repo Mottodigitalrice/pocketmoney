@@ -197,18 +197,29 @@ export function KanbanBoard({ childId }: KanbanBoardProps) {
         </div>
       </div>
 
-      {/* Dot indicators - mobile only */}
-      <div className="mt-4 flex items-center justify-center gap-2 md:hidden">
-        {[0, 1, 2].map((i) => (
+      {/* Dot indicators - mobile only.
+          F19 a11y: descriptive aria-labels per column + focus-visible ring. */}
+      <div
+        role="tablist"
+        aria-label={t("kanban_columns_label")}
+        className="mt-4 flex items-center justify-center gap-2 md:hidden"
+      >
+        {[
+          { i: 0, name: t("kanban_available") },
+          { i: 1, name: t("kanban_doing") },
+          { i: 2, name: t("kanban_done") },
+        ].map(({ i, name }) => (
           <button
             key={i}
+            role="tab"
+            aria-selected={activeColumn === i}
             onClick={() => scrollToColumn(i)}
-            className={`h-2.5 rounded-full transition-all duration-300 ${
+            className={`h-2.5 rounded-full transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2 focus-visible:ring-offset-blue-900 ${
               activeColumn === i
                 ? `w-6 ${columnColors[i]}`
                 : "w-2.5 bg-white/30"
             }`}
-            aria-label={`Column ${i + 1}`}
+            aria-label={name}
           />
         ))}
       </div>
