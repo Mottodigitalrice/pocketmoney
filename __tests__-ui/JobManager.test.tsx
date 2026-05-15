@@ -126,4 +126,37 @@ describe("JobManager", () => {
     // editJob fires on form submission, not on dialog open.
     expect(editJob).not.toHaveBeenCalled();
   });
+
+  // S2 (R4) — F10 5.10: quick-assign disabled when no kids exist.
+  it("disables the quick-assign button when familyChildren is empty (F10 5.10)", () => {
+    const job = jobFixture({ _id: "job-no-kids", title: "Take out trash" });
+    renderWithProviders(<JobManager />, {
+      contextValue: {
+        jobs: [job],
+        familyChildren: [], // No crew — quick-assign must be disabled.
+      },
+    });
+    // The quick-assign button uses the no-kids aria-label so AT users hear
+    // why it's disabled.
+    const quickAssignBtn = screen.getByRole("button", {
+      name: /Add a crew member before assigning a job/i,
+    });
+    expect(quickAssignBtn).toBeDisabled();
+    expect(quickAssignBtn).toHaveAttribute("aria-disabled", "true");
+  });
+
+  // S2 (R4) — F10 5.10: with kids, the button is enabled + uses the normal aria.
+  it("enables the quick-assign button when at least one child exists (F10 5.10)", () => {
+    const job = jobFixture({ _id: "job-with-kids", title: "Brush teeth" });
+    renderWithProviders(<JobManager />, {
+      contextValue: {
+        jobs: [job],
+        familyChildren: [CHILD_A],
+      },
+    });
+    const quickAssignBtn = screen.getByRole("button", {
+      name: /Assign Today/i,
+    });
+    expect(quickAssignBtn).not.toBeDisabled();
+  });
 });

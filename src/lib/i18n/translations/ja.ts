@@ -110,6 +110,8 @@ const ja = {
   job_manager_quick_assign: "今日わりあてる",
   job_manager_choose_child: "だれに",
   job_manager_photo_proof: "写真のしょうこが必要",
+  // S2 (R4) — F10 5.10: disabled-state aria-label when no kids exist.
+  job_manager_quick_assign_no_kids_aria: "先にクルーを追加してから、おしごとをわりあててね",
 
   // Job form
   job_form_edit_title: "お仕事を編集",
@@ -273,6 +275,8 @@ const ja = {
   lucky_chest_parent_subtitle: "今週のぜったいおしごとが全部おわると、しゅう1回ほうびのチェストをひらけます。",
   lucky_chest_max_label: "最高 ¥",
   lucky_chest_save: "保存",
+  // S2 (R4) — F10 5.19: surface the Monday-roll schedule + amount range.
+  lucky_chest_schedule_explainer: "毎週月曜日、ぜったいおしごとを全部おえたクルーは ¥10〜¥{{max}} のあいだでチェストをひらきます。",
 
   // Goals
   goal_title: "ためるゴール",

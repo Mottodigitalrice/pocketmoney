@@ -109,6 +109,8 @@ const en = {
   job_manager_quick_assign: "Assign Today",
   job_manager_choose_child: "Choose who",
   job_manager_photo_proof: "Photo proof required",
+  // S2 (R4) — F10 5.10: disabled-state aria-label when no kids exist.
+  job_manager_quick_assign_no_kids_aria: "Add a crew member before assigning a job",
 
   // Job form
   job_form_edit_title: "Edit Job",
@@ -258,6 +260,8 @@ const en = {
   lucky_chest_parent_subtitle: "Kids can open it once per week after all must-do jobs are approved.",
   lucky_chest_max_label: "Max ¥",
   lucky_chest_save: "Save",
+  // S2 (R4) — F10 5.19: surface the Monday-roll schedule + amount range.
+  lucky_chest_schedule_explainer: "Each Monday, every kid who finished must-do chores rolls between ¥10 and ¥{{max}}.",
 
   // Goals
   goal_title: "Save Goal",

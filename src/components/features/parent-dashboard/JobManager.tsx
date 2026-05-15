@@ -201,13 +201,27 @@ export function JobManager() {
                 hits the 44px Apple HIG. aria-label promoted from title so
                 screen readers + AT announce the action, not the emoji. */}
             <div className="flex gap-1">
+              {/* S2 (R4) — F10 5.10: disable quick-assign when no crew exists.
+                  Without kids, the picker dialog has nothing to pick — silently
+                  opening it would dead-end the parent. Also marks aria-disabled
+                  for assistive tech. */}
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => setAssigningJobId(job._id)}
-                className="min-h-11 min-w-11 text-base text-green-400 hover:bg-green-900/40 hover:text-green-300"
-                aria-label={t("job_manager_quick_assign")}
-                title={t("job_manager_quick_assign")}
+                disabled={familyChildren.length === 0}
+                aria-disabled={familyChildren.length === 0}
+                className="min-h-11 min-w-11 text-base text-green-400 hover:bg-green-900/40 hover:text-green-300 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
+                aria-label={
+                  familyChildren.length === 0
+                    ? t("job_manager_quick_assign_no_kids_aria")
+                    : t("job_manager_quick_assign")
+                }
+                title={
+                  familyChildren.length === 0
+                    ? t("job_manager_quick_assign_no_kids_aria")
+                    : t("job_manager_quick_assign")
+                }
               >
                 📅
               </Button>

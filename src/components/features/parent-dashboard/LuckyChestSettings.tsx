@@ -29,6 +29,14 @@ export function LuckyChestSettings() {
     }
   };
 
+  // S2 (R4) — F10 5.19: render the live amount in the schedule explainer so
+  // parents understand both the timing (every Monday) and the live range. We
+  // pin the *currently saved* amount (not the in-flight `amount` state) so the
+  // explainer reflects what kids will actually roll until Save is pressed.
+  const scheduleExplainer = t("lucky_chest_schedule_explainer", {
+    max: luckyChestMaxAmount,
+  });
+
   return (
     <div className="rounded-2xl border border-yellow-300/25 bg-yellow-950/20 p-4 backdrop-blur-sm">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
@@ -69,6 +77,15 @@ export function LuckyChestSettings() {
           </Button>
         </div>
       </div>
+      {/* S2 (R4) — F10 5.19: schedule explainer. Reads the LIVE saved max so a
+          parent sees the actual range kids will roll, not the in-flight unsaved
+          value. */}
+      <p
+        className="mt-3 text-xs text-yellow-100/60"
+        data-testid="lucky-chest-schedule-explainer"
+      >
+        <BudouXText>{scheduleExplainer}</BudouXText>
+      </p>
     </div>
   );
 }
