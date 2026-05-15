@@ -138,6 +138,20 @@ describe("WeekPlanner", () => {
     expect(container.querySelector('[data-testid="planner-cell"]')).toBeNull();
   });
 
+  // H4 (Gap 5.4): empty-state CTA wired to onNavigateToChildren prop.
+  it("fires onNavigateToChildren when the no-crew CTA is clicked", () => {
+    const onNavigateToChildren = vi.fn();
+    renderWithProviders(
+      <WeekPlanner onNavigateToChildren={onNavigateToChildren} />,
+      { contextValue: makeContext({ familyChildren: [] }) },
+    );
+
+    const cta = screen.getByText(/Go to the Crew tab/i);
+    expect(cta).toBeInTheDocument();
+    fireEvent.click(cta);
+    expect(onNavigateToChildren).toHaveBeenCalledTimes(1);
+  });
+
   it("renders the planner grid (header + child row + cells) when data is present", () => {
     const { container, getByText, getAllByText } = renderWithProviders(
       <WeekPlanner />,

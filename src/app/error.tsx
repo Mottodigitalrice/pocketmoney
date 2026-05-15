@@ -51,6 +51,21 @@ export default function Error({
         >
           {t("error_page_cta")}
         </Button>
+        {/* H4 (Gap 7.1): surface the error digest so a parent can quote it
+            when reporting. Small + monospace + selectable; no tooltip needed.
+            `<code>` is rendered when the runtime supplied a digest only —
+            local/dev errors without one stay invisible to avoid clutter. */}
+        {error.digest && (
+          <p
+            data-testid="error-digest"
+            className="pt-2 text-xs text-amber-400/60"
+          >
+            {t("error_digest_label")}{" "}
+            <code className="select-all rounded bg-amber-900/40 px-1.5 py-0.5 font-mono text-amber-200/80">
+              {error.digest}
+            </code>
+          </p>
+        )}
       </div>
     </div>
   );

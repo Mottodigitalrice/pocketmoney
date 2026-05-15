@@ -53,7 +53,16 @@ function QuickAddTodaySkeleton() {
   );
 }
 
-export function QuickAddToday() {
+interface QuickAddTodayProps {
+  /**
+   * H4 — invoked by the zero-children empty state's "Go to Crew tab" CTA.
+   * Optional so the component still renders in tests/storybook without the
+   * parent page wiring it in. When undefined the CTA is hidden.
+   */
+  onNavigateToChildren?: () => void;
+}
+
+export function QuickAddToday({ onNavigateToChildren }: QuickAddTodayProps = {}) {
   const { t, locale } = useTranslation();
   const { isLoading, jobs, familyChildren, quickAddForToday } = usePocketMoney();
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
@@ -113,6 +122,17 @@ export function QuickAddToday() {
         <p className="mt-1 text-sm text-amber-300/70">
           {t("quick_add_empty_children")}
         </p>
+        {/* H4 (Gap 5.2): one-tap escape to the Crew tab. Hidden when the
+            page hasn't supplied a navigator (tests, embedded contexts). */}
+        {onNavigateToChildren && (
+          <Button
+            type="button"
+            onClick={onNavigateToChildren}
+            className="mt-4 min-h-11 bg-amber-600 font-bold text-white hover:bg-amber-700"
+          >
+            {t("quick_add_go_to_children")}
+          </Button>
+        )}
       </div>
     );
   }

@@ -211,6 +211,7 @@ const en = {
 
   // Withdrawals
   withdraw_open: "Withdraw",
+  withdrawal_open_for: "Withdraw from {{name}}'s wallet",
   withdraw_title: "Withdraw from {{name}}",
   withdraw_jar: "Jar",
   withdraw_amount: "Amount",
@@ -232,6 +233,7 @@ const en = {
 
   // Bonuses
   bonus_open: "Bonus",
+  bonus_open_for: "Award bonus to {{name}}",
   bonus_title: "Bonus for {{name}}",
   bonus_amount: "Amount",
   bonus_note: "Reason",
@@ -472,6 +474,12 @@ const en = {
   child_form_cancel: "Cancel",
   child_form_save_edit: "Save Changes",
   child_form_save_add: "Add to Crew",
+
+  // H4 — Empty-state CTAs (parent dashboard) + recovery / diagnostic micro-copy
+  quick_add_go_to_children: "Go to the Crew tab",
+  week_planner_go_to_children: "Go to the Crew tab",
+  kid_back_home: "← Back home",
+  error_digest_label: "Error ID:",
 } as const;
 
 export default en;

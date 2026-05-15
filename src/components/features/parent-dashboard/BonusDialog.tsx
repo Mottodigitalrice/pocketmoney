@@ -42,6 +42,9 @@ export function BonusDialog({ childId, childName }: BonusDialogProps) {
       <Button
         type="button"
         onClick={handleOpen}
+        // H4 (Gap 5.14): screen readers hear "Award bonus to {child}" instead
+        // of just "Bonus" — gives the action context without changing visuals.
+        aria-label={t("bonus_open_for", { name: childName })}
         className="min-h-11 gap-2 bg-emerald-600 font-bold text-white hover:bg-emerald-700"
       >
         <Sparkles className="size-4" />

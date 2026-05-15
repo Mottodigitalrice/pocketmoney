@@ -214,6 +214,7 @@ const ja = {
 
   // Withdrawals
   withdraw_open: "引き出し",
+  withdrawal_open_for: "{{name}}のおさいふから引き出す",
   withdraw_title: "{{name}}から引き出し",
   withdraw_jar: "つぼ",
   withdraw_amount: "金額",
@@ -235,6 +236,7 @@ const ja = {
 
   // Bonuses
   bonus_open: "ボーナス",
+  bonus_open_for: "{{name}}にボーナスを渡す",
   bonus_title: "{{name}}にボーナス",
   bonus_amount: "金額",
   bonus_note: "理由",
@@ -501,6 +503,12 @@ const ja = {
   child_form_cancel: "キャンセル",
   child_form_save_edit: "保存",
   child_form_save_add: "クルーに追加",
+
+  // H4 — Empty-state CTAs (parent dashboard) + recovery / diagnostic micro-copy
+  quick_add_go_to_children: "クルータブへ移動",
+  week_planner_go_to_children: "クルータブへ移動",
+  kid_back_home: "← ホームへもどる",
+  error_digest_label: "エラーID:",
 } as const;
 
 export default ja;

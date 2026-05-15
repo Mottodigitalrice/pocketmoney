@@ -44,6 +44,9 @@ export function WithdrawalDialog({
       <Button
         type="button"
         onClick={handleOpen}
+        // H4 (Gap 5.15): screen readers hear "Withdraw from {child}'s wallet"
+        // instead of just "Withdraw" — gives the action context.
+        aria-label={t("withdrawal_open_for", { name: childName })}
         className="min-h-11 gap-2 bg-amber-600 font-bold text-white hover:bg-amber-700"
       >
         <WalletCards className="size-4" />

@@ -100,6 +100,28 @@ afterEach(() => {
   vi.useRealTimers();
 });
 
+describe("SiblingRankBoard — solo crew (Gap 6.8)", () => {
+  it("renders nothing when the family has fewer than 2 kids", () => {
+    // A leaderboard with one entry is silly — per the PRD it should hide
+    // entirely until 2+ kids exist on the crew.
+    const { container } = renderWithProviders(
+      <SiblingRankBoard childId={CHILD_A._id} />,
+      {
+        contextValue: {
+          familyChildren: [CHILD_A], // only one child
+          jobs: [JOB_100],
+          jobInstances: [],
+          getRankForChild: () => rank(0),
+          getWalletTotal: () => 0,
+        },
+      },
+    );
+
+    // Component returns null — nothing rendered into the container.
+    expect(container.firstChild).toBeNull();
+  });
+});
+
 describe("SiblingRankBoard — view rendering", () => {
   it("renders lifetime view by default with both kids and the toggle", () => {
     const { getByTestId, getByText } = renderWithProviders(

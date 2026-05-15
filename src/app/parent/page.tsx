@@ -82,6 +82,8 @@ export default function ParentPage() {
         ))}
       </div>
 
+      {/* H4 — empty-state CTAs in QuickAddToday/WeekPlanner can call this
+          to switch to the Crew tab. Keeps URL hash in sync with state. */}
       {/* Tab content */}
       <div
         role="tabpanel"
@@ -89,9 +91,23 @@ export default function ParentPage() {
         aria-labelledby={`parent-tab-${activeTab}`}
         className="mx-4 mt-6 sm:mx-8"
       >
-        {activeTab === "quick_add" && <QuickAddToday />}
+        {activeTab === "quick_add" && (
+          <QuickAddToday
+            onNavigateToChildren={() => {
+              setActiveTab("children");
+              window.history.replaceState(null, "", "#children");
+            }}
+          />
+        )}
         {activeTab === "approvals" && <ApprovalQueue />}
-        {activeTab === "planner" && <WeekPlanner />}
+        {activeTab === "planner" && (
+          <WeekPlanner
+            onNavigateToChildren={() => {
+              setActiveTab("children");
+              window.history.replaceState(null, "", "#children");
+            }}
+          />
+        )}
         {activeTab === "jobs" && <JobManager />}
         {activeTab === "overview" && (
           <div className="space-y-6">
