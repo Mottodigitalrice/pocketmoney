@@ -134,7 +134,7 @@ export const withdraw = mutation({
       amount: -args.amount,
       type: args.reason === "correction" ? "correction" : "withdrawal",
       reason: args.reason,
-      note: args.note,
+      ...(args.note !== undefined ? { note: args.note } : {}),
       createdAt: now,
     });
   },

@@ -3,6 +3,7 @@
 import { useUser } from "@clerk/nextjs";
 import { useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
+import { stripUndefined } from "@/lib/utils";
 import { useEffect, useRef } from "react";
 
 /**
@@ -22,11 +23,13 @@ export function useUserSync() {
     const email = user.emailAddresses[0]?.emailAddress;
     if (!email) return;
 
-    upsertUser({
-      email,
-      name: user.fullName || undefined,
-      imageUrl: user.imageUrl || undefined,
-    });
+    upsertUser(
+      stripUndefined({
+        email,
+        name: user.fullName || undefined,
+        imageUrl: user.imageUrl || undefined,
+      })
+    );
 
     hasSynced.current = true;
   }, [isLoaded, isSignedIn, user, upsertUser]);

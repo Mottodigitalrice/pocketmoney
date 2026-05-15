@@ -1,7 +1,23 @@
 "use client";
 
-import { BubbleEffect } from "@/components/features/ocean/BubbleEffect";
-import { WaveAnimation } from "@/components/features/ocean/WaveAnimation";
+import dynamic from "next/dynamic";
+
+// F21: decorative ocean flourishes are below-the-fold and not critical for
+// first paint. Lazy-load to keep the parent dashboard initial JS lean.
+const BubbleEffect = dynamic(
+  () =>
+    import("@/components/features/ocean/BubbleEffect").then((m) => ({
+      default: m.BubbleEffect,
+    })),
+  { ssr: false }
+);
+const WaveAnimation = dynamic(
+  () =>
+    import("@/components/features/ocean/WaveAnimation").then((m) => ({
+      default: m.WaveAnimation,
+    })),
+  { ssr: false }
+);
 
 export default function ParentLayout({ children }: { children: React.ReactNode }) {
   return (

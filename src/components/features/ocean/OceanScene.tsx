@@ -1,9 +1,25 @@
 "use client";
 
-import { BubbleEffect } from "./BubbleEffect";
-import { WaveAnimation } from "./WaveAnimation";
+import dynamic from "next/dynamic";
 import { LightRays } from "./LightRays";
-import { CreaturePool } from "../sea-creatures/CreaturePool";
+
+// F21: heavy/decorative components moved off the initial bundle. ssr: false
+// because they're purely visual flourishes — flicker-on-load is acceptable.
+const BubbleEffect = dynamic(
+  () => import("./BubbleEffect").then((m) => ({ default: m.BubbleEffect })),
+  { ssr: false }
+);
+const WaveAnimation = dynamic(
+  () => import("./WaveAnimation").then((m) => ({ default: m.WaveAnimation })),
+  { ssr: false }
+);
+const CreaturePool = dynamic(
+  () =>
+    import("../sea-creatures/CreaturePool").then((m) => ({
+      default: m.CreaturePool,
+    })),
+  { ssr: false }
+);
 
 interface OceanSceneProps {
   children: React.ReactNode;

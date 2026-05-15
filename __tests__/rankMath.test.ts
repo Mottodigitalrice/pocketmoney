@@ -24,7 +24,7 @@ describe("RANK_THRESHOLDS table", () => {
   });
   it("scores are monotonically increasing", () => {
     for (let i = 1; i < RANK_THRESHOLDS.length; i++) {
-      expect(RANK_THRESHOLDS[i].score).toBeGreaterThan(RANK_THRESHOLDS[i - 1].score);
+      expect(RANK_THRESHOLDS[i]!.score).toBeGreaterThan(RANK_THRESHOLDS[i - 1]!.score);
     }
   });
 });

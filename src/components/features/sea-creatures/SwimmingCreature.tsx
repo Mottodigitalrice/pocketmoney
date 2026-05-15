@@ -99,7 +99,7 @@ function BubbleBurst({ x, y, onDone }: { x: number; y: number; onDone: () => voi
           initial={{ scale: 0, x: 0, y: 0, opacity: 0.8 }}
           animate={{ scale: [0, 1.2, 0], x: p.dx, y: p.dy, opacity: [0.8, 0.6, 0] }}
           transition={{ duration: 0.5, ease: "easeOut" }}
-          onAnimationComplete={i === 0 ? onDone : undefined}
+          {...(i === 0 ? { onAnimationComplete: onDone } : {})}
         />
       ))}
     </div>

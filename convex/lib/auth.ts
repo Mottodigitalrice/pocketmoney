@@ -74,5 +74,5 @@ export async function getOwnedById<TableName extends "children" | "jobs" | "sche
 }
 
 function capitalize(s: string) {
-  return s.length === 0 ? s : s[0].toUpperCase() + s.slice(1);
+  return s.length === 0 ? s : s[0]!.toUpperCase() + s.slice(1);
 }

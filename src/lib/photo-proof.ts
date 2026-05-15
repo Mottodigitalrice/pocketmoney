@@ -150,7 +150,7 @@ export async function uploadProofWithRetry(
         method: "POST",
         headers: { "Content-Type": file.type },
         body: file,
-        signal: opts.signal,
+        ...(opts.signal !== undefined ? { signal: opts.signal } : {}),
       });
     } catch (err) {
       // AbortError: caller already unmounted. Fire-and-forget, no throw.

@@ -197,7 +197,7 @@ export function JobManager() {
         open={formOpen}
         onClose={() => setFormOpen(false)}
         onSave={handleSave}
-        editingJob={editing}
+        {...(editing !== undefined ? { editingJob: editing } : {})}
       />
 
       <OneOffTaskForm

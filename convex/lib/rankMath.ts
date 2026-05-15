@@ -72,7 +72,9 @@ export function calculateRank(
     (bestIndex, threshold, index) => (score >= threshold.score ? index : bestIndex),
     0
   );
-  const current = RANK_THRESHOLDS[currentIndex];
+  // safe: currentIndex always points to a valid entry since RANK_THRESHOLDS
+  // has at least one element and the reduce starts at index 0.
+  const current = RANK_THRESHOLDS[currentIndex]!;
   const next = RANK_THRESHOLDS[currentIndex + 1];
   const previousScore = current.score;
   const nextScore = next?.score;

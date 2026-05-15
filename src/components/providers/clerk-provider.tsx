@@ -46,7 +46,7 @@ export function ClerkClientProvider({ children }: { children: ReactNode }) {
   return (
     <BaseClerkProvider
       appearance={clerkAppearance}
-      localization={locale === "ja" ? jaJP : undefined}
+      {...(locale === "ja" ? { localization: jaJP } : {})}
     >
       {children}
     </BaseClerkProvider>

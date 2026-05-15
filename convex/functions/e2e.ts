@@ -112,7 +112,7 @@ export const seedKidScenario = mutation({
       userId: user._id,
       name: args.childName,
       icon: args.childIcon,
-      age: args.childAge,
+      ...(args.childAge !== undefined ? { age: args.childAge } : {}),
       rankMultiplier: 1,
       createdAt: now,
     });

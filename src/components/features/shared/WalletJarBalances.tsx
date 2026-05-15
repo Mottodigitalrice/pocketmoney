@@ -144,14 +144,18 @@ export function WalletJarBalances({
               className={`relative rounded-xl border border-white/10 ${config.bg} ${
                 compact ? "p-2" : "p-3"
               } text-center`}
-              animate={
-                token > 0
-                  ? {
+              {...(token > 0
+                ? {
+                    animate: {
                       scale: [1, 1.05, 1],
-                      boxShadow: ["0 0 0 rgba(0,0,0,0)", config.glow, "0 0 0 rgba(0,0,0,0)"],
-                    }
-                  : undefined
-              }
+                      boxShadow: [
+                        "0 0 0 rgba(0,0,0,0)",
+                        config.glow,
+                        "0 0 0 rgba(0,0,0,0)",
+                      ],
+                    },
+                  }
+                : {})}
               transition={{ duration: PULSE_DURATION_SEC, ease: "easeOut" }}
               // `key`-ing the animate prop on token forces motion to re-run
               // the keyframes when the balance increases again.

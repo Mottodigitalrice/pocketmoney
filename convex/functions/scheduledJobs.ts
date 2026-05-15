@@ -110,7 +110,7 @@ export const createBatch = mutation({
     const now = Date.now();
     const ids = [];
     for (let i = 0; i < args.entries.length; i++) {
-      const entry = args.entries[i];
+      const entry = args.entries[i]!; // safe: i bounded by args.entries.length
       const [job, child] = await Promise.all([
         ctx.db.get(entry.jobId),
         ctx.db.get(entry.childId),
@@ -214,7 +214,7 @@ export const quickAddForToday = mutation({
     const ids: Array<import("../_generated/dataModel").Id<"scheduledJobs"> | import("../_generated/dataModel").Id<"jobInstances">> = [];
 
     for (let i = 0; i < args.childIds.length; i++) {
-      const childId = args.childIds[i];
+      const childId = args.childIds[i]!; // safe: i bounded by args.childIds.length
       assertOwnedBy(await ctx.db.get(childId), user._id, "child");
       const timestamp = now + i;
 

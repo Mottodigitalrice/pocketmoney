@@ -62,7 +62,7 @@ export const create = mutation({
       userId: user._id,
       name: args.name,
       icon: args.icon,
-      age: args.age,
+      ...(args.age !== undefined ? { age: args.age } : {}),
       rankMultiplier,
       createdAt: Date.now(),
     });

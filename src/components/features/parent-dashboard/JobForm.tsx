@@ -93,8 +93,9 @@ export function JobForm({
         requiresPhotoProof,
         recurrence: {
           type: recurrenceType,
-          daysOfWeek:
-            recurrenceType === "specificDays" ? recurrenceDays : undefined,
+          ...(recurrenceType === "specificDays"
+            ? { daysOfWeek: recurrenceDays }
+            : {}),
           priority: recurrencePriority,
         },
       });

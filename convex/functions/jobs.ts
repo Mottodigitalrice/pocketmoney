@@ -80,13 +80,15 @@ export const create = mutation({
     return await ctx.db.insert("jobs", {
       userId: user._id,
       title: args.title,
-      titleJa: args.titleJa,
-      titleKey: args.titleKey,
+      ...(args.titleJa !== undefined ? { titleJa: args.titleJa } : {}),
+      ...(args.titleKey !== undefined ? { titleKey: args.titleKey } : {}),
       yenAmount: args.yenAmount,
       icon: args.icon,
-      isOneOff: args.isOneOff,
-      requiresPhotoProof: args.requiresPhotoProof,
-      recurrence: args.recurrence,
+      ...(args.isOneOff !== undefined ? { isOneOff: args.isOneOff } : {}),
+      ...(args.requiresPhotoProof !== undefined
+        ? { requiresPhotoProof: args.requiresPhotoProof }
+        : {}),
+      ...(args.recurrence !== undefined ? { recurrence: args.recurrence } : {}),
       createdAt: Date.now(),
     });
   },
@@ -201,7 +203,7 @@ export const seedDefaults = mutation({
     const now = Date.now();
 
     for (let i = 0; i < defaults.length; i++) {
-      const job = defaults[i];
+      const job = defaults[i]!; // safe: i bounded by defaults.length
       await ctx.db.insert("jobs", {
         userId: user._id,
         title: job.title,

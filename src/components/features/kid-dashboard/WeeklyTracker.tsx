@@ -2,10 +2,20 @@
 
 import { usePocketMoney } from "@/hooks/use-pocket-money";
 import { CURRENCY } from "@/lib/constants";
-import { TreasureChestAnimation } from "./TreasureChestAnimation";
+import dynamic from "next/dynamic";
 import { useTranslation } from "@/hooks/use-translation";
 import { useState } from "react";
 import { WalletJarBalances } from "@/components/features/shared/WalletJarBalances";
+
+// F21: chest animation only renders when the user taps the wallet card.
+// Lazy-load the motion + canvas bundle until then.
+const TreasureChestAnimation = dynamic(
+  () =>
+    import("./TreasureChestAnimation").then((m) => ({
+      default: m.TreasureChestAnimation,
+    })),
+  { ssr: false }
+);
 
 interface WeeklyTrackerProps {
   childId: string;

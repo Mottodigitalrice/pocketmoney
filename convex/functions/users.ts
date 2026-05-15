@@ -111,16 +111,16 @@ export const upsertFromClerk = mutation({
     if (existingUser) {
       await ctx.db.patch(existingUser._id, {
         email: args.email,
-        name: args.name,
-        imageUrl: args.imageUrl,
+        ...(args.name !== undefined ? { name: args.name } : {}),
+        ...(args.imageUrl !== undefined ? { imageUrl: args.imageUrl } : {}),
       });
       return existingUser._id;
     } else {
       return await ctx.db.insert("users", {
         clerkId: identity.subject,
         email: args.email,
-        name: args.name,
-        imageUrl: args.imageUrl,
+        ...(args.name !== undefined ? { name: args.name } : {}),
+        ...(args.imageUrl !== undefined ? { imageUrl: args.imageUrl } : {}),
         captainCodeEnabled: false,
         luckyChestMaxAmount: 100,
         createdAt: Date.now(),

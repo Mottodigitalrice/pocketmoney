@@ -169,7 +169,9 @@ export const start = mutation({
       userId: user._id,
       jobId: args.jobId,
       childId: args.childId,
-      scheduledJobId: args.scheduledJobId,
+      ...(args.scheduledJobId !== undefined
+        ? { scheduledJobId: args.scheduledJobId }
+        : {}),
       status: "in_progress",
       startedAt: Date.now(),
       createdAt: Date.now(),

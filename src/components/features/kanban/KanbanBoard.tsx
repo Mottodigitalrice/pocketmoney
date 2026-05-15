@@ -1,11 +1,19 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
+import dynamic from "next/dynamic";
 import { usePocketMoney } from "@/hooks/use-pocket-money";
 import { useTranslation } from "@/hooks/use-translation";
 import { KanbanColumn } from "./KanbanColumn";
 import { JobCard } from "./JobCard";
-import { DolphinCelebration } from "./DolphinCelebration";
+
+// F21: celebration only fires on job approval — defer the heavy motion bundle
+// until the user actually triggers it.
+const DolphinCelebration = dynamic(
+  () =>
+    import("./DolphinCelebration").then((m) => ({ default: m.DolphinCelebration })),
+  { ssr: false }
+);
 
 interface KanbanBoardProps {
   childId: string;
@@ -147,8 +155,8 @@ export function KanbanBoard({ childId }: KanbanBoardProps) {
                 key={sj._id}
                 job={sj.job}
                 status="available"
-                parentNote={sj.parentNote}
-                priority={sj.priority}
+                {...(sj.parentNote !== undefined ? { parentNote: sj.parentNote } : {})}
+                {...(sj.priority !== undefined ? { priority: sj.priority } : {})}
                 onStart={() => handleStart(sj.jobId, sj._id)}
               />
             ))}

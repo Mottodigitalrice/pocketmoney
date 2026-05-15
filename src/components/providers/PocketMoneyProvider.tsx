@@ -23,6 +23,7 @@ import {
   LuckyChestStatus,
 } from "@/types";
 import { resizeImageForProof, uploadProofWithRetry } from "@/lib/photo-proof";
+import { stripUndefined } from "@/lib/utils";
 import { calculateRank } from "../../../convex/lib/rankMath";
 
 // Helper to get today's date as YYYY-MM-DD in local timezone
@@ -296,49 +297,58 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
     userIdForQueries ? { weekDates: currentWeekDates } : "skip"
   );
 
-  // Map Convex documents to app types
+  // Map Convex documents to app types. `stripUndefined` is required because
+  // Convex doc shapes expose optional fields as `T | undefined`, while our
+  // domain types use `T?` (omit on undefined). With `exactOptionalPropertyTypes`
+  // those are NOT interchangeable.
   const jobs: Job[] = useMemo(
     () =>
-      (rawJobs ?? []).map((j: NonNullable<typeof rawJobs>[number]) => ({
-        _id: j._id,
-        userId: j.userId,
-        title: j.title,
-        titleJa: j.titleJa,
-        titleKey: j.titleKey,
-        yenAmount: j.yenAmount,
-        icon: j.icon,
-        isOneOff: j.isOneOff,
-        requiresPhotoProof: j.requiresPhotoProof,
-        recurrence: j.recurrence,
-        createdAt: j.createdAt,
-      })),
+      (rawJobs ?? []).map(
+        (j: NonNullable<typeof rawJobs>[number]) =>
+          stripUndefined({
+            _id: j._id,
+            userId: j.userId,
+            title: j.title,
+            titleJa: j.titleJa,
+            titleKey: j.titleKey,
+            yenAmount: j.yenAmount,
+            icon: j.icon,
+            isOneOff: j.isOneOff,
+            requiresPhotoProof: j.requiresPhotoProof,
+            recurrence: j.recurrence,
+            createdAt: j.createdAt,
+          }) as Job
+      ),
     [rawJobs]
   );
 
   const jobInstances: JobInstance[] = useMemo(
     () =>
-      (rawInstances ?? []).map((i: NonNullable<typeof rawInstances>[number]) => ({
-        _id: i._id,
-        userId: i.userId,
-        jobId: i.jobId,
-        childId: i.childId,
-        scheduledJobId: i.scheduledJobId,
-        status: i.status,
-        startedAt: i.startedAt,
-        completedAt: i.completedAt,
-        approvedAt: i.approvedAt,
-        rejectedAt: i.rejectedAt,
-        rejectionCount: i.rejectionCount,
-        parentNote: i.parentNote,
-        proofStorageId: i.proofStorageId,
-        proofFileName: i.proofFileName,
-        proofContentType: i.proofContentType,
-        proofFileSize: i.proofFileSize,
-        proofUploadedAt: i.proofUploadedAt,
-        proofDeletedAt: i.proofDeletedAt,
-        proofUrl: i.proofUrl,
-        createdAt: i.createdAt,
-      })),
+      (rawInstances ?? []).map(
+        (i: NonNullable<typeof rawInstances>[number]) =>
+          stripUndefined({
+            _id: i._id,
+            userId: i.userId,
+            jobId: i.jobId,
+            childId: i.childId,
+            scheduledJobId: i.scheduledJobId,
+            status: i.status,
+            startedAt: i.startedAt,
+            completedAt: i.completedAt,
+            approvedAt: i.approvedAt,
+            rejectedAt: i.rejectedAt,
+            rejectionCount: i.rejectionCount,
+            parentNote: i.parentNote,
+            proofStorageId: i.proofStorageId,
+            proofFileName: i.proofFileName,
+            proofContentType: i.proofContentType,
+            proofFileSize: i.proofFileSize,
+            proofUploadedAt: i.proofUploadedAt,
+            proofDeletedAt: i.proofDeletedAt,
+            proofUrl: i.proofUrl,
+            createdAt: i.createdAt,
+          }) as JobInstance
+      ),
     [rawInstances]
   );
 
@@ -358,15 +368,18 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
 
   const mappedChildren: Child[] = useMemo(
     () =>
-      (rawChildren ?? []).map((c: NonNullable<typeof rawChildren>[number]) => ({
-        _id: c._id,
-        userId: c.userId,
-        name: c.name,
-        icon: c.icon as Child["icon"],
-        age: c.age,
-        rankMultiplier: c.rankMultiplier,
-        createdAt: c.createdAt,
-      })),
+      (rawChildren ?? []).map(
+        (c: NonNullable<typeof rawChildren>[number]) =>
+          stripUndefined({
+            _id: c._id,
+            userId: c.userId,
+            name: c.name,
+            icon: c.icon as Child["icon"],
+            age: c.age,
+            rankMultiplier: c.rankMultiplier,
+            createdAt: c.createdAt,
+          }) as Child
+      ),
     [rawChildren]
   );
 
@@ -386,19 +399,22 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
 
   const transactions: Transaction[] = useMemo(
     () =>
-      (rawTransactions ?? []).map((tx: NonNullable<typeof rawTransactions>[number]) => ({
-        _id: tx._id,
-        userId: tx.userId,
-        childId: tx.childId,
-        walletId: tx.walletId,
-        jar: tx.jar,
-        amount: tx.amount,
-        type: tx.type,
-        reason: tx.reason,
-        note: tx.note,
-        jobInstanceId: tx.jobInstanceId,
-        createdAt: tx.createdAt,
-      })),
+      (rawTransactions ?? []).map(
+        (tx: NonNullable<typeof rawTransactions>[number]) =>
+          stripUndefined({
+            _id: tx._id,
+            userId: tx.userId,
+            childId: tx.childId,
+            walletId: tx.walletId,
+            jar: tx.jar,
+            amount: tx.amount,
+            type: tx.type,
+            reason: tx.reason,
+            note: tx.note,
+            jobInstanceId: tx.jobInstanceId,
+            createdAt: tx.createdAt,
+          }) as Transaction
+      ),
     [rawTransactions]
   );
 
@@ -478,16 +494,18 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
       recurrence?: JobRecurrence;
     }) => {
       if (!userIdForQueries) return;
-      const id = await createJobMutation({
-        title: job.title,
-        titleJa: job.titleJa,
-        yenAmount: job.yenAmount,
-        icon: job.icon,
-        titleKey: job.titleKey,
-        isOneOff: job.isOneOff,
-        requiresPhotoProof: job.requiresPhotoProof,
-        recurrence: job.recurrence,
-      });
+      const id = await createJobMutation(
+        stripUndefined({
+          title: job.title,
+          titleJa: job.titleJa,
+          yenAmount: job.yenAmount,
+          icon: job.icon,
+          titleKey: job.titleKey,
+          isOneOff: job.isOneOff,
+          requiresPhotoProof: job.requiresPhotoProof,
+          recurrence: job.recurrence,
+        })
+      );
       return id;
     },
     [userIdForQueries, createJobMutation]
@@ -495,14 +513,16 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
 
   const editJob = useCallback(
     (id: string, updates: Partial<Job>) => {
-      updateJobMutation({
-        jobId: id as Id<"jobs">,
-        title: updates.title,
-        yenAmount: updates.yenAmount,
-        icon: updates.icon,
-        requiresPhotoProof: updates.requiresPhotoProof,
-        recurrence: updates.recurrence,
-      });
+      updateJobMutation(
+        stripUndefined({
+          jobId: id as Id<"jobs">,
+          title: updates.title,
+          yenAmount: updates.yenAmount,
+          icon: updates.icon,
+          requiresPhotoProof: updates.requiresPhotoProof,
+          recurrence: updates.recurrence,
+        })
+      );
     },
     [updateJobMutation]
   );
@@ -607,13 +627,15 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
   const createOneOff = useCallback(
     async (title: string, titleJa: string | undefined, yenAmount: number, icon: string, childId: string) => {
       if (!userIdForQueries) return;
-      const jobId = await createJobMutation({
-        title,
-        titleJa,
-        yenAmount,
-        icon,
-        isOneOff: true,
-      });
+      const jobId = await createJobMutation(
+        stripUndefined({
+          title,
+          titleJa,
+          yenAmount,
+          icon,
+          isOneOff: true,
+        })
+      );
       if (jobId) {
         createScheduledJobMutation({
           jobId,
@@ -630,11 +652,13 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
   const startJob = useCallback(
     (jobId: string, childId: string, scheduledJobId?: string) => {
       if (!userIdForQueries) return;
-      startJobMutation({
-        jobId: jobId as Id<"jobs">,
-        childId: childId as Id<"children">,
-        scheduledJobId: scheduledJobId as Id<"scheduledJobs"> | undefined,
-      });
+      startJobMutation(
+        stripUndefined({
+          jobId: jobId as Id<"jobs">,
+          childId: childId as Id<"children">,
+          scheduledJobId: scheduledJobId as Id<"scheduledJobs"> | undefined,
+        })
+      );
     },
     [userIdForQueries, startJobMutation]
   );
@@ -698,13 +722,15 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
       note?: string;
     }) => {
       if (!userIdForQueries) return;
-      await withdrawMutation({
-        childId: input.childId as Id<"children">,
-        jar: input.jar,
-        amount: input.amount,
-        reason: input.reason,
-        note: input.note,
-      });
+      await withdrawMutation(
+        stripUndefined({
+          childId: input.childId as Id<"children">,
+          jar: input.jar,
+          amount: input.amount,
+          reason: input.reason,
+          note: input.note,
+        })
+      );
     },
     [userIdForQueries, withdrawMutation]
   );
@@ -730,11 +756,13 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
   const awardBonus = useCallback(
     async (input: { childId: string; amount: number; note?: string }) => {
       if (!userIdForQueries) return;
-      await awardBonusMutation({
-        childId: input.childId as Id<"children">,
-        amount: input.amount,
-        note: input.note,
-      });
+      await awardBonusMutation(
+        stripUndefined({
+          childId: input.childId as Id<"children">,
+          amount: input.amount,
+          note: input.note,
+        })
+      );
     },
     [userIdForQueries, awardBonusMutation]
   );
@@ -845,7 +873,7 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
 
       return todayScheduled
         .filter((s) => !activeScheduledJobIds.has(s._id))
-        .map((s) => {
+        .map((s): ScheduledJobWithJob => {
           const rejectedInstance = jobInstances
             .filter(
               (i) =>
@@ -855,11 +883,11 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
             )
             .sort((a, b) => (b.rejectedAt ?? 0) - (a.rejectedAt ?? 0))[0];
 
-          return {
+          return stripUndefined({
             ...s,
             parentNote: rejectedInstance?.parentNote,
             rejectionCount: rejectedInstance?.rejectionCount,
-          };
+          }) as ScheduledJobWithJob;
         });
     },
     [getScheduledJobsForChildDate, jobInstances]
@@ -957,14 +985,14 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
       const child = mappedChildren.find((c) => c._id === childId);
       const lifetime = getLifetimeEarnings(childId);
       const calc = calculateRank(lifetime, child?.rankMultiplier ?? 1);
-      return {
+      return stripUndefined({
         rank: calc.tier,
         nextRank: calc.nextRank ?? undefined,
         score: calc.score,
         nextScore: calc.nextTierAt ?? undefined,
         progress: calc.progressToNext,
         multiplier: calc.multiplier,
-      };
+      }) as RankProgress;
     },
     [getLifetimeEarnings, mappedChildren]
   );

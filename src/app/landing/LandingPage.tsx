@@ -14,7 +14,7 @@ function useInView(threshold = 0.15) {
     if (!el) return;
     const obs = new IntersectionObserver(
       ([e]) => {
-        if (e.isIntersecting) {
+        if (e?.isIntersecting) {
           setVisible(true);
           obs.disconnect();
         }
@@ -206,18 +206,16 @@ function HeroSection() {
         </div>
       </div>
 
-      {/* Hero content */}
+      {/* Hero content. F21: above-the-fold copy renders immediately (no
+          float-up entrance) so the H1 is the LCP element at first paint
+          rather than being delayed by the 0.6s opacity:0→1 keyframe. */}
       <div className="relative z-10">
-        <div
-          className="animate-float-up mb-4 text-5xl"
-          style={{ animationDelay: "0.1s" }}
-        >
+        <div className="mb-4 text-5xl">
           🏴‍☠️
         </div>
 
         <h1
-          className="animate-float-up mx-auto max-w-4xl text-5xl font-black leading-tight tracking-tight text-white drop-shadow-lg sm:text-6xl lg:text-7xl"
-          style={{ animationDelay: "0.2s" }}
+          className="mx-auto max-w-4xl text-5xl font-black leading-tight tracking-tight text-white drop-shadow-lg sm:text-6xl lg:text-7xl"
         >
           Turn Chores Into{" "}
           <span className="bg-gradient-to-r from-amber-300 to-yellow-200 bg-clip-text text-transparent">
@@ -226,8 +224,7 @@ function HeroSection() {
         </h1>
 
         <p
-          className="animate-float-up mx-auto mt-6 max-w-2xl text-lg text-white/80 sm:text-xl"
-          style={{ animationDelay: "0.4s" }}
+          className="mx-auto mt-6 max-w-2xl text-lg text-white/80 sm:text-xl"
         >
           Kids earn real pocket money by completing household jobs.
           <br className="hidden sm:block" /> Fun for kids, easy for parents,

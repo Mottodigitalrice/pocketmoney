@@ -102,7 +102,7 @@ export const getStatusForFamily = query({
       .withIndex("by_user", (q) => q.eq("userId", user._id))
       .collect();
     const maxAmount = user.luckyChestMaxAmount ?? 100;
-    const weekStart = args.weekDates[0];
+    const weekStart = args.weekDates[0]!; // safe: length checked above
 
     return await Promise.all(
       children.map(async (child) => {
@@ -118,7 +118,9 @@ export const getStatusForFamily = query({
           weekStart,
           unlocked: progress.unlocked,
           opened: Boolean(opened),
-          openedAmount: opened?.amount,
+          ...(opened?.amount !== undefined
+            ? { openedAmount: opened.amount }
+            : {}),
           maxAmount,
           mustDoTotal: progress.total,
           mustDoApproved: progress.approved,
@@ -147,7 +149,7 @@ export const open = mutation({
       throw new Error("Lucky Chest max amount is not set");
     }
 
-    const weekStart = args.weekDates[0];
+    const weekStart = args.weekDates[0]!; // safe: length checked above
     // (d) Single-open-per-week guard. The `by_child_week` index on
     // `luckyChests` makes this lookup O(1); we throw a structured error
     // here so the frontend can distinguish "already opened" from other

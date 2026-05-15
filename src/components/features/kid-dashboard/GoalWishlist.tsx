@@ -25,7 +25,7 @@ export function GoalWishlist({ childId }: GoalWishlistProps) {
   } = usePocketMoney();
   const [title, setTitle] = useState("");
   const [targetAmount, setTargetAmount] = useState("");
-  const [emoji, setEmoji] = useState(emojiOptions[0]);
+  const [emoji, setEmoji] = useState<string>(emojiOptions[0]!);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -69,7 +69,7 @@ export function GoalWishlist({ childId }: GoalWishlistProps) {
       });
       setTitle("");
       setTargetAmount("");
-      setEmoji(emojiOptions[0]);
+      setEmoji(emojiOptions[0]!); // safe: emojiOptions is a non-empty const array
     } catch (err) {
       setError(err instanceof Error ? err.message : t("goal_error_generic"));
     } finally {

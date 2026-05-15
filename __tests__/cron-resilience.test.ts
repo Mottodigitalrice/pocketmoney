@@ -116,8 +116,8 @@ describe("weeksToBackfill — lookback window", () => {
   it("each result is exactly 7 days earlier than the previous", () => {
     const result = weeksToBackfill(REF_MONDAY, 4);
     for (let i = 1; i < result.length; i++) {
-      const prev = new Date(result[i - 1]).getTime();
-      const cur = new Date(result[i]).getTime();
+      const prev = new Date(result[i - 1]!).getTime();
+      const cur = new Date(result[i]!).getTime();
       expect(prev - cur).toBe(MS_PER_WEEK);
     }
   });
@@ -335,8 +335,8 @@ describe("idempotency proof — re-running the predicate after a credit is a no-
     );
     // Two oldest weeks were already credited at the time the outage started.
     const transactions: TxLike[] = [
-      { type: "interest", createdAt: weeks[2] }, // 2 weeks ago
-      { type: "interest", createdAt: weeks[3] }, // 3 weeks ago
+      { type: "interest", createdAt: weeks[2]! }, // 2 weeks ago
+      { type: "interest", createdAt: weeks[3]! }, // 3 weeks ago
     ];
 
     let credits = 0;

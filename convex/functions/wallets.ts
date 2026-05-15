@@ -112,7 +112,7 @@ export async function creditApprovedJob(
       jar: wallet.jar,
       amount,
       type: "earning",
-      note: args.note,
+      ...(args.note !== undefined ? { note: args.note } : {}),
       jobInstanceId: args.jobInstanceId,
       createdAt: now,
     });
@@ -181,7 +181,7 @@ export async function creditBonus(
       jar: wallet.jar,
       amount,
       type: args.type ?? "bonus",
-      note: args.note,
+      ...(args.note !== undefined ? { note: args.note } : {}),
       createdAt: now,
     });
   }
@@ -380,7 +380,7 @@ export const awardBonus = mutation({
       userId: user._id,
       childId: args.childId,
       amount: Math.round(args.amount),
-      note: args.note,
+      ...(args.note !== undefined ? { note: args.note } : {}),
     });
     return null;
   },

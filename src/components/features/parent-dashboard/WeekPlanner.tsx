@@ -189,16 +189,18 @@ export function WeekPlanner() {
 
   const copyLastWeek = () => {
     const entries = activeChildIds.flatMap((childId) =>
-      previousWeekDates.flatMap((previousDate, index) =>
-        getScheduledJobsForChildDate(childId, previousDate)
-          .filter((entry) => !isScheduled(childId, weekDates[index], entry.jobId))
+      previousWeekDates.flatMap((previousDate, index) => {
+        const targetDate = weekDates[index];
+        if (!targetDate) return [];
+        return getScheduledJobsForChildDate(childId, previousDate)
+          .filter((entry) => !isScheduled(childId, targetDate, entry.jobId))
           .map((entry) => ({
             jobId: entry.jobId,
             childId,
-            date: weekDates[index],
+            date: targetDate,
             priority: entry.priority ?? "optional",
-          }))
-      )
+          }));
+      })
     );
 
     if (entries.length > 0) {
@@ -208,6 +210,7 @@ export function WeekPlanner() {
 
   const applyMondayTemplate = () => {
     const monday = weekDates[0];
+    if (!monday) return;
     const targetDates = weekDates.slice(1);
     const entries = activeChildIds.flatMap((childId) => {
       const mondayJobs = getScheduledJobsForChildDate(childId, monday);
