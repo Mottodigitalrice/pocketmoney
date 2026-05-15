@@ -372,6 +372,10 @@ const en = {
   kanban_empty_today_action: "🦜 Tell a grown-up if you want more!",
   weekly_tracker_zero_hint: "Do your chores to fill the chest! 🪙",
 
+  // S5 (R4) — GoalWishlist collapse toggle (F10 6.6).
+  goal_new_toggle_open: "+ I want something else!",
+  goal_new_toggle_close: "✕ Maybe later",
+
   // Math challenge (parent gate)
   math_challenge_title: "Captain's Code",
   math_challenge_subtitle: "Solve to enter the bridge!",

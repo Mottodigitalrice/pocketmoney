@@ -65,6 +65,10 @@ export function GoalWishlist({ childId }: GoalWishlistProps) {
   const [emoji, setEmoji] = useState<string>(emojiOptions[0]!);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // S5 (R4) — F10 6.6: collapse the swap form behind a "+ I want something
+  // else!" toggle when an active goal exists. First-time / empty-goal kids
+  // still see the form expanded so the very first goal is one tap away.
+  const [showSwapForm, setShowSwapForm] = useState(false);
 
   const goals = getGoalsForChild(childId);
   const recentGoals = useMemo(
@@ -110,12 +114,21 @@ export function GoalWishlist({ childId }: GoalWishlistProps) {
       setTitle("");
       setTargetAmount("");
       setEmoji(emojiOptions[0]!); // safe: emojiOptions is a non-empty const array
+      // S5 (R4) — F10 6.6: auto-collapse the form after a successful save so
+      // the kid lands back on the (newly active) goal card instead of staring
+      // at an empty form.
+      setShowSwapForm(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : t("goal_error_generic"));
     } finally {
       setIsSaving(false);
     }
   };
+
+  // S5 (R4) — F10 6.6: show the form whenever there's no active goal (so
+  // first-time kids see one tap to a goal), OR when the kid taps the toggle.
+  // Reusing the `activeGoal` already computed above.
+  const showForm = !activeGoal || showSwapForm;
 
   return (
     <div className="mx-4 overflow-hidden rounded-2xl border border-sky-300/30 bg-sky-950/40 p-4 backdrop-blur-sm sm:mx-8">
@@ -197,69 +210,93 @@ export function GoalWishlist({ childId }: GoalWishlistProps) {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="mt-4 space-y-3">
-        {/* F20: form inputs h-11 (was h-9 default) so the kid hits them
-            cleanly. Emoji tiles bumped from 40×40 to 44×44. Submit Button
-            also min-h-11. */}
-        <div className="grid gap-3 sm:grid-cols-[1fr_120px]">
-          <Input
-            value={title}
-            onChange={(event) => setTitle(event.target.value)}
-            className="h-11 border-sky-300/30 bg-sky-950/40 text-sky-50 placeholder:text-sky-100/40"
-            placeholder={t("goal_name_placeholder")}
-          />
-          <Input
-            value={targetAmount}
-            onChange={(event) => setTargetAmount(event.target.value)}
-            inputMode="numeric"
-            type="number"
-            min={1}
-            className="h-11 border-sky-300/30 bg-sky-950/40 text-sky-50 placeholder:text-sky-100/40"
-            placeholder={t("goal_amount_placeholder")}
-          />
-        </div>
+      {/* S5 (R4) — F10 6.6: when an active goal exists, collapse the swap form
+          behind a "+ I want something else!" toggle. The kid still sees the
+          form expanded on first-goal flow (no active goal) so the path to
+          their FIRST goal is one tap. */}
+      {activeGoal && (
+        <button
+          type="button"
+          onClick={() => setShowSwapForm((prev) => !prev)}
+          data-testid="goal-new-toggle"
+          aria-expanded={showSwapForm}
+          className="mt-4 w-full rounded-xl border-2 border-dashed border-sky-300/30 bg-sky-950/30 py-3 text-sm font-bold text-sky-100/80 transition-all hover:border-sky-200/50 hover:bg-sky-900/40 hover:text-sky-100"
+        >
+          {showSwapForm
+            ? t("goal_new_toggle_close")
+            : t("goal_new_toggle_open")}
+        </button>
+      )}
 
-        <div className="flex flex-wrap items-center gap-2">
-          {emojiOptions.map((option) => (
-            <button
-              key={option}
-              type="button"
-              onClick={() => setEmoji(option)}
-              className={`flex size-11 items-center justify-center rounded-xl border text-xl transition-all ${
-                emoji === option
-                  ? "border-sky-200 bg-sky-500/30"
-                  : "border-sky-300/20 bg-sky-950/30"
-              }`}
-            >
-              {option}
-            </button>
-          ))}
-          <Button
-            type="submit"
-            disabled={isSaving}
-            className="ml-auto min-h-11 bg-sky-500 font-bold text-white hover:bg-sky-600 disabled:opacity-60"
-          >
-            {isSaving ? t("goal_saving") : t("goal_create")}
-          </Button>
-        </div>
-
-        {activeGoal && (
-          <p className="text-xs text-sky-100/70">
-            <BudouXText
-              text={t("goal_swap_reassurance", {
-                amount: saveBalance.toLocaleString(),
-                name: title.trim() || activeGoal.title,
-              })}
+      {showForm && (
+        <form
+          onSubmit={handleSubmit}
+          className="mt-4 space-y-3"
+          data-testid="goal-create-form"
+        >
+          {/* F20: form inputs h-11 (was h-9 default) so the kid hits them
+              cleanly. Emoji tiles bumped from 40×40 to 44×44. Submit Button
+              also min-h-11. */}
+          <div className="grid gap-3 sm:grid-cols-[1fr_120px]">
+            <Input
+              value={title}
+              onChange={(event) => setTitle(event.target.value)}
+              className="h-11 border-sky-300/30 bg-sky-950/40 text-sky-50 placeholder:text-sky-100/40"
+              placeholder={t("goal_name_placeholder")}
             />
-          </p>
-        )}
+            <Input
+              value={targetAmount}
+              onChange={(event) => setTargetAmount(event.target.value)}
+              inputMode="numeric"
+              type="number"
+              min={1}
+              className="h-11 border-sky-300/30 bg-sky-950/40 text-sky-50 placeholder:text-sky-100/40"
+              placeholder={t("goal_amount_placeholder")}
+            />
+          </div>
 
-        {error && (
-          <p className="rounded-lg border border-red-400/30 bg-red-950/40 px-3 py-2 text-sm text-red-200">
-            {error}
-          </p>
-        )}
-      </form>
+          <div className="flex flex-wrap items-center gap-2">
+            {emojiOptions.map((option) => (
+              <button
+                key={option}
+                type="button"
+                onClick={() => setEmoji(option)}
+                className={`flex size-11 items-center justify-center rounded-xl border text-xl transition-all ${
+                  emoji === option
+                    ? "border-sky-200 bg-sky-500/30"
+                    : "border-sky-300/20 bg-sky-950/30"
+                }`}
+              >
+                {option}
+              </button>
+            ))}
+            <Button
+              type="submit"
+              disabled={isSaving}
+              className="ml-auto min-h-11 bg-sky-500 font-bold text-white hover:bg-sky-600 disabled:opacity-60"
+            >
+              {isSaving ? t("goal_saving") : t("goal_create")}
+            </Button>
+          </div>
+
+          {activeGoal && (
+            <p className="text-xs text-sky-100/70">
+              <BudouXText
+                text={t("goal_swap_reassurance", {
+                  amount: saveBalance.toLocaleString(),
+                  name: title.trim() || activeGoal.title,
+                })}
+              />
+            </p>
+          )}
+
+          {error && (
+            <p className="rounded-lg border border-red-400/30 bg-red-950/40 px-3 py-2 text-sm text-red-200">
+              {error}
+            </p>
+          )}
+        </form>
+      )}
 
       {recentGoals.length > 1 && (
         <div className="mt-4 grid gap-2 sm:grid-cols-3">

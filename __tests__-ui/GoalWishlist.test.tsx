@@ -9,7 +9,7 @@
  *   - Skeleton variant renders when isLoading=true.
  */
 import { describe, it, expect } from "vitest";
-import { renderWithProviders } from "./test-utils";
+import { renderWithProviders, fireEvent } from "./test-utils";
 import { GoalWishlist } from "@/components/features/kid-dashboard/GoalWishlist";
 import type { Goal } from "@/types";
 
@@ -114,5 +114,87 @@ describe("GoalWishlist", () => {
     expect(getByTestId("goal-wishlist-skeleton")).toBeInTheDocument();
     // Skeleton must NOT also render the real form below.
     expect(container.querySelector("form")).toBeNull();
+  });
+});
+
+// S5 (R4) — GoalWishlist collapse toggle (F10 6.6).
+describe("GoalWishlist — S5 (R4) collapse swap form behind toggle (F10 6.6)", () => {
+  it("with no active goal, the create-form is visible by default (first-goal flow)", () => {
+    const { getByTestId, queryByTestId } = renderWithProviders(
+      <GoalWishlist childId={CHILD_ID} />,
+      {
+        contextValue: {
+          getActiveGoalForChild: () => undefined,
+          getGoalsForChild: () => [],
+        },
+      },
+    );
+    // First-goal flow: form expanded, toggle button hidden.
+    expect(getByTestId("goal-create-form")).toBeInTheDocument();
+    expect(queryByTestId("goal-new-toggle")).toBeNull();
+  });
+
+  it("with an active goal, the form is hidden until the toggle is tapped", () => {
+    const { getByTestId, queryByTestId } = renderWithProviders(
+      <GoalWishlist childId={CHILD_ID} />,
+      {
+        contextValue: {
+          getActiveGoalForChild: () =>
+            goalFixture({ _id: "g-active", targetAmount: 500 }),
+          getGoalsForChild: () => [
+            goalFixture({ _id: "g-active", targetAmount: 500 }),
+          ],
+        },
+      },
+    );
+    // Toggle visible, form hidden.
+    const toggle = getByTestId("goal-new-toggle");
+    expect(toggle).toBeInTheDocument();
+    expect(toggle).toHaveAttribute("aria-expanded", "false");
+    expect(toggle).toHaveTextContent(/I want something else/i);
+    expect(queryByTestId("goal-create-form")).toBeNull();
+  });
+
+  it("tapping the toggle expands the form and flips aria-expanded", () => {
+    const { getByTestId, queryByTestId } = renderWithProviders(
+      <GoalWishlist childId={CHILD_ID} />,
+      {
+        contextValue: {
+          getActiveGoalForChild: () =>
+            goalFixture({ _id: "g-active", targetAmount: 500 }),
+          getGoalsForChild: () => [
+            goalFixture({ _id: "g-active", targetAmount: 500 }),
+          ],
+        },
+      },
+    );
+    // Start: form hidden.
+    expect(queryByTestId("goal-create-form")).toBeNull();
+    // Tap toggle — use fireEvent.click so React's synthetic event system
+    // picks up the change (toggle.click() in jsdom skips React's handlers).
+    const toggle = getByTestId("goal-new-toggle");
+    fireEvent.click(toggle);
+    // Form now visible, toggle text flipped to "Maybe later".
+    expect(getByTestId("goal-create-form")).toBeInTheDocument();
+    expect(toggle).toHaveAttribute("aria-expanded", "true");
+    expect(toggle).toHaveTextContent(/Maybe later/i);
+  });
+
+  it("renders the JP toggle copy when locale is ja", () => {
+    const { getByTestId } = renderWithProviders(
+      <GoalWishlist childId={CHILD_ID} />,
+      {
+        initialLang: "ja",
+        contextValue: {
+          getActiveGoalForChild: () =>
+            goalFixture({ _id: "g-active", targetAmount: 500 }),
+          getGoalsForChild: () => [
+            goalFixture({ _id: "g-active", targetAmount: 500 }),
+          ],
+        },
+      },
+    );
+    const toggle = getByTestId("goal-new-toggle");
+    expect(toggle).toHaveTextContent(/ほかのもほしい/);
   });
 });

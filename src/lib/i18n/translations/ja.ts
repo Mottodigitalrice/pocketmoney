@@ -388,6 +388,10 @@ const ja = {
   kanban_empty_today_action: "🦜 もっとやりたいときは、おとなにつたえよう!",
   weekly_tracker_zero_hint: "おしごとをやって、たからばこを いっぱいにしよう! 🪙",
 
+  // S5 (R4) — GoalWishlist collapse toggle (F10 6.6).
+  goal_new_toggle_open: "+ ほかのもほしい!",
+  goal_new_toggle_close: "✕ あとでね",
+
   // Math challenge
   math_challenge_title: "船長のコード",
   math_challenge_subtitle: "ブリッジに入るにはとけ!",
