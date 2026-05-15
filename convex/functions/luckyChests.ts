@@ -5,6 +5,7 @@ import type { MutationCtx, QueryCtx } from "../_generated/server";
 import { getCurrentUser } from "./users";
 import { creditBonus } from "./wallets";
 import { assertOwnedBy } from "../lib/auth";
+import { pickLuckyChestAmount } from "../lib/luckyChestMath";
 
 const luckyChestDocValidator = v.object({
   _id: v.id("luckyChests"),
@@ -169,7 +170,7 @@ export const open = mutation({
       throw new Error("Lucky Chest is still locked");
     }
 
-    const amount = Math.max(1, Math.floor(Math.random() * maxAmount) + 1);
+    const amount = pickLuckyChestAmount(maxAmount);
     const openedAt = Date.now();
     const chestId = await ctx.db.insert("luckyChests", {
       userId: user._id,

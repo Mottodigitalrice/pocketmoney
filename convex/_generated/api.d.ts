@@ -24,6 +24,7 @@ import type * as functions_wallets from "../functions/wallets.js";
 import type * as lib_auth from "../lib/auth.js";
 import type * as lib_childCascade from "../lib/childCascade.js";
 import type * as lib_cronMath from "../lib/cronMath.js";
+import type * as lib_luckyChestMath from "../lib/luckyChestMath.js";
 import type * as lib_migrationDiff from "../lib/migrationDiff.js";
 import type * as lib_orphanSweep from "../lib/orphanSweep.js";
 import type * as lib_rankMath from "../lib/rankMath.js";
@@ -54,6 +55,7 @@ declare const fullApi: ApiFromModules<{
   "lib/auth": typeof lib_auth;
   "lib/childCascade": typeof lib_childCascade;
   "lib/cronMath": typeof lib_cronMath;
+  "lib/luckyChestMath": typeof lib_luckyChestMath;
   "lib/migrationDiff": typeof lib_migrationDiff;
   "lib/orphanSweep": typeof lib_orphanSweep;
   "lib/rankMath": typeof lib_rankMath;
