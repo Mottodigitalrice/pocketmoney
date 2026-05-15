@@ -23,6 +23,19 @@ afterEach(() => {
   cleanup();
 });
 
+// H1: jsdom doesn't ship ResizeObserver — Radix's `use-size` hook (used by
+// Switch + other primitives that probe their own dimensions on mount) throws
+// `ReferenceError: ResizeObserver is not defined` without this polyfill.
+// jsdom 26 still hasn't added it. Minimal stub is enough: Radix only calls
+// `observe()` and `disconnect()`, never reads back from the callback.
+if (typeof globalThis.ResizeObserver === "undefined") {
+  globalThis.ResizeObserver = class {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  } as unknown as typeof ResizeObserver;
+}
+
 vi.mock("convex/react", () => ({
   useQuery: vi.fn(() => undefined),
   useMutation: vi.fn(() => vi.fn().mockResolvedValue(undefined)),
