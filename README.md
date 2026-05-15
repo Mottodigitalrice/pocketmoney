@@ -70,10 +70,24 @@ convex/                 # Backend
 ## Commands
 
 ```bash
-npm run dev:all      # Start Next.js + Convex together
-npm run build        # Production build
-npm run deploy       # Deploy to Vercel
+npm run dev:all          # Start Next.js + Convex together
+npm run build            # Production build
+npm run deploy           # Deploy to Vercel
+npm run lint             # Lint
+npm run lint:fix         # Lint with autofix
+npm run typecheck        # `tsc --noEmit`
+npm run typecheck:watch  # Watch-mode type-checking
+npm test                 # Run backend + UI test suites
+npm run test:backend     # Backend (node) tests only
+npm run test:ui          # UI (jsdom) tests only
 ```
+
+## Continuous Integration
+
+`.github/workflows/test.yml` runs `lint → typecheck → test` on every push to
+`main` and on every pull request. The workflow uses Node 20 with cached
+`npm ci`. It does not deploy — promotion to Vercel stays manual via
+`npm run deploy`.
 
 ## Claude Code Integration
 
