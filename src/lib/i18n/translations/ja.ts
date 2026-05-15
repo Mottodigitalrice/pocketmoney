@@ -235,6 +235,9 @@ const ja = {
   withdraw_error_balance: "このつぼには十分なたからものがありません。",
   withdraw_error_note: "その他の理由にはメモを入れてください。",
   withdraw_error_generic: "引き出しを記録できませんでした。",
+  // S4 (R4) — F10 5.16: inline max-amount hint + one-tap "Use max" pill.
+  withdraw_max_helper: "最大 ¥{{max}}",
+  withdraw_use_max: "最大額",
 
   // Bonuses
   bonus_open: "ボーナス",

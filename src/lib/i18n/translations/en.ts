@@ -232,6 +232,9 @@ const en = {
   withdraw_error_balance: "That jar does not have enough treasure.",
   withdraw_error_note: "Add a note when the reason is Other.",
   withdraw_error_generic: "Could not record the withdrawal.",
+  // S4 (R4) — F10 5.16: inline max-amount hint + one-tap "Use max" pill.
+  withdraw_max_helper: "Max ¥{{max}}",
+  withdraw_use_max: "Use max",
 
   // Bonuses
   bonus_open: "Bonus",

@@ -170,7 +170,30 @@ export function WithdrawalDialogBody({
                   onChange={(event) => setAmount(event.target.value)}
                   className="h-11 border-amber-700/40 bg-amber-900/40 text-amber-100"
                   placeholder="500"
+                  data-testid="withdraw-amount-input"
                 />
+                {/* S4 (R4) — F10 5.16: inline max-amount helper + one-tap "Use
+                    max" pill so the parent doesn't have to retype the balance
+                    to drain a jar. Hidden when the jar is empty — no point
+                    surfacing "Max ¥0" or a useless pill. */}
+                {balance > 0 && (
+                  <div className="flex items-center justify-between text-xs">
+                    <span
+                      className="text-amber-200/70"
+                      data-testid="withdraw-max-helper"
+                    >
+                      {t("withdraw_max_helper", { max: balance.toLocaleString() })}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setAmount(String(balance))}
+                      data-testid="withdraw-use-max"
+                      className="rounded-full bg-amber-700/40 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-amber-100 transition-colors hover:bg-amber-700/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/70"
+                    >
+                      {t("withdraw_use_max")}
+                    </button>
+                  </div>
+                )}
               </label>
             </div>
 
