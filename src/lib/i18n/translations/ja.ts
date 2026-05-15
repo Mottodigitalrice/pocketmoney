@@ -270,6 +270,8 @@ const ja = {
   rank_score: "{{score}}ランクポイント",
   rank_next: "つぎ: {{score}}で{{rank}}",
   rank_max: "さいこうランク!",
+  rank_up_toast_title: "ランクアップ!",
+  rank_up_toast_body: "おめでとう、{{rank}}!",
 
   // Job titles
   job_fold_washing: "せんたくものをたたむ",

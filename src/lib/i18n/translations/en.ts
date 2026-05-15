@@ -270,6 +270,8 @@ const en = {
   rank_score: "{{score}} rank points",
   rank_next: "Next: {{rank}} at {{score}}",
   rank_max: "Top rank reached",
+  rank_up_toast_title: "You leveled up!",
+  rank_up_toast_body: "Welcome, {{rank}} pirate!",
 
   // Job titles
   job_fold_washing: "Fold the washing",

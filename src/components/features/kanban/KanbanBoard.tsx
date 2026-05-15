@@ -20,6 +20,7 @@ export function KanbanBoard({ childId }: KanbanBoardProps) {
     startJob,
     completeJob,
     getJobById,
+    getInstancesForChild,
   } = usePocketMoney();
 
   const [celebrating, setCelebrating] = useState(false);
@@ -30,6 +31,44 @@ export function KanbanBoard({ childId }: KanbanBoardProps) {
   const available = getTodayAvailableJobs(childId);
   const inProgress = getInProgressJobs(childId);
   const completed = getCompletedJobs(childId);
+
+  // F17 Goal C: observe `status === "approved"` transitions on the kid's
+  // jobInstances. When the parent approves a submission, the kid's Convex
+  // realtime feed flips the instance to "approved" — fire DolphinCelebration
+  // so the kid sees their money land.
+  const childInstances = getInstancesForChild(childId);
+  const seenApprovedIdsRef = useRef<Set<string> | null>(null);
+  useEffect(() => {
+    // First pass — seed the set with whatever is already approved so we
+    // don't fake-celebrate historical approvals on initial mount.
+    if (seenApprovedIdsRef.current === null) {
+      seenApprovedIdsRef.current = new Set(
+        childInstances.filter((i) => i.status === "approved").map((i) => i._id)
+      );
+      return;
+    }
+
+    const seen = seenApprovedIdsRef.current;
+    let toCelebrate: { yenAmount: number } | null = null;
+    for (const inst of childInstances) {
+      if (inst.status !== "approved") continue;
+      if (seen.has(inst._id)) continue;
+      seen.add(inst._id);
+      if (toCelebrate) continue; // Only first new approval in this tick fires.
+      const job = getJobById(inst.jobId);
+      if (job) {
+        toCelebrate = { yenAmount: job.yenAmount };
+      }
+    }
+    if (toCelebrate) {
+      // Defer state writes out of the effect body to avoid cascading renders.
+      const payload = toCelebrate;
+      queueMicrotask(() => {
+        setCelebrationYen(payload.yenAmount);
+        setCelebrating(true);
+      });
+    }
+  }, [childInstances, getJobById]);
 
   const handleStart = (jobId: string, scheduledJobId: string) => {
     startJob(jobId, childId, scheduledJobId);
