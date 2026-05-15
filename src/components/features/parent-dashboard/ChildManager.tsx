@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Child, ChildIcon } from "@/types";
 import { CHILD_ICON_CONFIG } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "@/hooks/use-translation";
 import { ChildForm } from "./ChildForm";
 
 interface ChildManagerProps {
@@ -19,6 +20,7 @@ export function ChildManager({
   onEdit,
   onDelete,
 }: ChildManagerProps) {
+  const { t } = useTranslation();
   const [formOpen, setFormOpen] = useState(false);
   const [editingChild, setEditingChild] = useState<{
     id: string;
@@ -64,19 +66,19 @@ export function ChildManager({
 
       {/* Child list or empty state */}
       {crewMembers.length === 0 ? (
-        <div className="flex flex-col items-center gap-3 rounded-2xl border border-amber-700/30 bg-amber-900/30 p-10 text-center backdrop-blur-sm">
+        <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-amber-700/30 bg-amber-900/30 px-6 py-12 text-center backdrop-blur-sm">
           <span className="text-5xl">🏴‍☠️</span>
           <p className="text-lg font-semibold text-amber-200">
-            No crew members yet!
+            {t("child_manager_no_kids")}
           </p>
-          <p className="text-sm text-amber-300/60">
-            Add your first little pirate to get started.
+          <p className="text-sm text-amber-300/70">
+            {t("child_manager_no_kids_hint")}
           </p>
           <Button
             onClick={handleAdd}
             className="mt-2 bg-amber-600 font-bold text-white hover:bg-amber-700"
           >
-            + Add Crew Member
+            {t("children_add")}
           </Button>
         </div>
       ) : (

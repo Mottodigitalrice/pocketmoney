@@ -240,14 +240,23 @@ export function WeekPlanner() {
 
   if (familyChildren.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-2xl border border-amber-700/20 bg-amber-900/20 py-12 text-center">
+      <div className="flex flex-col items-center justify-center rounded-2xl border border-amber-700/20 bg-amber-900/20 px-6 py-12 text-center">
         <Users className="mb-3 h-10 w-10 text-amber-300" />
         <p className="text-lg font-semibold text-amber-200">
-          {t("planner_no_children")}
+          {t("planner_empty_title")}
+        </p>
+        <p className="mt-1 text-sm text-amber-300/70">
+          {t("planner_empty_hint")}
         </p>
       </div>
     );
   }
+
+  const weekHasAnyScheduled = familyChildren.some((child) =>
+    weekDates.some(
+      (date) => getScheduledJobsForChildDate(child._id, date).length > 0
+    )
+  );
 
   return (
     <div className="space-y-4">
@@ -301,6 +310,17 @@ export function WeekPlanner() {
               <p className="mb-2 text-xs font-semibold uppercase text-amber-300/70">
                 {t("planner_bulk_job")}
               </p>
+              {libraryJobs.length === 0 ? (
+                <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-amber-700/30 bg-amber-900/20 px-4 py-8 text-center">
+                  <span className="text-3xl">📜</span>
+                  <p className="text-sm font-semibold text-amber-200">
+                    {t("planner_no_jobs_title")}
+                  </p>
+                  <p className="text-xs text-amber-300/70">
+                    {t("planner_no_jobs_hint")}
+                  </p>
+                </div>
+              ) : (
               <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
                 {libraryJobs.map((job) => {
                   const isSelected = selectedJobId === job._id;
@@ -333,6 +353,7 @@ export function WeekPlanner() {
                   );
                 })}
               </div>
+              )}
             </div>
 
             <div>
@@ -423,6 +444,13 @@ export function WeekPlanner() {
           </div>
         </div>
       </div>
+
+      {weekHasAnyScheduled === false && libraryJobs.length > 0 && (
+        <div className="flex items-start gap-3 rounded-2xl border border-dashed border-amber-700/30 bg-amber-900/20 px-4 py-3 text-left text-sm text-amber-200">
+          <span className="text-xl">🗓️</span>
+          <p className="flex-1">{t("planner_week_empty_banner")}</p>
+        </div>
+      )}
 
       <div className="overflow-hidden rounded-2xl border border-amber-700/20 bg-amber-950/40 backdrop-blur-sm">
         <div className="grid grid-cols-[88px_repeat(7,minmax(118px,1fr))] overflow-x-auto">

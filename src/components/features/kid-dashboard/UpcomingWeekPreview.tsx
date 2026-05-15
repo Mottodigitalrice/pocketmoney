@@ -42,7 +42,15 @@ export function UpcomingWeekPreview({ childId }: UpcomingWeekPreviewProps) {
       </div>
 
       {grouped.length === 0 ? (
-        <p className="text-sm text-white/60">{t("kid_upcoming_empty")}</p>
+        <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-cyan-300/20 bg-cyan-950/30 px-6 py-8 text-center">
+          <span className="text-4xl">🗓️</span>
+          <p className="text-base font-bold text-cyan-100">
+            {t("upcoming_empty_title")}
+          </p>
+          <p className="text-sm text-white/70">
+            {t("upcoming_empty_hint")}
+          </p>
+        </div>
       ) : (
         <div className="space-y-3">
           {grouped.map(([date, jobs]) => (
@@ -74,6 +82,11 @@ export function UpcomingWeekPreview({ childId }: UpcomingWeekPreviewProps) {
                           ? entry.job.titleJa
                           : entry.job.title}
                     </span>
+                    {entry.priority === "mustDo" && (
+                      <span className="rounded-full bg-red-500/30 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wide text-red-100">
+                        {t("priority_must_do")}
+                      </span>
+                    )}
                   </div>
                 ))}
               </div>

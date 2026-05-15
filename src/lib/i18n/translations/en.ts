@@ -1,7 +1,7 @@
 const en = {
   // App
-  app_name: "PocketMoney",
-  app_title: "PocketMoney | Earn Yen!",
+  app_name: "Pirate Money",
+  app_title: "Pirate Money | Earn Yen!",
   app_description: "Earn Yen by helping around the house!",
 
   // Home page
@@ -21,6 +21,7 @@ const en = {
 
   // Kid
   kid_invalid_child: "Who are you? 🤔",
+  kid_loading: "Loading...",
   kid_home: "Home",
   kid_header_jobs: "{{name}}'s Jobs",
   kid_header_shark: "Great White Shark",
@@ -57,6 +58,7 @@ const en = {
   job_start: "Let's Do It! 💪",
   job_complete: "I Did It! ✅",
   job_waiting: "Waiting for Mummy or Daddy",
+  job_try_again_note: "Try again - note from Mum or Dad: {{note}}",
 
   // Celebration
   celebration_great_job: "GREAT JOB!",
@@ -85,12 +87,16 @@ const en = {
   // Approval card
   approval_approve: "Approve ✅",
   approval_reject: "Try Again 🔄",
+  approval_reject_note_prompt: "What should they fix before trying again?",
+  approval_photo_proof: "Photo proof",
+  approval_photo_proof_alt: "Photo proof for completed job",
 
   // Job manager
   job_manager_title: "Job Library ({{count}})",
   job_manager_new: "+ New Job",
   job_manager_quick_assign: "Assign Today",
   job_manager_choose_child: "Choose who",
+  job_manager_photo_proof: "Photo proof required",
 
   // Job form
   job_form_edit_title: "Edit Job",
@@ -99,6 +105,9 @@ const en = {
   job_form_name_placeholder: "e.g. Clean up toys",
   job_form_icon_label: "Icon",
   job_form_yen_label: "Yen Amount (¥)",
+  job_form_recurrence_label: "Repeats",
+  job_form_photo_proof_label: "Require photo proof",
+  job_form_photo_proof_hint: "Kids must upload a photo before this job can be sent for approval.",
   job_form_cancel: "Cancel",
   job_form_save: "Save Changes",
   job_form_add: "Add Job",
@@ -113,9 +122,41 @@ const en = {
   planner_add_jobs: "Add Jobs",
   planner_no_children: "Add crew members first!",
   planner_empty_day: "No jobs",
-  planner_select_jobs: "Select jobs for {{name}} on {{day}}",
-  planner_done: "Done",
   planner_clear_day: "Clear Day",
+  planner_bulk_job: "Job to assign",
+  planner_bulk_children: "Assign to",
+  planner_priority: "Priority",
+  planner_priority_optional: "Optional",
+  planner_priority_must: "Must do",
+  planner_all_children_selected: "All crew selected",
+  planner_selected_children: "{{count}} selected",
+  planner_copy_last_week: "Copy last week",
+  planner_apply_monday: "Apply Monday template",
+  planner_apply_recurring: "Apply recurring jobs",
+  planner_crew: "Crew",
+  planner_add_selected: "Add selected",
+  planner_remove_job: "Remove job",
+  priority_must_do: "Must do",
+
+  // Photo proof
+  photo_proof_required: "Photo proof needed",
+  photo_proof_choose: "Take or choose photo",
+  photo_proof_chosen: "{{name}} selected",
+  photo_proof_uploading: "Uploading...",
+  photo_proof_error: "Could not upload the photo. Please try again.",
+
+  // Recurrence
+  recurrence_none: "No repeat",
+  recurrence_daily: "Daily",
+  recurrence_weekdays: "Weekdays",
+  recurrence_specificDays: "Specific days",
+  recurrence_day_0: "Mon",
+  recurrence_day_1: "Tue",
+  recurrence_day_2: "Wed",
+  recurrence_day_3: "Thu",
+  recurrence_day_4: "Fri",
+  recurrence_day_5: "Sat",
+  recurrence_day_6: "Sun",
 
   // Quick assign
   quick_assign_title: "Assign Today",
@@ -150,6 +191,82 @@ const en = {
   overview_completed: "Completed",
   overview_waiting: "⏳ {{count}} job(s) waiting for approval",
 
+  // Wallet
+  wallet_spend: "Spend",
+  wallet_save: "Save",
+  wallet_give: "Give",
+  wallet_total: "Total Treasure",
+
+  // Withdrawals
+  withdraw_open: "Withdraw",
+  withdraw_title: "Withdraw from {{name}}",
+  withdraw_jar: "Jar",
+  withdraw_amount: "Amount",
+  withdraw_available: "Available",
+  withdraw_reason: "Reason",
+  withdraw_reason_cashOut: "Cash out",
+  withdraw_reason_penalty: "Penalty",
+  withdraw_reason_correction: "Correction",
+  withdraw_reason_other: "Other",
+  withdraw_note: "Note",
+  withdraw_note_placeholder: "What was this for?",
+  withdraw_submit: "Record Withdrawal",
+  withdraw_saving: "Recording...",
+  withdraw_error_amount: "Enter an amount above ¥0.",
+  withdraw_error_balance: "That jar does not have enough treasure.",
+  withdraw_error_note: "Add a note when the reason is Other.",
+  withdraw_error_generic: "Could not record the withdrawal.",
+
+  // Bonuses
+  bonus_open: "Bonus",
+  bonus_title: "Bonus for {{name}}",
+  bonus_amount: "Amount",
+  bonus_note: "Reason",
+  bonus_note_placeholder: "What did they do well?",
+  bonus_split_hint: "Bonus treasure is split into Spend / Save / Give using 70 / 20 / 10.",
+  bonus_submit: "Award Bonus",
+  bonus_saving: "Awarding...",
+  bonus_error_amount: "Enter an amount above ¥0.",
+  bonus_error_generic: "Could not award the bonus.",
+
+  // Lucky Chest
+  lucky_chest_title: "Lucky Chest",
+  lucky_chest_locked: "{{done}} / {{total}} must-do jobs approved this week.",
+  lucky_chest_unlocked: "Unlocked! Open it for up to ¥{{amount}}.",
+  lucky_chest_opened: "Opened this week: ¥{{amount}} added to your treasure.",
+  lucky_chest_open: "Open Chest",
+  lucky_chest_opening: "Opening...",
+  lucky_chest_error: "Could not open the chest.",
+  lucky_chest_parent_title: "Lucky Chest",
+  lucky_chest_parent_subtitle: "Kids can open it once per week after all must-do jobs are approved.",
+  lucky_chest_max_label: "Max ¥",
+  lucky_chest_save: "Save",
+
+  // Goals
+  goal_title: "Save Goal",
+  goal_subtitle: "Your Save jar goes toward the thing you want next.",
+  goal_empty: "No save goal yet",
+  goal_empty_subtitle: "Pick something you want and start filling the Save jar.",
+  goal_save_balance: "Save jar: ¥{{amount}}",
+  goal_funded: "funded",
+  goal_ready: "Ready!",
+  goal_remaining: "¥{{amount}} to go",
+  goal_name_placeholder: "What are you saving for?",
+  goal_amount_placeholder: "¥ goal",
+  goal_create: "Set Goal",
+  goal_saving: "Saving...",
+  goal_error_title: "Name your goal first.",
+  goal_error_amount: "Enter a goal amount above ¥0.",
+  goal_error_generic: "Could not save the goal.",
+  goal_swap_reassurance: "Your ¥{{amount}} is still saved. It will now go toward {{name}}.",
+
+  // Ranks
+  rank_board_title: "Crew Ranks",
+  rank_current: "Current rank",
+  rank_score: "{{score}} rank points",
+  rank_next: "Next: {{rank}} at {{score}}",
+  rank_max: "Top rank reached",
+
   // Job titles
   job_fold_washing: "Fold the washing",
   job_clean_toys: "Clean up toys",
@@ -173,7 +290,7 @@ const en = {
   job_help_cook: "Help cook dinner",
 
   // Onboarding
-  onboarding_welcome: "Welcome to PocketMoney!",
+  onboarding_welcome: "Welcome to Pirate Money!",
   onboarding_welcome_subtitle: "Ahoy, Captain! Ready to set sail on a treasure-filled adventure? Let's get your crew together and start earning some booty!",
   onboarding_get_started: "Get Started",
   onboarding_add_crew: "Who's in your crew?",
@@ -236,6 +353,35 @@ const en = {
   auth_sign_up_title: "Join the Crew!",
   auth_sign_up_subtitle: "Start your treasure adventure",
   auth_logout: "Log Out",
+
+  // F11 — Empty states (parent dashboard)
+  job_library_empty_title: "No chores in your library yet",
+  job_library_empty_hint: "Tap + New Job to add your first chore — the kids can't see anything until you do.",
+  job_library_empty_cta: "+ Add Your First Job",
+  approvals_empty_title: "Nothing waiting — kids are caught up!",
+  approvals_empty_hint: "Finished chores will show up here for you to review.",
+  quick_add_empty_title: "No quick-add tasks today",
+  quick_add_empty_hint: "Pick a chore above to add it to today, or use Planner for the rest of the week.",
+  quick_add_empty_jobs_title: "No chores in your library yet",
+  child_manager_no_kids: "No crew aboard yet",
+  child_manager_no_kids_hint: "Add your first kid to get the adventure started.",
+  planner_empty_title: "No crew to plan for",
+  planner_empty_hint: "Add at least one kid in the Crew tab, then come back to plan the week.",
+  planner_no_jobs_title: "Your job library is empty",
+  planner_no_jobs_hint: "Add chores in the Jobs tab — they'll show up here to drag onto days.",
+  planner_week_empty_banner: "No chores scheduled this week yet — drag a job onto a day or tap Apply Monday template.",
+
+  // F11 — Empty states (kid dashboard)
+  kanban_empty_today_title: "All done for today!",
+  kanban_empty_today_hint: "Try checking back tomorrow — or ask a captain if you want more.",
+  goals_empty_title: "No goal yet",
+  goals_empty_hint: "Pick something cool to save for!",
+  history_empty_title: "Your treasure log is empty",
+  history_empty_hint: "Finish a chore and it'll show up here — keep going!",
+  upcoming_empty_title: "Nothing planned yet",
+  upcoming_empty_hint: "No jobs lined up — ask your captain to plan some!",
+  sibling_rank_solo_title: "Just you for now!",
+  sibling_rank_solo_hint: "When another crew member joins, you'll see who's ahead.",
 } as const;
 
 export default en;

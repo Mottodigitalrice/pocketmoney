@@ -148,7 +148,15 @@ export function TreasureHistoryCalendar({ childId }: TreasureHistoryCalendarProp
           ))}
         </div>
       ) : (
-        <p className="text-sm text-white/60">{t("kid_history_empty")}</p>
+        <div className="flex flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-amber-300/20 bg-amber-950/30 px-6 py-10 text-center">
+          <span className="text-5xl">📜</span>
+          <p className="text-lg font-bold text-amber-100">
+            {t("history_empty_title")}
+          </p>
+          <p className="text-sm text-white/70">
+            {t("history_empty_hint")}
+          </p>
+        </div>
       )}
     </div>
   );

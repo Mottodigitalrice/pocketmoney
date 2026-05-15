@@ -1,7 +1,7 @@
 const ja = {
   // App
-  app_name: "おこづかい",
-  app_title: "おこづかい | 円をかせごう!",
+  app_name: "Pirate Money",
+  app_title: "Pirate Money | 円をかせごう!",
   app_description: "おうちのお手伝いで円をかせごう!",
 
   // Home page
@@ -21,6 +21,7 @@ const ja = {
 
   // Kid
   kid_invalid_child: "だれですか? 🤔",
+  kid_loading: "読み込み中...",
   kid_home: "ホーム",
   kid_header_jobs: "{{name}}のおしごと",
   kid_header_shark: "ホオジロザメ",
@@ -57,6 +58,7 @@ const ja = {
   job_start: "やるぞ! 💪",
   job_complete: "やったよ! ✅",
   job_waiting: "ママかパパをまってるよ",
+  job_try_again_note: "もう一回やってみよう - ママかパパから: {{note}}",
 
   // Celebration
   celebration_great_job: "よくできました!",
@@ -85,12 +87,16 @@ const ja = {
   // Approval card
   approval_approve: "承認 ✅",
   approval_reject: "もう一回 🔄",
+  approval_reject_note_prompt: "もう一回やる前に、何を直してほしいですか?",
+  approval_photo_proof: "写真のしょうこ",
+  approval_photo_proof_alt: "お仕事完了の写真",
 
   // Job manager
   job_manager_title: "おしごとライブラリ ({{count}})",
   job_manager_new: "+ 新しいお仕事",
   job_manager_quick_assign: "今日わりあてる",
   job_manager_choose_child: "だれに",
+  job_manager_photo_proof: "写真のしょうこが必要",
 
   // Job form
   job_form_edit_title: "お仕事を編集",
@@ -99,6 +105,9 @@ const ja = {
   job_form_name_placeholder: "例: おもちゃを片付ける",
   job_form_icon_label: "アイコン",
   job_form_yen_label: "金額 (¥)",
+  job_form_recurrence_label: "くりかえし",
+  job_form_photo_proof_label: "写真のしょうこを必要にする",
+  job_form_photo_proof_hint: "子どもは承認待ちにする前に写真をアップロードします。",
   job_form_cancel: "キャンセル",
   job_form_save: "保存",
   job_form_add: "追加",
@@ -113,9 +122,41 @@ const ja = {
   planner_add_jobs: "お仕事を追加",
   planner_no_children: "まずクルーを追加してね!",
   planner_empty_day: "なし",
-  planner_select_jobs: "{{day}}の{{name}}のおしごと",
-  planner_done: "かんりょう",
   planner_clear_day: "クリア",
+  planner_bulk_job: "わりあてるおしごと",
+  planner_bulk_children: "だれに",
+  planner_priority: "たいせつさ",
+  planner_priority_optional: "できたら",
+  planner_priority_must: "ぜったい",
+  planner_all_children_selected: "全員が選ばれています",
+  planner_selected_children: "{{count}}人を選択中",
+  planner_copy_last_week: "先週をコピー",
+  planner_apply_monday: "月曜をテンプレートにする",
+  planner_apply_recurring: "くりかえしを入れる",
+  planner_crew: "クルー",
+  planner_add_selected: "選んだおしごとを追加",
+  planner_remove_job: "おしごとを削除",
+  priority_must_do: "ぜったい",
+
+  // Photo proof
+  photo_proof_required: "写真が必要だよ",
+  photo_proof_choose: "写真をとる / えらぶ",
+  photo_proof_chosen: "{{name}}を選んだよ",
+  photo_proof_uploading: "アップロード中...",
+  photo_proof_error: "写真をアップロードできませんでした。もう一度試してね。",
+
+  // Recurrence
+  recurrence_none: "くりかえしなし",
+  recurrence_daily: "まいにち",
+  recurrence_weekdays: "へいじつ",
+  recurrence_specificDays: "曜日をえらぶ",
+  recurrence_day_0: "月",
+  recurrence_day_1: "火",
+  recurrence_day_2: "水",
+  recurrence_day_3: "木",
+  recurrence_day_4: "金",
+  recurrence_day_5: "土",
+  recurrence_day_6: "日",
 
   // Quick assign
   quick_assign_title: "今日わりあてる",
@@ -150,6 +191,82 @@ const ja = {
   overview_completed: "おわった",
   overview_waiting: "⏳ {{count}}つのお仕事が承認待ち",
 
+  // Wallet
+  wallet_spend: "つかう",
+  wallet_save: "ためる",
+  wallet_give: "あげる",
+  wallet_total: "ぜんぶのたからもの",
+
+  // Withdrawals
+  withdraw_open: "引き出し",
+  withdraw_title: "{{name}}から引き出し",
+  withdraw_jar: "つぼ",
+  withdraw_amount: "金額",
+  withdraw_available: "使える金額",
+  withdraw_reason: "理由",
+  withdraw_reason_cashOut: "現金で渡した",
+  withdraw_reason_penalty: "ペナルティ",
+  withdraw_reason_correction: "修正",
+  withdraw_reason_other: "その他",
+  withdraw_note: "メモ",
+  withdraw_note_placeholder: "何のための引き出し?",
+  withdraw_submit: "引き出しを記録",
+  withdraw_saving: "記録中...",
+  withdraw_error_amount: "¥0より大きい金額を入れてください。",
+  withdraw_error_balance: "このつぼには十分なたからものがありません。",
+  withdraw_error_note: "その他の理由にはメモを入れてください。",
+  withdraw_error_generic: "引き出しを記録できませんでした。",
+
+  // Bonuses
+  bonus_open: "ボーナス",
+  bonus_title: "{{name}}にボーナス",
+  bonus_amount: "金額",
+  bonus_note: "理由",
+  bonus_note_placeholder: "何をよくできた?",
+  bonus_split_hint: "ボーナスは、つかう / ためる / あげるに 70 / 20 / 10 で分けます。",
+  bonus_submit: "ボーナスをあげる",
+  bonus_saving: "追加中...",
+  bonus_error_amount: "¥0より大きい金額を入れてください。",
+  bonus_error_generic: "ボーナスを追加できませんでした。",
+
+  // Lucky Chest
+  lucky_chest_title: "ラッキーチェスト",
+  lucky_chest_locked: "今週のぜったいおしごと {{total}}このうち{{done}}こ承認済み。",
+  lucky_chest_unlocked: "あいたよ! 最高¥{{amount}}まで当たるよ。",
+  lucky_chest_opened: "今週は¥{{amount}}をたからものに追加したよ。",
+  lucky_chest_open: "あける",
+  lucky_chest_opening: "あけている...",
+  lucky_chest_error: "チェストをあけられませんでした。",
+  lucky_chest_parent_title: "ラッキーチェスト",
+  lucky_chest_parent_subtitle: "今週のぜったいおしごとが全部承認されたら、子どもが週1回あけられます。",
+  lucky_chest_max_label: "最高 ¥",
+  lucky_chest_save: "保存",
+
+  // Goals
+  goal_title: "ためるゴール",
+  goal_subtitle: "ためるつぼは、次にほしいもののために使うよ。",
+  goal_empty: "まだゴールがないよ",
+  goal_empty_subtitle: "ほしいものを決めて、ためるつぼをいっぱいにしよう。",
+  goal_save_balance: "ためるつぼ: ¥{{amount}}",
+  goal_funded: "たまった",
+  goal_ready: "もう買えるよ!",
+  goal_remaining: "あと¥{{amount}}",
+  goal_name_placeholder: "何のためにためる?",
+  goal_amount_placeholder: "¥ ゴール",
+  goal_create: "ゴールにする",
+  goal_saving: "保存中...",
+  goal_error_title: "まずゴールの名前を入れてね。",
+  goal_error_amount: "¥0より大きいゴール金額を入れてね。",
+  goal_error_generic: "ゴールを保存できませんでした。",
+  goal_swap_reassurance: "¥{{amount}}はなくならないよ。これからは{{name}}のためにたまるよ。",
+
+  // Ranks
+  rank_board_title: "クルーランク",
+  rank_current: "いまのランク",
+  rank_score: "{{score}}ランクポイント",
+  rank_next: "つぎ: {{score}}で{{rank}}",
+  rank_max: "さいこうランク!",
+
   // Job titles
   job_fold_washing: "せんたくものをたたむ",
   job_clean_toys: "おもちゃをかたづける",
@@ -173,8 +290,8 @@ const ja = {
   job_help_cook: "りょうりのてつだい",
 
   // Onboarding
-  onboarding_welcome: "おこづかいへようこそ!",
-  onboarding_welcome_subtitle: "船長さん、こんにちは! たからものいっぱいの冒険に出かけよう! クルーをあつめて、おこづかいをかせごう!",
+  onboarding_welcome: "Pirate Moneyへようこそ!",
+  onboarding_welcome_subtitle: "船長さん、こんにちは! たからものいっぱいの冒険に出かけよう! クルーをあつめて、円をかせごう!",
   onboarding_get_started: "はじめよう",
   onboarding_add_crew: "クルーはだれ?",
   onboarding_add_crew_subtitle: "おこさまを追加してください。最大6人まで追加できます。",
@@ -236,6 +353,35 @@ const ja = {
   auth_sign_up_title: "クルーに入ろう!",
   auth_sign_up_subtitle: "たからもの冒険を始めよう",
   auth_logout: "ログアウト",
+
+  // F11 — Empty states (parent dashboard) // CMO-review: tone calibration for parent vs kid surfaces
+  job_library_empty_title: "おしごとライブラリはまだからっぽです",
+  job_library_empty_hint: "「+ 新しいお仕事」をタップして最初のおしごとを追加してください。追加するまで子どもには何も見えません。", // CMO-review: "見えません" might be too direct; consider softer phrasing
+  job_library_empty_cta: "+ 最初のおしごとを追加",
+  approvals_empty_title: "ぜんぶおわってる! みんなえらい!", // CMO-review: kid-readable hiragana — verify tone for parent surface
+  approvals_empty_hint: "子どもがおしごとをおわらせると、ここにしょうにん待ちで出てきます。",
+  quick_add_empty_title: "今日のクイック追加はありません",
+  quick_add_empty_hint: "上のおしごとをタップして今日に追加するか、よていタブで一週間ぶんを計画してください。",
+  quick_add_empty_jobs_title: "おしごとライブラリはまだからっぽです",
+  child_manager_no_kids: "まだクルーがいません",
+  child_manager_no_kids_hint: "最初のおこさまを追加して、冒険をはじめよう。",
+  planner_empty_title: "計画するクルーがいません",
+  planner_empty_hint: "クルータブで子どもを1人以上追加してから、ここに戻ってきてください。",
+  planner_no_jobs_title: "おしごとライブラリがからっぽ",
+  planner_no_jobs_hint: "おしごとタブでチョアを追加すると、ここにドラッグできるようになります。", // CMO-review: "チョア" is loanword — might prefer "おしごと"
+  planner_week_empty_banner: "今週のよていはまだありません — おしごとを曜日にドラッグするか、「月曜をテンプレートにする」をタップしてください。",
+
+  // F11 — Empty states (kid dashboard) — kid-readable hiragana
+  kanban_empty_today_title: "きょうのおしごとなし!",
+  kanban_empty_today_hint: "あしたまたみてみよう。もっとやりたいときは船長にきいてね。",
+  goals_empty_title: "ゴールはまだないよ",
+  goals_empty_hint: "なにかほしいものをえらんでね!",
+  history_empty_title: "たからものれきしはまだからっぽ",
+  history_empty_hint: "おしごとをひとつおわらせるとここにでてくるよ — がんばれ!",
+  upcoming_empty_title: "まだよていなし",
+  upcoming_empty_hint: "おしごとのよていがないよ — 船長にたのんでみよう!",
+  sibling_rank_solo_title: "いまはきみだけ!",
+  sibling_rank_solo_hint: "もうひとりクルーがふえると、だれがいちばんかみえるよ。",
 } as const;
 
 export default ja;

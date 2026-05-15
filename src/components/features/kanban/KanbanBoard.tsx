@@ -35,8 +35,8 @@ export function KanbanBoard({ childId }: KanbanBoardProps) {
     startJob(jobId, childId, scheduledJobId);
   };
 
-  const handleComplete = (instanceId: string, jobId: string) => {
-    completeJob(instanceId);
+  const handleComplete = async (instanceId: string, jobId: string, proofFile?: File) => {
+    await completeJob(instanceId, proofFile);
     const job = getJobById(jobId);
     if (job) {
       setCelebrationYen(job.yenAmount);
@@ -76,13 +76,13 @@ export function KanbanBoard({ childId }: KanbanBoardProps) {
 
   if (hasNoJobsToday) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-blue-300/30 py-12 text-center">
+      <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-blue-300/30 px-6 py-12 text-center">
         <span className="mb-3 text-5xl">📅</span>
         <p className="text-lg font-semibold text-white/80">
-          {t("kanban_no_jobs_today")}
+          {t("kanban_empty_today_title")}
         </p>
-        <p className="text-sm text-white/50">
-          {t("kanban_no_jobs_hint")}
+        <p className="mt-1 text-sm text-white/60">
+          {t("kanban_empty_today_hint")}
         </p>
       </div>
     );
@@ -108,6 +108,8 @@ export function KanbanBoard({ childId }: KanbanBoardProps) {
                 key={sj._id}
                 job={sj.job}
                 status="available"
+                parentNote={sj.parentNote}
+                priority={sj.priority}
                 onStart={() => handleStart(sj.jobId, sj._id)}
               />
             ))}
@@ -128,7 +130,9 @@ export function KanbanBoard({ childId }: KanbanBoardProps) {
                 job={inst.job}
                 status="in_progress"
                 instanceId={inst._id}
-                onComplete={() => handleComplete(inst._id, inst.jobId)}
+                onComplete={(proofFile) =>
+                  handleComplete(inst._id, inst.jobId, proofFile)
+                }
               />
             ))}
           </KanbanColumn>

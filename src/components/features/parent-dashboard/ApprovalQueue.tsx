@@ -9,14 +9,22 @@ export function ApprovalQueue() {
   const { t } = useTranslation();
   const pending = getPendingApprovals();
 
+  const handleReject = (instanceId: string) => {
+    const parentNote = window.prompt(t("approval_reject_note_prompt"));
+    if (!parentNote?.trim()) return;
+    rejectJob(instanceId, parentNote.trim());
+  };
+
   if (pending.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-2xl border border-amber-700/20 bg-amber-900/20 py-12 text-center">
+      <div className="flex flex-col items-center justify-center rounded-2xl border border-amber-700/20 bg-amber-900/20 px-6 py-12 text-center">
         <span className="mb-3 text-5xl">⚓</span>
         <p className="text-lg font-semibold text-amber-200">
-          {t("approval_all_clear")}
+          {t("approvals_empty_title")}
         </p>
-        <p className="text-sm text-amber-300/60">{t("approval_no_jobs")}</p>
+        <p className="mt-1 text-sm text-amber-300/70">
+          {t("approvals_empty_hint")}
+        </p>
       </div>
     );
   }
@@ -35,7 +43,7 @@ export function ApprovalQueue() {
             key={inst._id}
             instance={inst}
             onApprove={() => approveJob(inst._id)}
-            onReject={() => rejectJob(inst._id)}
+            onReject={() => handleReject(inst._id)}
           />
         ))}
       </div>

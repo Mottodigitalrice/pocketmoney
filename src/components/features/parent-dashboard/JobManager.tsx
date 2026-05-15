@@ -9,7 +9,7 @@ import { CURRENCY, CHILD_ICON_CONFIG } from "@/lib/constants";
 import { JobForm } from "./JobForm";
 import { OneOffTaskForm } from "./OneOffTaskForm";
 import type { TranslationKey } from "@/lib/i18n/translations";
-import type { ChildIcon } from "@/types";
+import type { ChildIcon, JobPriority, RecurrenceType } from "@/types";
 import {
   Dialog,
   DialogContent,
@@ -41,6 +41,12 @@ export function JobManager() {
     titleJa?: string;
     yenAmount: number;
     icon: string;
+    requiresPhotoProof?: boolean;
+    recurrence?: {
+      type: RecurrenceType;
+      daysOfWeek?: number[];
+      priority?: JobPriority;
+    };
   }) => {
     if (editing) {
       editJob(editing._id, jobData);
@@ -52,6 +58,18 @@ export function JobManager() {
   const handleQuickAssign = (jobId: string, childId: string) => {
     quickAssign(jobId, childId);
     setAssigningJobId(null);
+  };
+
+  const getRecurrenceLabel = (job: Job) => {
+    const recurrence = job.recurrence;
+    if (!recurrence || recurrence.type === "none") return null;
+    if (recurrence.type !== "specificDays") {
+      return t(`recurrence_${recurrence.type}` as TranslationKey);
+    }
+    const days = (recurrence.daysOfWeek ?? [])
+      .map((day) => t(`recurrence_day_${day}` as TranslationKey))
+      .join(", ");
+    return days || t("recurrence_specificDays");
   };
 
   return (
@@ -80,6 +98,24 @@ export function JobManager() {
         </div>
       </div>
 
+      {jobs.filter((job) => !job.isOneOff).length === 0 && (
+        <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-amber-700/20 bg-amber-900/20 px-6 py-12 text-center backdrop-blur-sm">
+          <span className="text-5xl">📜</span>
+          <p className="text-lg font-semibold text-amber-200">
+            {t("job_library_empty_title")}
+          </p>
+          <p className="text-sm text-amber-300/70">
+            {t("job_library_empty_hint")}
+          </p>
+          <Button
+            onClick={handleAdd}
+            className="mt-2 bg-amber-600 font-bold text-white hover:bg-amber-700"
+          >
+            {t("job_library_empty_cta")}
+          </Button>
+        </div>
+      )}
+
       <div className="space-y-2">
         {jobs.filter((job) => !job.isOneOff).map((job) => (
           <div
@@ -95,6 +131,16 @@ export function JobManager() {
                     ? job.titleJa
                     : job.title}
               </h3>
+              {getRecurrenceLabel(job) && (
+                <p className="mt-1 truncate text-xs font-semibold text-amber-300/70">
+                  {getRecurrenceLabel(job)}
+                </p>
+              )}
+              {job.requiresPhotoProof && (
+                <p className="mt-1 text-xs font-semibold text-sky-200">
+                  {t("job_manager_photo_proof")}
+                </p>
+              )}
             </div>
             <span className="rounded-full bg-amber-400/20 px-3 py-1 text-sm font-bold text-amber-300">
               {CURRENCY}

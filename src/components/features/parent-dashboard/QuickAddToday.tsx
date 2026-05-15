@@ -64,12 +64,12 @@ export function QuickAddToday() {
 
   if (familyChildren.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-2xl border border-amber-700/20 bg-amber-900/20 py-12 text-center">
+      <div className="flex flex-col items-center justify-center rounded-2xl border border-amber-700/20 bg-amber-900/20 px-6 py-12 text-center">
         <span className="mb-3 text-5xl">👶</span>
         <p className="text-lg font-semibold text-amber-200">
-          {t("children_empty")}
+          {t("child_manager_no_kids")}
         </p>
-        <p className="text-sm text-amber-300/60">
+        <p className="mt-1 text-sm text-amber-300/70">
           {t("quick_add_empty_children")}
         </p>
       </div>
@@ -78,12 +78,12 @@ export function QuickAddToday() {
 
   if (libraryJobs.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-2xl border border-amber-700/20 bg-amber-900/20 py-12 text-center">
+      <div className="flex flex-col items-center justify-center rounded-2xl border border-amber-700/20 bg-amber-900/20 px-6 py-12 text-center">
         <span className="mb-3 text-5xl">📜</span>
         <p className="text-lg font-semibold text-amber-200">
-          {t("job_manager_title", { count: "0" })}
+          {t("quick_add_empty_jobs_title")}
         </p>
-        <p className="text-sm text-amber-300/60">
+        <p className="mt-1 text-sm text-amber-300/70">
           {t("quick_add_empty_jobs")}
         </p>
       </div>
