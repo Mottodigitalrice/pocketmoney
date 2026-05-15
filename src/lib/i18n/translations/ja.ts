@@ -91,6 +91,13 @@ const ja = {
   approval_approve: "承認 ✅",
   approval_reject: "もう一回 🔄",
   approval_reject_note_prompt: "もう一回やる前に、何を直してほしいですか?",
+  // S6 (R4) — F10 5.17: styled reject-note dialog replaces window.prompt.
+  approval_reject_dialog_title: "もう一回やってもらおう",
+  approval_reject_dialog_subtitle: "何を直してほしいか、やさしくつたえてあげてください。",
+  approval_reject_dialog_placeholder: "例: ベッドのまくらの下にまだくつしたがあるよ!",
+  approval_reject_dialog_cancel: "キャンセル",
+  approval_reject_dialog_submit: "もどす",
+  approval_reject_dialog_empty_error: "もどす前に、すこしメモを入れてくださいね。",
   approval_photo_proof: "写真のしょうこ",
   approval_photo_proof_alt: "お仕事完了の写真",
   // F20 — tap-to-enlarge + close labels for the proof preview modal.

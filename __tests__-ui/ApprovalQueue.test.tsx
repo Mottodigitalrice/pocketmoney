@@ -10,11 +10,12 @@
  *   - Empty state (no pending) shows the F11 onboarding copy.
  *   - Single pending row renders an ApprovalCard with both action buttons.
  *   - Clicking Approve fires the `approveJob` mutation with the instance id.
- *   - Clicking Reject triggers the prompt path and calls `rejectJob` with the
- *     parent note (empty / cancelled prompts must NOT call rejectJob).
+ *   - Clicking Reject opens the styled dialog (S6, R4 — previously
+ *     window.prompt) and calls `rejectJob` with the trimmed note on submit.
+ *     Cancel + empty submits MUST NOT call rejectJob.
  */
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { renderWithProviders, fireEvent } from "./test-utils";
+import { describe, it, expect, vi } from "vitest";
+import { renderWithProviders, fireEvent, screen } from "./test-utils";
 import { ApprovalQueue } from "@/components/features/parent-dashboard/ApprovalQueue";
 import type { Child, Job, JobInstanceWithJob } from "@/types";
 
@@ -101,22 +102,9 @@ describe("ApprovalQueue", () => {
     expect(approveJob).toHaveBeenCalledWith("inst-1");
   });
 
-  describe("reject flow", () => {
-    let originalPrompt: typeof window.prompt;
-
-    beforeEach(() => {
-      originalPrompt = window.prompt;
-    });
-
-    afterEach(() => {
-      window.prompt = originalPrompt;
-    });
-
-    it("fires rejectJob with the trimmed note when the parent answers the prompt", () => {
+  describe("reject flow (S6, R4 — styled dialog replaces window.prompt)", () => {
+    it("opens the reject-note dialog when the reject button is clicked", () => {
       const rejectJob = vi.fn();
-      // window.prompt → "  Please redo it  " → expect trimmed.
-      window.prompt = vi.fn(() => "  Please redo it  ");
-
       const { getByTestId } = renderWithProviders(<ApprovalQueue />, {
         contextValue: {
           getPendingApprovals: () => [pendingInstance("inst-2")],
@@ -124,25 +112,45 @@ describe("ApprovalQueue", () => {
           rejectJob,
         },
       });
+      // Dialog hidden before click.
+      expect(screen.queryByTestId("reject-note-dialog")).toBeNull();
 
-      // The 2nd button inside the card is Reject (outline variant).
       const buttons = getByTestId("approval-card").querySelectorAll("button");
-      // Buttons in order: [proof-button (only if proofUrl)], approve, reject.
-      // No proofUrl here, so [0]=approve, [1]=reject.
       const rejectBtn = buttons[buttons.length - 1];
-      expect(rejectBtn).toBeDefined();
       fireEvent.click(rejectBtn!);
 
-      expect(window.prompt).toHaveBeenCalled();
+      // Dialog renders into document.body via Radix portal.
+      expect(screen.getByTestId("reject-note-dialog")).toBeInTheDocument();
+      // rejectJob NOT called yet — the parent still has to type + submit.
+      expect(rejectJob).not.toHaveBeenCalled();
+    });
+
+    it("fires rejectJob with the trimmed note when the dialog submit fires", () => {
+      const rejectJob = vi.fn();
+      const { getByTestId } = renderWithProviders(<ApprovalQueue />, {
+        contextValue: {
+          getPendingApprovals: () => [pendingInstance("inst-2")],
+          getChildById: () => CHILD_A,
+          rejectJob,
+        },
+      });
+      const buttons = getByTestId("approval-card").querySelectorAll("button");
+      const rejectBtn = buttons[buttons.length - 1];
+      fireEvent.click(rejectBtn!);
+
+      // Type into the textarea with padding to verify trim() runs.
+      const textarea = screen.getByTestId("reject-note-textarea");
+      fireEvent.change(textarea, { target: { value: "  Please redo it  " } });
+      // Submit.
+      const submitBtn = screen.getByTestId("reject-note-submit");
+      fireEvent.click(submitBtn);
+
       expect(rejectJob).toHaveBeenCalledTimes(1);
       expect(rejectJob).toHaveBeenCalledWith("inst-2", "Please redo it");
     });
 
-    it("does NOT call rejectJob when the parent cancels or leaves the prompt blank", () => {
+    it("blocks the submit + shows the empty-error when the textarea is blank", () => {
       const rejectJob = vi.fn();
-      // First case — prompt cancelled (returns null in real browsers).
-      window.prompt = vi.fn(() => null);
-
       const { getByTestId } = renderWithProviders(<ApprovalQueue />, {
         contextValue: {
           getPendingApprovals: () => [pendingInstance("inst-3")],
@@ -152,8 +160,33 @@ describe("ApprovalQueue", () => {
       });
       const buttons = getByTestId("approval-card").querySelectorAll("button");
       const rejectBtn = buttons[buttons.length - 1];
-      expect(rejectBtn).toBeDefined();
       fireEvent.click(rejectBtn!);
+
+      // Submit with empty textarea.
+      fireEvent.click(screen.getByTestId("reject-note-submit"));
+
+      // Inline error appears, rejectJob never fires.
+      expect(screen.getByTestId("reject-note-empty-error")).toBeInTheDocument();
+      expect(rejectJob).not.toHaveBeenCalled();
+    });
+
+    it("does NOT call rejectJob when the parent cancels the dialog", () => {
+      const rejectJob = vi.fn();
+      const { getByTestId } = renderWithProviders(<ApprovalQueue />, {
+        contextValue: {
+          getPendingApprovals: () => [pendingInstance("inst-4")],
+          getChildById: () => CHILD_A,
+          rejectJob,
+        },
+      });
+      const buttons = getByTestId("approval-card").querySelectorAll("button");
+      const rejectBtn = buttons[buttons.length - 1];
+      fireEvent.click(rejectBtn!);
+
+      // Type something then bail.
+      const textarea = screen.getByTestId("reject-note-textarea");
+      fireEvent.change(textarea, { target: { value: "Never mind" } });
+      fireEvent.click(screen.getByTestId("reject-note-cancel"));
 
       expect(rejectJob).not.toHaveBeenCalled();
     });

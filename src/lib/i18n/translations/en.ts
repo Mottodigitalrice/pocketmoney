@@ -90,6 +90,13 @@ const en = {
   approval_approve: "Approve ✅",
   approval_reject: "Try Again 🔄",
   approval_reject_note_prompt: "What should they fix before trying again?",
+  // S6 (R4) — F10 5.17: styled reject-note dialog replaces window.prompt.
+  approval_reject_dialog_title: "Send back for a do-over",
+  approval_reject_dialog_subtitle: "Leave a kind note so they know what to fix.",
+  approval_reject_dialog_placeholder: "e.g. The bed still has socks under the pillow!",
+  approval_reject_dialog_cancel: "Cancel",
+  approval_reject_dialog_submit: "Send Back",
+  approval_reject_dialog_empty_error: "Please write a quick note before sending it back.",
   approval_photo_proof: "Photo proof",
   approval_photo_proof_alt: "Photo proof for completed job",
   // F20 — tap-to-enlarge + close labels for the proof preview modal.
