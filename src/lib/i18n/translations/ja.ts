@@ -355,12 +355,18 @@ const ja = {
 
   // Onboarding - Jobs step
   onboarding_add_jobs: "おしごとをつくろう",
-  onboarding_add_jobs_subtitle: "クルーがたからものをかせぐおしごとは? すくなくとも1つ追加してね。",
+  onboarding_add_jobs_subtitle: "クルーがたからものをかせぐおしごとは? 自分で追加してもいいし、スキップすれば最初から20個のおしごとを用意します。",
   onboarding_job_name: "おしごとの名前",
   onboarding_job_name_placeholder: "れい: おもちゃをかたづける",
   onboarding_job_yen: "金額 (¥)",
   onboarding_add_job: "+ おしごとを追加",
   onboarding_remove_job: "はずす",
+  // H3 — skip-jobs path: empty custom list is fine, defaults always seed.
+  onboarding_use_defaults_only: "スキップすると、20個の最初のおしごとを用意します",
+
+  // H3 — onboarding save error UX
+  onboarding_save_failed_title: "嵐にあいました — クルーをほぞんできませんでした",
+  onboarding_save_retry: "もう一度ためす",
 
   // Math challenge
   math_challenge_title: "船長のコード",
@@ -390,6 +396,8 @@ const ja = {
   // Home
   home_add_children_hint: "船長のブリッジでクルーを追加しよう!",
   home_no_children: "まだクルーがいません",
+  // H3 — friendlier loading state during convexUser provisioning race.
+  home_loading_crew: "クルーをよみこみ中…",
 
   // Auth
   auth_sign_in_title: "おかえり、船長!",

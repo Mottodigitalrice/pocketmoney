@@ -1,6 +1,7 @@
 "use client";
 
 import { Skeleton } from "@/components/ui/skeleton";
+import { useTranslation } from "@/hooks/use-translation";
 
 /**
  * AppSkeleton — polished shell placeholder for initial Convex hydration.
@@ -14,6 +15,11 @@ import { Skeleton } from "@/components/ui/skeleton";
  * shadcn `Skeleton` is `bg-accent`, which on this app's dark amber surfaces
  * reads as a muted shimmer rather than the spec's `bg-amber-900/30`. We use
  * the shadcn default so any future theme retuning stays centralized.
+ *
+ * H3 — punchlist 2.1: the `home` variant now shows a friendly visible
+ * "Loading your crew…" label so the brief empty-character-select flash during
+ * the `convexUser === undefined` provisioning race reads as intentional
+ * loading copy rather than a blank shell.
  */
 export function AppSkeleton({ variant = "home" }: { variant?: "home" | "kid" | "parent" }) {
   return (
@@ -41,10 +47,20 @@ export function AppSkeleton({ variant = "home" }: { variant?: "home" | "kid" | "
 }
 
 function HomeSkeletonBody() {
+  const { t } = useTranslation();
   return (
     <div className="flex flex-col items-center justify-center px-4 py-12">
       <Skeleton className="h-14 w-72 rounded-xl bg-amber-900/40" />
       <Skeleton className="mt-4 h-6 w-56 rounded-lg bg-amber-900/30" />
+
+      {/* H3 — punchlist 2.1: visible loading copy so the convexUser
+          provisioning race reads as intentional loading, not a blank flash. */}
+      <p
+        data-testid="home-loading-label"
+        className="mt-6 text-sm font-medium text-white/70 drop-shadow"
+      >
+        {t("home_loading_crew")}
+      </p>
 
       {/* Child avatar row — 3 round skeletons */}
       <div className="mt-12 grid w-full max-w-4xl grid-cols-2 gap-6 sm:grid-cols-4">

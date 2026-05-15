@@ -10,6 +10,7 @@ import { hasAppDataEnv } from "@/lib/env";
 import { LanguageToggle } from "@/components/shared/LanguageToggle";
 import { BudouXText } from "@/components/shared/BudouXText";
 import { useTranslation } from "@/hooks/use-translation";
+import { mapConvexError } from "@/lib/convex-errors";
 import type { ChildIcon } from "@/types";
 
 // ---------------------------------------------------------------------------
@@ -427,9 +428,10 @@ function StepAddJobs({
 }) {
   const { t } = useTranslation();
 
-  const isValid =
-    jobs.length >= 1 &&
-    jobs.every((j) => j.title.trim() !== "" && j.yenAmount >= 10);
+  // H3 — punchlist 3.2: Empty custom list is fine. `seedDefaults()` always runs
+  // in `handleComplete`, so 20 built-in chores will be there regardless. If the
+  // parent DOES add custom jobs, each one still needs a title + yen >= 10.
+  const isValid = jobs.every((j) => j.title.trim() !== "" && j.yenAmount >= 10);
 
   const addJob = useCallback(() => {
     if (jobs.length >= MAX_JOBS) return;
@@ -488,6 +490,17 @@ function StepAddJobs({
         </button>
       )}
 
+      {/* H3 — punchlist 3.2: explicit skip path. Clears any half-typed custom
+          jobs and relies on the always-run seedDefaults() in handleComplete. */}
+      <button
+        type="button"
+        data-testid="onboarding-skip-jobs"
+        onClick={() => setJobs([])}
+        className="text-center text-sm text-white/60 underline-offset-4 transition-colors hover:text-white/90 hover:underline"
+      >
+        {t("onboarding_use_defaults_only")}
+      </button>
+
       <div className="flex gap-3">
         <button
           type="button"
@@ -498,6 +511,7 @@ function StepAddJobs({
         </button>
         <button
           type="button"
+          data-testid="onboarding-jobs-next"
           onClick={onNext}
           disabled={!isValid}
           className="flex-1 rounded-xl bg-amber-500 py-3 font-bold text-white shadow-lg transition-all duration-200 hover:bg-amber-600 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-amber-500"
@@ -519,12 +533,16 @@ function StepDone({
   onBack,
   onComplete,
   isSaving,
+  saveError,
+  onRetry,
 }: {
   crewMembers: LocalChild[];
   jobs: LocalJob[];
   onBack: () => void;
   onComplete: () => void;
   isSaving: boolean;
+  saveError: string | null;
+  onRetry: () => void;
 }) {
   const { t, locale } = useTranslation();
 
@@ -573,28 +591,58 @@ function StepDone({
         </div>
       </div>
 
-      {/* Jobs summary */}
-      <div className="w-full rounded-2xl border border-white/20 bg-white/10 p-6 backdrop-blur-md">
-        <h3 className="mb-4 text-lg font-bold text-amber-300">
-          {t("tab_jobs")}
-        </h3>
-        <div className="flex flex-col gap-2">
-          {localJobs.map((job) => (
-            <div
-              key={job.id}
-              className="flex items-center justify-between rounded-xl border border-white/10 bg-white/5 px-4 py-3"
-            >
-              <div className="flex items-center gap-3">
-                <span className="text-2xl">{job.icon}</span>
-                <span className="font-semibold text-white">{job.title}</span>
+      {/* Jobs summary — only shown when the parent typed at least one custom job.
+          When localJobs is empty, the 20 built-in defaults will seed on save and
+          we don't need to render an empty box. (H3 punchlist 3.2) */}
+      {localJobs.length > 0 && (
+        <div className="w-full rounded-2xl border border-white/20 bg-white/10 p-6 backdrop-blur-md">
+          <h3 className="mb-4 text-lg font-bold text-amber-300">
+            {t("tab_jobs")}
+          </h3>
+          <div className="flex flex-col gap-2">
+            {localJobs.map((job) => (
+              <div
+                key={job.id}
+                className="flex items-center justify-between rounded-xl border border-white/10 bg-white/5 px-4 py-3"
+              >
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">{job.icon}</span>
+                  <span className="font-semibold text-white">{job.title}</span>
+                </div>
+                <span className="rounded-full bg-amber-400/20 px-3 py-1 text-sm font-bold text-amber-300">
+                  ¥{job.yenAmount}
+                </span>
               </div>
-              <span className="rounded-full bg-amber-400/20 px-3 py-1 text-sm font-bold text-amber-300">
-                ¥{job.yenAmount}
-              </span>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
+      )}
+
+      {/* H3 — punchlist 3.7: surface save errors instead of swallowing them in
+          console.error. `saveError` is a pre-translated message from
+          mapConvexError; we render it inline above the navigation with a
+          dedicated retry button. */}
+      {saveError && (
+        <div
+          data-testid="onboarding-save-error"
+          role="alert"
+          className="w-full rounded-2xl border border-red-400/40 bg-red-500/15 p-5 text-center backdrop-blur-md"
+        >
+          <p className="text-sm font-bold text-red-200">
+            {t("onboarding_save_failed_title")}
+          </p>
+          <p className="mt-1 text-sm text-red-100/90">{saveError}</p>
+          <button
+            type="button"
+            data-testid="onboarding-save-retry"
+            onClick={onRetry}
+            disabled={isSaving}
+            className="mt-3 rounded-xl bg-red-400/90 px-5 py-2 text-sm font-bold text-white shadow transition-all duration-200 hover:bg-red-400 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {t("onboarding_save_retry")}
+          </button>
+        </div>
+      )}
 
       {/* Navigation */}
       <div className="flex w-full gap-3">
@@ -651,6 +699,7 @@ export default function OnboardingPage() {
 function OnboardingPageInner() {
   const router = useRouter();
   const { user } = useUser();
+  const { t } = useTranslation();
 
   // Convex
   const convexUser = useQuery(
@@ -664,6 +713,9 @@ function OnboardingPageInner() {
   // Local state
   const [step, setStep] = useState(0);
   const [isSaving, setIsSaving] = useState(false);
+  // H3 — punchlist 3.7: track save failures so we can surface a friendly
+  // toast/inline error instead of silently console.error'ing.
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [localChildren, setLocalChildren] = useState<LocalChild[]>([
     { id: crypto.randomUUID(), name: "", icon: null },
   ]);
@@ -685,10 +737,13 @@ function OnboardingPageInner() {
     []
   );
 
-  // Complete onboarding: save children + jobs, then redirect
+  // Complete onboarding: save children + jobs, then redirect.
+  // H3 — punchlist 3.7: any failure here is mapped through `mapConvexError`
+  // so the parent sees a translated, actionable message + a retry button.
   const handleComplete = useCallback(async () => {
     if (!convexUser?._id) return;
 
+    setSaveError(null);
     setIsSaving(true);
     try {
       // Create all children
@@ -701,9 +756,13 @@ function OnboardingPageInner() {
         }
       }
 
+      // H3 — punchlist 3.2: seedDefaults always runs, so the parent can
+      // legitimately leave `localJobs` empty and still land in a home with
+      // 20 built-in chores ready to assign.
       await seedDefaults();
 
-      // Create all custom jobs as the parent typed them.
+      // Create all custom jobs as the parent typed them. With the skip-jobs
+      // path, this loop may execute zero times — which is fine.
       for (const job of localJobs) {
         if (job.title.trim()) {
           await createJob({
@@ -717,10 +776,14 @@ function OnboardingPageInner() {
       // Redirect to home
       router.push("/");
     } catch (error) {
-      console.error("Onboarding error:", error);
+      const mapped = mapConvexError(error, t);
+      // Keep the raw message in console for debugging — the UI gets the
+      // translated, user-safe `mapped.message`.
+      console.error("Onboarding error:", mapped.code, mapped.raw);
+      setSaveError(mapped.message);
       setIsSaving(false);
     }
-  }, [convexUser, localChildren, localJobs, createChild, createJob, seedDefaults, router]);
+  }, [convexUser, localChildren, localJobs, createChild, createJob, seedDefaults, router, t]);
 
   return (
     <div className="flex min-h-screen flex-col items-center px-4 py-8">
@@ -764,6 +827,8 @@ function OnboardingPageInner() {
             onBack={() => goToStep(2)}
             onComplete={handleComplete}
             isSaving={isSaving}
+            saveError={saveError}
+            onRetry={handleComplete}
           />
         )}
       </div>

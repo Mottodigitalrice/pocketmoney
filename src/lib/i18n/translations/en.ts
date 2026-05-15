@@ -339,12 +339,18 @@ const en = {
 
   // Onboarding - Jobs step
   onboarding_add_jobs: "Set Up Some Jobs",
-  onboarding_add_jobs_subtitle: "What chores can your crew do to earn treasure? Add at least one.",
+  onboarding_add_jobs_subtitle: "What chores can your crew do to earn treasure? Add your own, or skip and we'll start you with 20 built-in chores.",
   onboarding_job_name: "Job name",
   onboarding_job_name_placeholder: "e.g. Clean up toys",
   onboarding_job_yen: "Yen (¥)",
   onboarding_add_job: "+ Add Another Job",
   onboarding_remove_job: "Remove",
+  // H3 — skip-jobs path: empty custom list is fine, defaults always seed.
+  onboarding_use_defaults_only: "Or skip this and we'll set up 20 starter chores for you",
+
+  // H3 — onboarding save error UX (mapped from mapConvexError + retry affordance)
+  onboarding_save_failed_title: "We hit a squall — couldn't save your crew",
+  onboarding_save_retry: "Try again",
 
   // Math challenge (parent gate)
   math_challenge_title: "Captain's Code",
@@ -374,6 +380,8 @@ const en = {
   // Home page (updated for dynamic)
   home_add_children_hint: "Add your crew in the Captain's Bridge!",
   home_no_children: "No crew members yet",
+  // H3 — friendlier loading state during convexUser provisioning race.
+  home_loading_crew: "Loading your crew…",
 
   // Auth
   auth_sign_in_title: "Welcome Back, Captain!",
