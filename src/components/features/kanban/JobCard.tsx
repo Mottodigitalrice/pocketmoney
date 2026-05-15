@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { CURRENCY } from "@/lib/constants";
 import { useTranslation } from "@/hooks/use-translation";
 import type { TranslationKey } from "@/lib/i18n/translations";
+import { mapConvexError } from "@/lib/convex-errors";
+import { RetryablePhotoUploadError } from "@/lib/photo-proof";
 
 interface JobCardProps {
   job: Job;
@@ -31,16 +33,19 @@ export function JobCard({
   const [proofFile, setProofFile] = useState<File | undefined>();
   const [isCompleting, setIsCompleting] = useState(false);
   const [error, setError] = useState("");
+  const [retryable, setRetryable] = useState(false);
   const { t, locale } = useTranslation();
   const requiresPhotoProof = Boolean(job.requiresPhotoProof);
 
   const handleAction = async () => {
     if (status === "in_progress" && requiresPhotoProof && !proofFile) {
       setError(t("photo_proof_required"));
+      setRetryable(false);
       return;
     }
 
     setError("");
+    setRetryable(false);
     setBouncing(true);
     setTimeout(() => setBouncing(false), 500);
 
@@ -50,8 +55,17 @@ export function JobCard({
       setIsCompleting(true);
       try {
         await onComplete(proofFile);
-      } catch {
-        setError(t("photo_proof_error"));
+      } catch (err) {
+        // F12: route errors through the typed mapper so the kid sees a
+        // friendly message, not a raw error code.
+        if (err instanceof RetryablePhotoUploadError) {
+          setError(t("error_network"));
+          setRetryable(true);
+        } else {
+          const { message } = mapConvexError(err, t);
+          setError(message);
+          setRetryable(false);
+        }
       } finally {
         setIsCompleting(false);
       }
@@ -130,6 +144,7 @@ export function JobCard({
                   onChange={(event) => {
                     setProofFile(event.target.files?.[0]);
                     setError("");
+                    setRetryable(false);
                   }}
                 />
                 {proofFile
@@ -140,14 +155,28 @@ export function JobCard({
           )}
 
           {error && (
-            <p className="rounded-lg bg-red-50 px-3 py-2 text-sm font-semibold text-red-700">
-              {error}
-            </p>
+            <div
+              data-testid="job-card-error"
+              className="rounded-lg bg-red-50 px-3 py-2 text-sm font-semibold text-red-700"
+            >
+              <p>{error}</p>
+              {retryable && (
+                <Button
+                  onClick={handleAction}
+                  disabled={isCompleting}
+                  data-testid="job-card-retry"
+                  className="mt-2 w-full rounded-md bg-red-600 py-2 text-sm font-bold text-white hover:bg-red-700 disabled:opacity-60"
+                >
+                  {t("photo_proof_retry")}
+                </Button>
+              )}
+            </div>
           )}
 
           <Button
             onClick={handleAction}
             disabled={isCompleting || (requiresPhotoProof && !proofFile)}
+            data-testid="job-card-complete"
             className="w-full rounded-xl bg-green-500 py-6 text-lg font-bold text-white hover:bg-green-600 active:scale-95 disabled:opacity-60"
             size="lg"
           >

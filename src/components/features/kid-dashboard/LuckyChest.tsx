@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { usePocketMoney } from "@/hooks/use-pocket-money";
 import { useTranslation } from "@/hooks/use-translation";
 import { CURRENCY } from "@/lib/constants";
+import { mapConvexError } from "@/lib/convex-errors";
 
 interface LuckyChestProps {
   childId: string;
@@ -27,7 +28,10 @@ export function LuckyChest({ childId }: LuckyChestProps) {
     try {
       await openLuckyChest(childId);
     } catch (err) {
-      setError(err instanceof Error ? err.message : t("lucky_chest_error"));
+      // F12: route raw Convex errors through the typed mapper so the kid
+      // never sees `LUCKY_CHEST_ALREADY_OPENED_THIS_WEEK` or other codes.
+      const { message } = mapConvexError(err, t);
+      setError(message);
     } finally {
       setIsOpening(false);
     }
@@ -67,7 +71,7 @@ export function LuckyChest({ childId }: LuckyChestProps) {
                       total: status.mustDoTotal,
                     })}
             </p>
-            {error && <p className="mt-2 text-sm text-red-200">{error}</p>}
+            {error && <p className="mt-2 text-sm text-red-200" data-testid="lucky-chest-error">{error}</p>}
           </div>
         </div>
 

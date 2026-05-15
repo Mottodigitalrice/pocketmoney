@@ -22,7 +22,7 @@ import {
   JobRecurrence,
   LuckyChestStatus,
 } from "@/types";
-import { resizeImageForProof } from "@/lib/photo-proof";
+import { resizeImageForProof, uploadProofWithRetry } from "@/lib/photo-proof";
 import { calculateRank } from "../../../convex/lib/rankMath";
 
 // Helper to get today's date as YYYY-MM-DD in local timezone
@@ -647,25 +647,25 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
       }
 
       const resizedProof = await resizeImageForProof(proofFile);
-      const uploadUrl = await generateProofUploadUrlMutation();
-      const result = await fetch(uploadUrl, {
-        method: "POST",
-        headers: { "Content-Type": resizedProof.type },
-        body: resizedProof,
-      });
+      // F12: uploadProofWithRetry handles in-flight dedupe (double-tap),
+      // retryable 5xx errors (throws RetryablePhotoUploadError), and surfaces
+      // a clean Error on permanent 4xx. Callers (JobCard) catch and either
+      // show a Retry button or let the global mapper handle it.
+      const { storageId, fileName, contentType, size } = await uploadProofWithRetry(
+        resizedProof,
+        {
+          dedupeKey: instanceId,
+          getUploadUrl: () => generateProofUploadUrlMutation(),
+        }
+      );
 
-      if (!result.ok) {
-        throw new Error("Could not upload photo proof");
-      }
-
-      const { storageId } = (await result.json()) as { storageId: Id<"_storage"> };
       await completeJobMutation({
         instanceId: instanceId as Id<"jobInstances">,
         proof: {
-          storageId,
-          fileName: resizedProof.name,
-          contentType: resizedProof.type,
-          size: resizedProof.size,
+          storageId: storageId as Id<"_storage">,
+          fileName,
+          contentType,
+          size,
         },
       });
     },

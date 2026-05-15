@@ -382,6 +382,60 @@ const ja = {
   upcoming_empty_hint: "おしごとのよていがないよ — 船長にたのんでみよう!",
   sibling_rank_solo_title: "いまはきみだけ!",
   sibling_rank_solo_hint: "もうひとりクルーがふえると、だれがいちばんかみえるよ。",
+
+  // F12 — Mapped error messages (mapConvexError) // CMO-review: tone calibration for parent vs kid surfaces
+  error_auth_lost: "ログインがきれちゃったみたい。もう一度ログインしてね。", // CMO-review: parent will see this — verify tone
+  error_network: "船とつながらないよ。インターネットをかくにんしてもう一度ためしてね。",
+  error_overdraft: "そのつぼには、引き出すぶんのたからものがたりません。",
+  error_lucky_chest_locked: "今週はもうラッキーチェストをあけたよ。月曜にまたためしてね!",
+  error_child_deleted: "そのクルーはもう乗っていません。ページを更新します。",
+  error_already_approved: "このおしごとはもう承認ずみです。取り消しはいりません。",
+  error_ownership: "それはあなたのクルーのものではありません。",
+  error_validation: "入力内容にきになるところがあります。確認してもう一度送ってね。",
+  error_unknown: "なにかつまずいたみたい。もう一度ためしてね。",
+
+  // F12 — Error / not-found pages (pirate-toned bilingual)
+  error_page_title: "あれ、まいごになっちゃった!", // CMO-review: kid-friendly hiragana — verify parent tone
+  error_page_subtitle: "だいじょうぶ、たからものはぶじだよ。下のボタンでもう一度ためしてね。",
+  error_page_cta: "もう一度",
+  not_found_page_title: "この地図にはなにもないよ!",
+  not_found_page_subtitle: "そのページが見つかりませんでした。安全なところに戻りましょう。",
+  not_found_page_cta: "ホームへもどる",
+
+  // F12 — Photo upload retry
+  photo_proof_retry: "もう一度アップロード",
+
+  // F12 — Destructive confirmation dialogs (child)
+  child_delete_confirm_title: "{{name}}を削除しますか?",
+  child_delete_confirm_body: "つぼ・れきし・よていされたおしごとがすべて消えます。元にはもどせません。",
+  child_delete_confirm_cta: "はい、クルーを削除する",
+  child_delete_confirm_cancel: "そのままにする",
+
+  // F12 — Destructive confirmation dialogs (job)
+  job_delete_confirm_title: "このおしごとを削除しますか?",
+  job_delete_confirm_body: "よていされたインスタンスは削除されます。承認ずみのれきしは残ります。元にはもどせません。",
+  job_delete_confirm_cta: "はい、削除する",
+  job_delete_confirm_cancel: "そのままにする",
+
+  // F12 — ChildManager i18n cleanup
+  child_manager_header: "クルーメンバー ({{count}})", // CMO-review: header tone, parent-facing
+  child_manager_add_btn: "+ クルーを追加",
+  child_manager_empty_title: "まだクルーがいません!",
+  child_manager_empty_subtitle: "最初のちいさな海賊を追加して、冒険をはじめよう。",
+  child_manager_empty_cta: "+ クルーを追加",
+  child_icon_fallback_label: "サカナ",
+  child_manager_delete_aria: "{{name}}を削除",
+  child_manager_edit_aria: "{{name}}を編集",
+
+  // F12 — ChildForm i18n cleanup
+  child_form_edit_title: "クルーを編集",
+  child_form_add_title: "クルーを追加",
+  child_form_name_label: "なまえ",
+  child_form_name_placeholder: "名前を入力...",
+  child_form_icon_label: "アイコンをえらぼう",
+  child_form_cancel: "キャンセル",
+  child_form_save_edit: "保存",
+  child_form_save_add: "クルーに追加",
 } as const;
 
 export default ja;

@@ -6,6 +6,7 @@ import { CHILD_ICON_CONFIG } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useTranslation } from "@/hooks/use-translation";
 import {
   Dialog,
   DialogContent,
@@ -23,6 +24,7 @@ interface ChildFormProps {
 const iconKeys = Object.keys(CHILD_ICON_CONFIG) as ChildIcon[];
 
 export function ChildForm({ open, onClose, onSave, editingChild }: ChildFormProps) {
+  const { t, locale } = useTranslation();
   const [name, setName] = useState(() => editingChild?.name ?? "");
   const [selectedIcon, setSelectedIcon] = useState<ChildIcon>(
     () => (editingChild?.icon as ChildIcon | undefined) ?? "shark"
@@ -42,18 +44,18 @@ export function ChildForm({ open, onClose, onSave, editingChild }: ChildFormProp
       <DialogContent className="border-amber-700/50 bg-amber-950 text-amber-100 sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="text-amber-100">
-            {isEditing ? "Edit Crew Member" : "Add Crew Member"}
+            {isEditing ? t("child_form_edit_title") : t("child_form_add_title")}
           </DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* Name field */}
           <div>
-            <Label className="text-amber-200">Name</Label>
+            <Label className="text-amber-200">{t("child_form_name_label")}</Label>
             <Input
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Enter their name..."
+              placeholder={t("child_form_name_placeholder")}
               className="mt-1 border-amber-700/50 bg-amber-900/50 text-amber-100 placeholder:text-amber-500"
               autoFocus
             />
@@ -61,16 +63,21 @@ export function ChildForm({ open, onClose, onSave, editingChild }: ChildFormProp
 
           {/* Icon selection grid */}
           <div>
-            <Label className="text-amber-200">Choose an icon</Label>
+            <Label className="text-amber-200">{t("child_form_icon_label")}</Label>
             <div className="mt-2 grid grid-cols-4 gap-2">
               {iconKeys.map((key) => {
                 const config = CHILD_ICON_CONFIG[key];
                 const isSelected = selectedIcon === key;
+                // F12: locale-aware sea creature labels — `labelJa` is in
+                // CHILD_ICON_CONFIG and was previously ignored on this form.
+                const iconLabel = locale === "ja" ? config.labelJa : config.label;
                 return (
                   <button
                     type="button"
                     key={key}
                     onClick={() => setSelectedIcon(key)}
+                    aria-label={iconLabel}
+                    aria-pressed={isSelected}
                     className={`flex flex-col items-center gap-1 rounded-xl p-3 transition-all ${
                       isSelected
                         ? "bg-amber-600 ring-2 ring-amber-400"
@@ -79,7 +86,7 @@ export function ChildForm({ open, onClose, onSave, editingChild }: ChildFormProp
                   >
                     <span className="text-2xl">{config.emoji}</span>
                     <span className="text-xs font-medium text-amber-200">
-                      {config.label}
+                      {iconLabel}
                     </span>
                   </button>
                 );
@@ -95,13 +102,13 @@ export function ChildForm({ open, onClose, onSave, editingChild }: ChildFormProp
               onClick={onClose}
               className="flex-1 border-amber-700/50 text-amber-300 hover:bg-amber-800/40"
             >
-              Cancel
+              {t("child_form_cancel")}
             </Button>
             <Button
               type="submit"
               className="flex-1 bg-amber-600 font-bold text-white hover:bg-amber-700"
             >
-              {isEditing ? "Save Changes" : "Add to Crew"}
+              {isEditing ? t("child_form_save_edit") : t("child_form_save_add")}
             </Button>
           </div>
         </form>

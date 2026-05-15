@@ -382,6 +382,60 @@ const en = {
   upcoming_empty_hint: "No jobs lined up — ask your captain to plan some!",
   sibling_rank_solo_title: "Just you for now!",
   sibling_rank_solo_hint: "When another crew member joins, you'll see who's ahead.",
+
+  // F12 — Mapped error messages (mapConvexError → human-readable strings)
+  error_auth_lost: "You've been signed out — please log back in to keep going.",
+  error_network: "We can't reach the ship right now. Check your connection and try again.",
+  error_overdraft: "That jar doesn't have enough treasure for this withdrawal.",
+  error_lucky_chest_locked: "You already opened the Lucky Chest this week — try again on Monday!",
+  error_child_deleted: "That crew member is no longer aboard. The page will refresh.",
+  error_already_approved: "This chore was already approved — no take-backs needed!",
+  error_ownership: "That doesn't belong to your crew.",
+  error_validation: "Something in that form isn't quite right. Please check and try again.",
+  error_unknown: "Something hit a reef. Please try again in a moment.",
+
+  // F12 — Error / not-found pages (pirate-toned)
+  error_page_title: "Something hit a reef!",
+  error_page_subtitle: "Don't worry — your treasure is safe. Tap below to try again.",
+  error_page_cta: "Try Again",
+  not_found_page_title: "This map leads nowhere!",
+  not_found_page_subtitle: "We couldn't find that page. Let's get you back to safe waters.",
+  not_found_page_cta: "Back to Safe Harbour",
+
+  // F12 — Photo upload retry
+  photo_proof_retry: "Retry Upload",
+
+  // F12 — Destructive confirmation dialogs (child)
+  child_delete_confirm_title: "Delete {{name}}?",
+  child_delete_confirm_body: "This removes their wallet, history, and all scheduled jobs. This cannot be undone.",
+  child_delete_confirm_cta: "Yes, delete crew member",
+  child_delete_confirm_cancel: "Keep them aboard",
+
+  // F12 — Destructive confirmation dialogs (job)
+  job_delete_confirm_title: "Delete this chore?",
+  job_delete_confirm_body: "Any scheduled instances of this chore will be removed. Past completed history stays. This cannot be undone.",
+  job_delete_confirm_cta: "Yes, delete chore",
+  job_delete_confirm_cancel: "Keep it",
+
+  // F12 — ChildManager i18n cleanup
+  child_manager_header: "Crew Members ({{count}})",
+  child_manager_add_btn: "+ Add Child",
+  child_manager_empty_title: "No crew members yet!",
+  child_manager_empty_subtitle: "Add your first little pirate to get started.",
+  child_manager_empty_cta: "+ Add Crew Member",
+  child_icon_fallback_label: "Fish",
+  child_manager_delete_aria: "Delete {{name}}",
+  child_manager_edit_aria: "Edit {{name}}",
+
+  // F12 — ChildForm i18n cleanup
+  child_form_edit_title: "Edit Crew Member",
+  child_form_add_title: "Add Crew Member",
+  child_form_name_label: "Name",
+  child_form_name_placeholder: "Enter their name...",
+  child_form_icon_label: "Choose an icon",
+  child_form_cancel: "Cancel",
+  child_form_save_edit: "Save Changes",
+  child_form_save_add: "Add to Crew",
 } as const;
 
 export default en;

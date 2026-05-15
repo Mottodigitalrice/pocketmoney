@@ -6,6 +6,7 @@ import { CHILD_ICON_CONFIG } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "@/hooks/use-translation";
 import { ChildForm } from "./ChildForm";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 interface ChildManagerProps {
   crewMembers: Child[];
@@ -20,12 +21,18 @@ export function ChildManager({
   onEdit,
   onDelete,
 }: ChildManagerProps) {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const [formOpen, setFormOpen] = useState(false);
   const [editingChild, setEditingChild] = useState<{
     id: string;
     name: string;
     icon: string;
+  } | null>(null);
+  // F12: confirm-dialog state for the destructive delete path. Tracks the
+  // specific child being deleted so the dialog can show their name.
+  const [deletingChild, setDeletingChild] = useState<{
+    id: string;
+    name: string;
   } | null>(null);
 
   const handleAdd = () => {
@@ -53,14 +60,14 @@ export function ChildManager({
         <div className="flex items-center gap-2">
           <span className="text-xl">👥</span>
           <h2 className="text-lg font-bold text-amber-100">
-            Crew Members ({crewMembers.length})
+            {t("child_manager_header", { count: crewMembers.length })}
           </h2>
         </div>
         <Button
           onClick={handleAdd}
           className="bg-amber-600 font-bold text-white hover:bg-amber-700"
         >
-          + Add Child
+          {t("child_manager_add_btn")}
         </Button>
       </div>
 
@@ -69,22 +76,28 @@ export function ChildManager({
         <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-amber-700/30 bg-amber-900/30 px-6 py-12 text-center backdrop-blur-sm">
           <span className="text-5xl">🏴‍☠️</span>
           <p className="text-lg font-semibold text-amber-200">
-            {t("child_manager_no_kids")}
+            {t("child_manager_empty_title")}
           </p>
           <p className="text-sm text-amber-300/70">
-            {t("child_manager_no_kids_hint")}
+            {t("child_manager_empty_subtitle")}
           </p>
           <Button
             onClick={handleAdd}
             className="mt-2 bg-amber-600 font-bold text-white hover:bg-amber-700"
           >
-            {t("children_add")}
+            {t("child_manager_empty_cta")}
           </Button>
         </div>
       ) : (
         <div className="space-y-2">
           {crewMembers.map((child) => {
             const iconConfig = CHILD_ICON_CONFIG[child.icon as ChildIcon];
+            // F12: locale-aware sea-creature label (was English-only).
+            const iconLabel = iconConfig
+              ? locale === "ja"
+                ? iconConfig.labelJa
+                : iconConfig.label
+              : t("child_icon_fallback_label");
             return (
               <div
                 key={child._id}
@@ -109,9 +122,7 @@ export function ChildManager({
                   <h3 className="truncate font-semibold text-amber-100">
                     {child.name}
                   </h3>
-                  <p className="text-xs text-amber-300/60">
-                    {iconConfig?.label ?? "Fish"}
-                  </p>
+                  <p className="text-xs text-amber-300/60">{iconLabel}</p>
                 </div>
 
                 {/* Actions */}
@@ -120,6 +131,7 @@ export function ChildManager({
                     variant="ghost"
                     size="sm"
                     onClick={() => handleEdit(child)}
+                    aria-label={t("child_manager_edit_aria", { name: child.name })}
                     className="text-amber-300 hover:bg-amber-800/40 hover:text-amber-100"
                   >
                     ✏️
@@ -127,9 +139,14 @@ export function ChildManager({
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => onDelete(child._id)}
+                    // F12: route delete through confirm dialog instead of
+                    // calling onDelete immediately. The dialog confirms the
+                    // cascade impact (wallet, history, scheduled jobs).
+                    onClick={() =>
+                      setDeletingChild({ id: child._id, name: child.name })
+                    }
                     data-testid="child-row-delete"
-                    aria-label={`Delete ${child.name}`}
+                    aria-label={t("child_manager_delete_aria", { name: child.name })}
                     className="text-red-400 hover:bg-red-900/40 hover:text-red-300"
                   >
                     🗑️
@@ -148,6 +165,20 @@ export function ChildManager({
         onClose={() => setFormOpen(false)}
         onSave={handleSave}
         editingChild={editingChild}
+      />
+
+      {/* F12 — Delete-child confirmation dialog */}
+      <ConfirmDialog
+        open={!!deletingChild}
+        onClose={() => setDeletingChild(null)}
+        onConfirm={() => {
+          if (deletingChild) onDelete(deletingChild.id);
+        }}
+        title={t("child_delete_confirm_title", { name: deletingChild?.name ?? "" })}
+        body={t("child_delete_confirm_body")}
+        confirmLabel={t("child_delete_confirm_cta")}
+        cancelLabel={t("child_delete_confirm_cancel")}
+        confirmTestId="child-delete-confirm"
       />
     </div>
   );

@@ -16,6 +16,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 export function JobManager() {
   const { t, locale } = useTranslation();
@@ -25,6 +26,9 @@ export function JobManager() {
   const [editing, setEditing] = useState<Job | undefined>();
   const [oneOffOpen, setOneOffOpen] = useState(false);
   const [assigningJobId, setAssigningJobId] = useState<string | null>(null);
+  // F12: confirm-dialog state for destructive delete. Same pattern as
+  // ChildManager — orphans scheduled instances, so we gate behind confirm.
+  const [deletingJobId, setDeletingJobId] = useState<string | null>(null);
 
   const handleAdd = () => {
     setEditing(undefined);
@@ -167,7 +171,10 @@ export function JobManager() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => deleteJob(job._id)}
+                // F12: route delete through confirm dialog. Single-tap
+                // destructive delete is forbidden (F10 gap 5.9).
+                onClick={() => setDeletingJobId(job._id)}
+                data-testid="job-row-delete"
                 className="text-red-400 hover:bg-red-900/40 hover:text-red-300"
               >
                 🗑️
@@ -187,6 +194,20 @@ export function JobManager() {
       <OneOffTaskForm
         open={oneOffOpen}
         onClose={() => setOneOffOpen(false)}
+      />
+
+      {/* F12 — Delete-job confirmation dialog */}
+      <ConfirmDialog
+        open={!!deletingJobId}
+        onClose={() => setDeletingJobId(null)}
+        onConfirm={() => {
+          if (deletingJobId) deleteJob(deletingJobId);
+        }}
+        title={t("job_delete_confirm_title")}
+        body={t("job_delete_confirm_body")}
+        confirmLabel={t("job_delete_confirm_cta")}
+        cancelLabel={t("job_delete_confirm_cancel")}
+        confirmTestId="job-delete-confirm"
       />
 
       {/* Quick assign child picker */}
