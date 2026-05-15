@@ -6,6 +6,10 @@ import { getCurrentUser } from "./users";
 import { assertOwnedBy } from "../lib/auth";
 import { splitEarning as splitEarningPure } from "../lib/walletMath";
 import {
+  computeMigrationDelta,
+  isDeltaZero,
+} from "../lib/migrationDiff";
+import {
   assertIsWeekStartISO,
   hasTransactionInWeek,
   weeksToBackfill,
@@ -183,39 +187,6 @@ export async function creditBonus(
   }
 }
 
-async function getApprovedLifetimeEarnings(
-  ctx: MutationCtx,
-  childId: Id<"children">
-) {
-  const instances = await ctx.db
-    .query("jobInstances")
-    .withIndex("by_child_status", (q) =>
-      q.eq("childId", childId).eq("status", "approved")
-    )
-    .collect();
-
-  let total = 0;
-  for (const instance of instances) {
-    const job = await ctx.db.get(instance.jobId);
-    total += job?.yenAmount ?? 0;
-  }
-  return total;
-}
-
-async function getChildEarningTransactionsTotal(
-  ctx: MutationCtx,
-  childId: Id<"children">
-) {
-  const transactions = await ctx.db
-    .query("transactions")
-    .withIndex("by_child", (q) => q.eq("childId", childId))
-    .collect();
-
-  return transactions
-    .filter((transaction) => transaction.type === "earning")
-    .reduce((sum, transaction) => sum + Math.max(0, transaction.amount), 0);
-}
-
 export const getByChild = query({
   args: { childId: v.id("children") },
   returns: v.array(walletDocValidator),
@@ -253,63 +224,142 @@ export const ensureForChild = mutation({
   },
 });
 
+/**
+ * Migrate legacy approved-job earnings into the 3-jar wallet system.
+ *
+ * Per-child idempotency contract:
+ *   - `lifetimeEarnings` = sum of `earning`-type transactions on that child
+ *     (NOT including bonus / interest / luckyChest — those are post-split
+ *     credits already and aren't part of the migration baseline).
+ *   - For each child we compute `expected = splitEarning(lifetimeEarnings)`
+ *     and compare against `actual` = the sum of past migration-type
+ *     transactions, grouped by jar.
+ *   - We credit ONLY the per-jar delta `(expected - actual)`. Already-fully-
+ *     migrated children get a zero-write no-op return. Partially-migrated
+ *     children (e.g. previous run crashed after Spend) finish only the
+ *     missing jars.
+ *   - Negative deltas (jar already over-credited via manual adjustment)
+ *     clamp to 0 — the ledger is immutable, we never issue compensating debits.
+ *
+ * `dryRun: true` → returns the diff shape with NO writes (preview).
+ * `dryRun: false` (or omitted) → performs writes AND returns the same shape
+ *   reflecting what was credited on this call.
+ *
+ * Auth: only the calling parent operates on their own children
+ * (`assertOwnedBy` via the `by_user` index on `children`).
+ */
+const childMigrationDiffValidator = v.object({
+  childId: v.id("children"),
+  lifetimeEarnings: v.number(),
+  expected: v.object({
+    spend: v.number(),
+    save: v.number(),
+    give: v.number(),
+  }),
+  actual: v.object({
+    spend: v.number(),
+    save: v.number(),
+    give: v.number(),
+  }),
+  delta: v.object({
+    spend: v.number(),
+    save: v.number(),
+    give: v.number(),
+  }),
+});
+
 export const migrateLegacyEarnings = mutation({
-  args: {},
-  returns: v.array(
-    v.object({
-      childId: v.id("children"),
-      migratedAmount: v.number(),
-      skipped: v.boolean(),
-    })
-  ),
-  handler: async (ctx) => {
+  args: {
+    dryRun: v.optional(v.boolean()),
+  },
+  returns: v.object({
+    children: v.array(childMigrationDiffValidator),
+  }),
+  handler: async (ctx, args) => {
+    const dryRun = args.dryRun === true;
     const user = await getCurrentUser(ctx);
+
+    // Auth-gated by index: only this user's children. `assertOwnedBy` is
+    // implicitly satisfied since we query by userId; explicit assertion
+    // would only matter if we fetched by id from somewhere else.
     const children = await ctx.db
       .query("children")
       .withIndex("by_user", (q) => q.eq("userId", user._id))
       .collect();
-    const results = [];
+
+    const childrenDiffs: Array<{
+      childId: Id<"children">;
+      lifetimeEarnings: number;
+      expected: { spend: number; save: number; give: number };
+      actual: { spend: number; save: number; give: number };
+      delta: { spend: number; save: number; give: number };
+    }> = [];
 
     for (const child of children) {
-      const existingMigration = (
-        await ctx.db
-          .query("transactions")
-          .withIndex("by_child", (q) => q.eq("childId", child._id))
-          .collect()
-      ).some((transaction) => transaction.type === "migration");
+      // Defense in depth: confirm ownership of every doc we touch even
+      // though the index already filtered by user.
+      assertOwnedBy(child, user._id, "child");
 
-      if (existingMigration) {
-        results.push({ childId: child._id, migratedAmount: 0, skipped: true });
-        continue;
-      }
+      // lifetimeEarnings = sum of earning-type transactions (NOT bonus/
+      // interest/luckyChest — those are post-split credits already).
+      const childTxs = await ctx.db
+        .query("transactions")
+        .withIndex("by_child", (q) => q.eq("childId", child._id))
+        .collect();
 
-      const lifetimeEarnings = await getApprovedLifetimeEarnings(ctx, child._id);
-      const alreadyCredited = await getChildEarningTransactionsTotal(ctx, child._id);
-      const amountToMigrate = Math.max(0, lifetimeEarnings - alreadyCredited);
+      const lifetimeEarnings = childTxs
+        .filter((t) => t.type === "earning")
+        .reduce((sum, t) => sum + Math.max(0, t.amount), 0);
+
+      // actual = sum of migration-type transactions, grouped by jar.
+      const actualSpend = childTxs
+        .filter((t) => t.type === "migration" && t.jar === "spend")
+        .reduce((sum, t) => sum + t.amount, 0);
+      const actualSave = childTxs
+        .filter((t) => t.type === "migration" && t.jar === "save")
+        .reduce((sum, t) => sum + t.amount, 0);
+      const actualGive = childTxs
+        .filter((t) => t.type === "migration" && t.jar === "give")
+        .reduce((sum, t) => sum + t.amount, 0);
+
+      const { expected, actual, delta } = computeMigrationDelta({
+        lifetimeEarnings,
+        actualSpend,
+        actualSave,
+        actualGive,
+      });
+
+      // Record the diff in the response regardless of dryRun.
+      childrenDiffs.push({
+        childId: child._id,
+        lifetimeEarnings,
+        expected,
+        actual,
+        delta,
+      });
+
+      // No writes if dryRun OR if there's nothing to do.
+      if (dryRun || isDeltaZero(delta)) continue;
+
+      // Apply only the non-zero deltas.
       const wallets = await ensureWalletsForChild(ctx, user._id, child._id);
-      const split = splitEarning(amountToMigrate);
-
       for (const wallet of wallets) {
+        const amount = delta[wallet.jar];
+        if (amount <= 0) continue;
         await creditWallet(ctx, {
           userId: user._id,
           childId: child._id,
           walletId: wallet._id,
           jar: wallet.jar,
           currentBalance: wallet.balance,
-          amount: split[wallet.jar],
+          amount,
           type: "migration",
           note: "Opening deposit from approved jobs before wallets",
         });
       }
-
-      results.push({
-        childId: child._id,
-        migratedAmount: amountToMigrate,
-        skipped: false,
-      });
     }
 
-    return results;
+    return { children: childrenDiffs };
   },
 });
 
