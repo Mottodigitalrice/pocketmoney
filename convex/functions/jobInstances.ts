@@ -241,6 +241,16 @@ export const complete = mutation({
 });
 
 // Approve a completed job instance (parent action)
+//
+// Edge cases handled (F6):
+//   - (b) Concurrent approve: second call observes `status === "approved"`
+//     and bails before patching → no double-credit. Convex serializes
+//     mutations per document, so the read-status / write-status race is
+//     resolved by this guard at the top.
+//   - (e) Child deleted between completion and approval: the orphan
+//     jobInstance still references a now-missing child. We throw a
+//     structured error `CHILD_DELETED_AFTER_COMPLETION` rather than
+//     crashing inside `creditApprovedJob` when the wallet lookup fails.
 export const approve = mutation({
   args: { instanceId: v.id("jobInstances") },
   returns: v.null(),
@@ -252,7 +262,16 @@ export const approve = mutation({
       "job instance"
     );
     if (!instance) return null;
+    // (b) Idempotency guard: already-approved instance must NOT re-credit.
     if (instance.status === "approved") return null;
+
+    // (e) Orphan guard: if the child was deleted while this instance was
+    // sitting in "completed", bail with a structured error so the frontend
+    // can pattern-match and show a clean message.
+    const child = await ctx.db.get(instance.childId);
+    if (!child) {
+      throw new Error("CHILD_DELETED_AFTER_COMPLETION");
+    }
 
     const job = assertOwnedBy(
       await ctx.db.get(instance.jobId),
@@ -337,6 +356,11 @@ export const cleanupApprovedPhotoProofs = internalMutation({
 });
 
 // Reject a completed job instance (parent action)
+//
+// Edge cases handled (F6):
+//   - (b) Concurrent reject: if the instance is already in `approved`, we
+//     refuse to silently overwrite a credited approval with a rejection.
+//     If it's already in `rejected`, we no-op (second tap is harmless).
 export const reject = mutation({
   args: {
     instanceId: v.id("jobInstances"),
@@ -351,6 +375,10 @@ export const reject = mutation({
       "job instance"
     );
     if (!instance) return null;
+    if (instance.status === "rejected") return null;
+    if (instance.status === "approved") {
+      throw new Error("CANNOT_REJECT_APPROVED_INSTANCE");
+    }
 
     await ctx.db.patch(args.instanceId, {
       status: "rejected",

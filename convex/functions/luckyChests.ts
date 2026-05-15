@@ -148,8 +148,15 @@ export const open = mutation({
     }
 
     const weekStart = args.weekDates[0];
+    // (d) Single-open-per-week guard. The `by_child_week` index on
+    // `luckyChests` makes this lookup O(1); we throw a structured error
+    // here so the frontend can distinguish "already opened" from other
+    // failure modes. Previously returned the existing chest silently,
+    // which lost the signal that the second tap was a no-op.
     const existing = await getOpenedChest(ctx, args.childId, weekStart);
-    if (existing) return existing;
+    if (existing) {
+      throw new Error("LUCKY_CHEST_ALREADY_OPENED_THIS_WEEK");
+    }
 
     const progress = await getMustDoProgress(ctx, {
       userId: user._id,

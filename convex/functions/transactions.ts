@@ -3,6 +3,7 @@ import { mutation, query } from "../_generated/server";
 import { getCurrentUser } from "./users";
 import { ensureWalletsForChild } from "./wallets";
 import { assertOwnedBy } from "../lib/auth";
+import { overdraftErrorOrNull } from "../lib/withdrawGuard";
 
 const jarValidator = v.union(
   v.literal("spend"),
@@ -72,6 +73,16 @@ export const getByFamily = query({
   },
 });
 
+/**
+ * Withdraw from a child's jar. Overdraft is blocked by a balance check
+ * BEFORE any `ctx.db.patch` — see F6 (c).
+ *
+ * Error contract (frontend pattern-matches these prefixes):
+ *   - `OVERDRAFT: balance ¥X cannot cover withdrawal ¥Y` — insufficient funds.
+ *   - `Withdrawal amount must be positive` — non-positive amount.
+ *   - `Wallet not found` — shouldn't happen (ensureWalletsForChild ran), but
+ *     left as a structured throw for resilience.
+ */
 export const withdraw = mutation({
   args: {
     childId: v.id("children"),
@@ -100,8 +111,13 @@ export const withdraw = mutation({
     if (!wallet) {
       throw new Error("Wallet not found");
     }
-    if (wallet.balance < args.amount) {
-      throw new Error("Insufficient wallet balance");
+    // (c) Structured overdraft error — thrown BEFORE any db.patch so the
+    // ledger stays consistent on failure. Format must keep the OVERDRAFT:
+    // prefix; F12 (frontend) will pattern-match on it. See
+    // `convex/lib/withdrawGuard.ts` for the pure predicate.
+    const overdraftError = overdraftErrorOrNull(wallet.balance, args.amount);
+    if (overdraftError) {
+      throw new Error(overdraftError);
     }
 
     const now = Date.now();
@@ -123,3 +139,4 @@ export const withdraw = mutation({
     });
   },
 });
+

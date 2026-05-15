@@ -1,9 +1,15 @@
 import { v } from "convex/values";
 import { mutation, query } from "../_generated/server";
+import type { MutationCtx } from "../_generated/server";
+import type { Id } from "../_generated/dataModel";
 import { getCurrentUser } from "./users";
 import { ensureWalletsForChild } from "./wallets";
 import { deleteJobInstanceAndProof } from "./jobInstances";
 import { assertOwnedByOrNull } from "../lib/auth";
+import {
+  CHILD_CASCADE_TABLES,
+  type ChildCascadeTable,
+} from "../lib/childCascade";
 
 const childDocValidator = v.object({
   _id: v.id("children"),
@@ -131,39 +137,86 @@ export const remove = mutation({
       }
     }
 
-    const wallets = await ctx.db
-      .query("wallets")
-      .withIndex("by_child", (q) => q.eq("childId", args.childId))
-      .collect();
-    for (const wallet of wallets) {
-      await ctx.db.delete(wallet._id);
-    }
-
-    const transactions = await ctx.db
-      .query("transactions")
-      .withIndex("by_child", (q) => q.eq("childId", args.childId))
-      .collect();
-    for (const transaction of transactions) {
-      await ctx.db.delete(transaction._id);
-    }
-
-    const goals = await ctx.db
-      .query("goals")
-      .withIndex("by_child", (q) => q.eq("childId", args.childId))
-      .collect();
-    for (const goal of goals) {
-      await ctx.db.delete(goal._id);
-    }
-
-    const luckyChests = await ctx.db
-      .query("luckyChests")
-      .withIndex("by_child", (q) => q.eq("childId", args.childId))
-      .collect();
-    for (const luckyChest of luckyChests) {
-      await ctx.db.delete(luckyChest._id);
-    }
+    // (a) Track-B cascade: wallets, transactions, goals, luckyChests.
+    // Single source of truth = `CHILD_CASCADE_TABLES` from
+    // `convex/lib/childCascade.ts`. If you add a per-child table, append
+    // it there and the loop below picks it up — the corresponding test
+    // in `__tests__/edge-cases.test.ts` will fail until both update.
+    await cascadeChildSimpleTables(ctx, args.childId);
 
     await ctx.db.delete(args.childId);
     return null;
   },
 });
+
+/**
+ * Walk every table in `CHILD_CASCADE_TABLES` by its `by_child` index and
+ * delete each row keyed on `childId`. Idempotent: re-running after a
+ * partial failure simply finds nothing on the second pass.
+ *
+ * Tables in scope (Track B + earlier): wallets, transactions, goals,
+ * luckyChests. jobInstances + scheduledJobs are handled separately in
+ * `children.remove` because they need proof-storage cleanup and a
+ * non-`by_child` index walk respectively.
+ *
+ * Note: we dispatch per-table rather than looping with a dynamic table
+ * name because Convex's `ctx.db.query(tableName)` is strongly typed and
+ * a generic loop would lose the index-key relationship at compile time.
+ * The order tracks `CHILD_CASCADE_TABLES` and the test pins it.
+ */
+async function cascadeChildSimpleTables(
+  ctx: MutationCtx,
+  childId: Id<"children">
+) {
+  // Compile-time guard: if a new table is added to CHILD_CASCADE_TABLES,
+  // this switch must be updated. The default-case `assertNever` enforces
+  // exhaustiveness.
+  for (const table of CHILD_CASCADE_TABLES) {
+    await cascadeOneTable(ctx, table, childId);
+  }
+}
+
+async function cascadeOneTable(
+  ctx: MutationCtx,
+  table: ChildCascadeTable,
+  childId: Id<"children">
+) {
+  switch (table) {
+    case "wallets": {
+      const rows = await ctx.db
+        .query("wallets")
+        .withIndex("by_child", (q) => q.eq("childId", childId))
+        .collect();
+      for (const row of rows) await ctx.db.delete(row._id);
+      return;
+    }
+    case "transactions": {
+      const rows = await ctx.db
+        .query("transactions")
+        .withIndex("by_child", (q) => q.eq("childId", childId))
+        .collect();
+      for (const row of rows) await ctx.db.delete(row._id);
+      return;
+    }
+    case "goals": {
+      const rows = await ctx.db
+        .query("goals")
+        .withIndex("by_child", (q) => q.eq("childId", childId))
+        .collect();
+      for (const row of rows) await ctx.db.delete(row._id);
+      return;
+    }
+    case "luckyChests": {
+      const rows = await ctx.db
+        .query("luckyChests")
+        .withIndex("by_child", (q) => q.eq("childId", childId))
+        .collect();
+      for (const row of rows) await ctx.db.delete(row._id);
+      return;
+    }
+    default: {
+      const _exhaustive: never = table;
+      throw new Error(`Unhandled cascade table: ${_exhaustive}`);
+    }
+  }
+}
