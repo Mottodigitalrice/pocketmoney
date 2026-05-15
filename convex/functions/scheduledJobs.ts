@@ -4,6 +4,7 @@ import { getCurrentUser } from "./users";
 import { creditApprovedJob } from "./wallets";
 import { deleteJobInstanceAndProof } from "./jobInstances";
 import { assertOwnedBy, assertOwnedByOrNull } from "../lib/auth";
+import { recurrenceMatchesDateMonIndexed } from "../lib/recurrence";
 
 const priorityValidator = v.union(v.literal("mustDo"), v.literal("optional"));
 
@@ -23,26 +24,9 @@ const scheduledJobDocValidator = v.object({
   createdAt: v.number(),
 });
 
-function dayIndexFromDateString(date: string) {
-  const day = new Date(`${date}T00:00:00`).getDay();
-  return day === 0 ? 6 : day - 1;
-}
-
-function recurrenceMatchesDate(
-  recurrence:
-    | {
-        type: "none" | "daily" | "weekdays" | "specificDays";
-        daysOfWeek?: number[];
-      }
-    | undefined,
-  date: string
-) {
-  if (!recurrence || recurrence.type === "none") return false;
-  const dayIndex = dayIndexFromDateString(date);
-  if (recurrence.type === "daily") return true;
-  if (recurrence.type === "weekdays") return dayIndex >= 0 && dayIndex <= 4;
-  return recurrence.daysOfWeek?.includes(dayIndex) ?? false;
-}
+// Legacy per-date predicate — delegates to the pure lib. Behavior
+// preserved exactly; only the implementation moved.
+const recurrenceMatchesDate = recurrenceMatchesDateMonIndexed;
 
 // Get all scheduled jobs for a family
 export const getByFamily = query({

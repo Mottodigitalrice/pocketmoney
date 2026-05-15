@@ -4,11 +4,17 @@ import type { Id } from "../_generated/dataModel";
 import type { MutationCtx } from "../_generated/server";
 import { getCurrentUser } from "./users";
 import { assertOwnedBy } from "../lib/auth";
+import { splitEarning as splitEarningPure } from "../lib/walletMath";
 
 const jars = ["spend", "save", "give"] as const;
 type Jar = (typeof jars)[number];
 const SAVE_INTEREST_APR = 0.1;
 const WEEKS_PER_YEAR = 52;
+
+// Re-export so existing import sites (`import { splitEarning } from "./wallets"`)
+// continue to work. The lib is the authoritative implementation now.
+export const splitEarning = (amount: number): Record<Jar, number> =>
+  splitEarningPure(amount);
 
 const jarValidator = v.union(
   v.literal("spend"),
@@ -31,16 +37,6 @@ async function assertChildOwner(ctx: MutationCtx, childId: Id<"children">) {
   const user = await getCurrentUser(ctx);
   const child = assertOwnedBy(await ctx.db.get(childId), user._id, "child");
   return { user, child };
-}
-
-export function splitEarning(amount: number): Record<Jar, number> {
-  const save = Math.floor(amount * 0.2);
-  const give = Math.floor(amount * 0.1);
-  return {
-    spend: amount - save - give,
-    save,
-    give,
-  };
 }
 
 export async function ensureWalletsForChild(
