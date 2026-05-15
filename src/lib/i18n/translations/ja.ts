@@ -300,6 +300,16 @@ const ja = {
   rank_max: "さいこうランク!",
   rank_up_toast_title: "ランクアップ!",
   rank_up_toast_body: "おめでとう、{{rank}}!",
+  // G5: kid-spoken hiragana register (F18). Wrapped in BudouXText at the
+  // call site so the longer lines break on phrase boundaries.
+  rank_kudos_above_avg:
+    "こんしゅうは ¥{{amount}} かせいだよ! いつもより {{percent}}% おおい! がんばってる!",
+  rank_kudos_at_avg:
+    "こんしゅうは ¥{{amount}} かせいだよ! いつもどおりのペース!",
+  rank_kudos_below_avg:
+    "こんしゅうは ¥{{amount}}。いつもよりちょっとすくないけど、ちいさいいっぽも たいせつだよ。",
+  rank_toggle_lifetime: "ぜんぶ",
+  rank_toggle_weekly: "こんしゅう",
 
   // Job titles
   job_fold_washing: "せんたくものをたたむ",

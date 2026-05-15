@@ -284,6 +284,16 @@ const en = {
   rank_max: "Top rank reached",
   rank_up_toast_title: "You leveled up!",
   rank_up_toast_body: "Welcome, {{rank}} pirate!",
+  // G5: private kudos line — compares THIS WEEK vs THIS CHILD's rolling
+  // 4-week average. Never shown against siblings; self-vs-self only.
+  rank_kudos_above_avg:
+    "You earned ¥{{amount}} this week — that's {{percent}}% above your usual! Keep going!",
+  rank_kudos_at_avg:
+    "You earned ¥{{amount}} this week — right on your usual pace.",
+  rank_kudos_below_avg:
+    "You earned ¥{{amount}} this week. Your usual pace is higher — small steps add up!",
+  rank_toggle_lifetime: "All time",
+  rank_toggle_weekly: "This week",
 
   // Job titles
   job_fold_washing: "Fold the washing",

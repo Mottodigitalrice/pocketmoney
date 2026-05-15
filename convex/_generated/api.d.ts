@@ -28,6 +28,7 @@ import type * as lib_luckyChestMath from "../lib/luckyChestMath.js";
 import type * as lib_migrationDiff from "../lib/migrationDiff.js";
 import type * as lib_orphanSweep from "../lib/orphanSweep.js";
 import type * as lib_rankMath from "../lib/rankMath.js";
+import type * as lib_rankWeekly from "../lib/rankWeekly.js";
 import type * as lib_recurrence from "../lib/recurrence.js";
 import type * as lib_walletMath from "../lib/walletMath.js";
 import type * as lib_withdrawGuard from "../lib/withdrawGuard.js";
@@ -59,6 +60,7 @@ declare const fullApi: ApiFromModules<{
   "lib/migrationDiff": typeof lib_migrationDiff;
   "lib/orphanSweep": typeof lib_orphanSweep;
   "lib/rankMath": typeof lib_rankMath;
+  "lib/rankWeekly": typeof lib_rankWeekly;
   "lib/recurrence": typeof lib_recurrence;
   "lib/walletMath": typeof lib_walletMath;
   "lib/withdrawGuard": typeof lib_withdrawGuard;
