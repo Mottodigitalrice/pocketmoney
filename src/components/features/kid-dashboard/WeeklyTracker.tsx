@@ -83,6 +83,17 @@ export function WeeklyTracker({ childId }: WeeklyTrackerProps) {
                   total: potential.toLocaleString(),
                 })}
               </p>
+              {/* S3 (R4) — F10 6.5: first-day ¥0 nudge. Fires only when there
+                  IS something to earn (potential > 0) but nothing has landed
+                  yet — so we don't shout at a kid on a planning-only week. */}
+              {earned === 0 && potential > 0 && (
+                <p
+                  className="mt-1 text-xs font-medium text-amber-200/90"
+                  data-testid="weekly-tracker-zero-hint"
+                >
+                  {t("weekly_tracker_zero_hint")}
+                </p>
+              )}
               <div className="mt-3">
                 <WalletJarBalances balances={walletBalances} compact />
               </div>

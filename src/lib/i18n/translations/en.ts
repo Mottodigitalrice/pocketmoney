@@ -365,6 +365,10 @@ const en = {
   onboarding_sibling_unlock_hint: "Add 2+ kids to unlock the sibling leaderboard.",
   auth_env_missing_subtitle: "We're having trouble loading your account. Try again in a moment, or ask the captain to check the setup.",
 
+  // S3 (R4) — Kid dashboard polish (F10 6.3 / 6.5)
+  kanban_empty_today_action: "🦜 Tell a grown-up if you want more!",
+  weekly_tracker_zero_hint: "Do your chores to fill the chest! 🪙",
+
   // Math challenge (parent gate)
   math_challenge_title: "Captain's Code",
   math_challenge_subtitle: "Solve to enter the bridge!",
@@ -427,8 +431,10 @@ const en = {
   goals_empty_hint: "Pick something cool to save for!",
   history_empty_title: "Your treasure log is empty",
   history_empty_hint: "Finish a chore and it'll show up here — keep going!",
+  // S3 (R4) — F10 6.9: warmer tone. Frames the empty state as "your captain
+  // hasn't sailed there yet" instead of telling the kid to nag.
   upcoming_empty_title: "Nothing planned yet",
-  upcoming_empty_hint: "No jobs lined up — ask your captain to plan some!",
+  upcoming_empty_hint: "Your captain hasn't charted the rest of the week — sit tight!",
   sibling_rank_solo_title: "Just you for now!",
   sibling_rank_solo_hint: "When another crew member joins, you'll see who's ahead.",
 

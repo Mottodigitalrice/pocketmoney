@@ -159,13 +159,22 @@ export function KanbanBoard({ childId }: KanbanBoardProps) {
 
   if (hasNoJobsToday) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-blue-300/30 px-6 py-12 text-center">
+      <div
+        className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-blue-300/30 px-6 py-12 text-center"
+        data-testid="kanban-empty-today"
+      >
         <span className="mb-3 text-5xl">📅</span>
         <p className="text-lg font-semibold text-white/80">
           {t("kanban_empty_today_title")}
         </p>
         <p className="mt-1 text-sm text-white/60">
           {t("kanban_empty_today_hint")}
+        </p>
+        {/* S3 (R4) — F10 6.3: nudge a kid who genuinely wants more chores to
+            ask a grown-up. The parrot emoji lands the pirate theme without
+            adding a third paragraph block. */}
+        <p className="mt-3 text-sm font-medium text-amber-200/90">
+          {t("kanban_empty_today_action")}
         </p>
       </div>
     );

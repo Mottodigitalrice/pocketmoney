@@ -192,4 +192,24 @@ describe("KanbanBoard", () => {
     // Columns must NOT render in this state.
     expect(container.querySelector('[data-testid="job-card"]')).toBeNull();
   });
+
+  // S3 (R4) — F10 6.3: empty-state surfaces the "tell a grown-up" nudge.
+  it("includes the 'tell a grown-up' action line in the no-jobs-today empty state", () => {
+    const { getByTestId, getByText } = renderWithProviders(
+      <KanbanBoard childId={CHILD_ID} />,
+      {
+        contextValue: {
+          getTodayAvailableJobs: () => [],
+          getInProgressJobs: () => [],
+          getCompletedJobs: () => [],
+          getInstancesForChild: () => [],
+        },
+      },
+    );
+    // Wrapped in a single empty-state container.
+    const empty = getByTestId("kanban-empty-today");
+    expect(empty).toBeInTheDocument();
+    // S3 (R4) action nudge — parrot emoji + "Tell a grown-up" copy.
+    expect(getByText(/Tell a grown-up if you want more/i)).toBeInTheDocument();
+  });
 });

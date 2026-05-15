@@ -381,6 +381,10 @@ const ja = {
   onboarding_sibling_unlock_hint: "2人以上ふやすと、きょうだいランキングがひらきます。",
   auth_env_missing_subtitle: "アカウントの読み込みでつまずいています。少しまってからもう一度ためすか、船長に設定を確認してもらってください。",
 
+  // S3 (R4) — Kid dashboard polish (F10 6.3 / 6.5)
+  kanban_empty_today_action: "🦜 もっとやりたいときは、おとなにつたえよう!",
+  weekly_tracker_zero_hint: "おしごとをやって、たからばこを いっぱいにしよう! 🪙",
+
   // Math challenge
   math_challenge_title: "船長のコード",
   math_challenge_subtitle: "ブリッジに入るにはとけ!",
@@ -449,8 +453,10 @@ const ja = {
   goals_empty_hint: "なにかほしいものをえらんでね!",
   history_empty_title: "たからものれきしはまだからっぽ",
   history_empty_hint: "おしごとをひとつおわらせるとここにでてくるよ — がんばれ!",
+  // S3 (R4) — F10 6.9: warmer tone — passive "your captain hasn't planned
+  // yet" rather than active "go nag them".
   upcoming_empty_title: "まだよていなし",
-  upcoming_empty_hint: "おしごとのよていがないよ — 船長にたのんでみよう!",
+  upcoming_empty_hint: "船長は まだのこりのしゅうを きめてないみたい — ちょっとまっててね!",
   sibling_rank_solo_title: "いまはきみだけ!",
   sibling_rank_solo_hint: "もうひとりクルーがふえると、だれがいちばんかみえるよ。",
 
