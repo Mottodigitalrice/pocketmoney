@@ -15,12 +15,47 @@ import {
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { BudouXText } from "@/components/shared/BudouXText";
+import { Skeleton } from "@/components/ui/skeleton";
 import type { ChildIcon } from "@/types";
 import type { TranslationKey } from "@/lib/i18n/translations";
 
+/**
+ * G2: QuickAddTodaySkeleton — header line + 4 quick-add chip skeletons.
+ */
+function QuickAddTodaySkeleton() {
+  return (
+    <div aria-hidden="true" data-testid="quick-add-today-skeleton" className="space-y-4">
+      <div className="rounded-2xl border border-amber-700/20 bg-amber-900/20 p-4">
+        <div className="flex items-start gap-3">
+          <Skeleton className="size-10 rounded bg-amber-900/50" />
+          <div className="flex-1 space-y-2">
+            <Skeleton className="h-5 w-44 rounded bg-amber-900/40" />
+            <Skeleton className="h-3 w-56 rounded bg-amber-900/30" />
+          </div>
+        </div>
+      </div>
+      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+        {[0, 1, 2, 3].map((i) => (
+          <div
+            key={i}
+            className="flex min-h-[60px] items-center gap-3 rounded-2xl border border-amber-700/20 bg-amber-900/30 p-4"
+          >
+            <Skeleton className="size-10 rounded bg-amber-900/50" />
+            <div className="flex-1 space-y-2">
+              <Skeleton className="h-4 w-32 rounded bg-amber-900/40" />
+              <Skeleton className="h-4 w-16 rounded bg-amber-900/30" />
+            </div>
+            <Skeleton className="size-6 rounded bg-amber-900/30" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function QuickAddToday() {
   const { t, locale } = useTranslation();
-  const { jobs, familyChildren, quickAddForToday } = usePocketMoney();
+  const { isLoading, jobs, familyChildren, quickAddForToday } = usePocketMoney();
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
   const [selectedChildIds, setSelectedChildIds] = useState<string[]>([]);
   const [preApprove, setPreApprove] = useState(false);
@@ -30,6 +65,9 @@ export function QuickAddToday() {
     () => jobs.filter((job) => !job.isOneOff),
     [jobs]
   );
+
+  // G2: skeleton while context hydrates. After hooks so order is stable.
+  if (isLoading) return <QuickAddTodaySkeleton />;
 
   const selectedJob = libraryJobs.find((job) => job._id === selectedJobId);
 

@@ -10,6 +10,7 @@ import { SharkAvatar } from "@/components/features/avatars/SharkAvatar";
 import { DolphinAvatar } from "@/components/features/avatars/DolphinAvatar";
 import { LanguageToggle } from "@/components/shared/LanguageToggle";
 import { MathChallenge } from "@/components/features/parent-dashboard/MathChallenge";
+import { AppSkeleton } from "@/components/features/shared/AppSkeleton";
 import { useTranslation } from "@/hooks/use-translation";
 import { usePocketMoney } from "@/hooks/use-pocket-money";
 import { hasClerkEnv } from "@/lib/env";
@@ -75,15 +76,10 @@ function HomePageInner() {
     router.push(ROUTES.parent);
   };
 
-  // Show nothing while checking onboarding status
+  // G2: AppSkeleton replaces the `...` text gate so initial Convex hydration
+  // shows a polished shell instead of a blank screen.
   if (isLoading || (userId && familyChildren.length === 0)) {
-    return (
-      <OceanScene>
-        <div className="flex min-h-screen items-center justify-center">
-          <p className="animate-pulse text-2xl text-white/60">...</p>
-        </div>
-      </OceanScene>
-    );
+    return <AppSkeleton variant="home" />;
   }
 
   return (
@@ -207,13 +203,7 @@ function HomePageInnerWithoutClerk() {
   };
 
   if (isLoading || (userId && familyChildren.length === 0)) {
-    return (
-      <OceanScene>
-        <div className="flex min-h-screen items-center justify-center">
-          <p className="animate-pulse text-2xl text-white/60">...</p>
-        </div>
-      </OceanScene>
-    );
+    return <AppSkeleton variant="home" />;
   }
 
   return (

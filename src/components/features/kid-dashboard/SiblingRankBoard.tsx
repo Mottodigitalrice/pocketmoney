@@ -3,8 +3,43 @@
 import { Trophy } from "lucide-react";
 import { usePocketMoney } from "@/hooks/use-pocket-money";
 import { useTranslation } from "@/hooks/use-translation";
+import { Skeleton } from "@/components/ui/skeleton";
 import { CHILD_ICON_CONFIG, CURRENCY } from "@/lib/constants";
 import type { ChildIcon } from "@/types";
+
+/**
+ * G2: SiblingRankBoardSkeleton — 2-3 rank rows with avatar + progress bar.
+ */
+function SiblingRankBoardSkeleton() {
+  return (
+    <div
+      aria-hidden="true"
+      data-testid="sibling-rank-skeleton"
+      className="mx-4 rounded-2xl border border-amber-300/25 bg-amber-950/35 p-4 backdrop-blur-sm sm:mx-8"
+    >
+      <div className="mb-3 flex items-center gap-2">
+        <Skeleton className="size-9 rounded-xl bg-amber-900/50" />
+        <Skeleton className="h-5 w-32 rounded bg-amber-900/40" />
+      </div>
+      <div className="grid gap-3 sm:grid-cols-2">
+        {[0, 1].map((i) => (
+          <div
+            key={i}
+            className="rounded-xl border border-amber-700/20 bg-amber-900/25 p-3 space-y-3"
+          >
+            <div className="flex items-center gap-3">
+              <Skeleton className="size-9 rounded-full bg-amber-900/50" />
+              <Skeleton className="h-6 flex-1 rounded bg-amber-900/40" />
+              <Skeleton className="h-4 w-12 rounded bg-amber-900/30" />
+            </div>
+            <Skeleton className="h-2 w-full rounded-full bg-amber-950" />
+            <Skeleton className="h-3 w-28 rounded bg-amber-900/30" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 interface SiblingRankBoardProps {
   childId: string;
@@ -12,7 +47,9 @@ interface SiblingRankBoardProps {
 
 export function SiblingRankBoard({ childId }: SiblingRankBoardProps) {
   const { t } = useTranslation();
-  const { familyChildren, getRankForChild, getWalletTotal } = usePocketMoney();
+  const { isLoading, familyChildren, getRankForChild, getWalletTotal } = usePocketMoney();
+
+  if (isLoading) return <SiblingRankBoardSkeleton />;
 
   const rankedChildren = familyChildren
     .map((child) => ({

@@ -8,6 +8,45 @@ import { useTranslation } from "@/hooks/use-translation";
 import { ChildForm } from "./ChildForm";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { BudouXText } from "@/components/shared/BudouXText";
+import { Skeleton } from "@/components/ui/skeleton";
+
+/**
+ * G2: ChildManagerSkeleton — header + 2-3 child card placeholders.
+ * Exported so the parent page can switch to it during hydration. ChildManager
+ * itself receives data as a prop (not from context), so it can't gate
+ * internally — the parent route owns the loading branch.
+ */
+export function ChildManagerSkeleton() {
+  return (
+    <div aria-hidden="true" data-testid="child-manager-skeleton" className="space-y-4">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Skeleton className="size-7 rounded bg-amber-900/40" />
+          <Skeleton className="h-5 w-40 rounded bg-amber-900/40" />
+        </div>
+        <Skeleton className="h-11 w-32 rounded-xl bg-amber-900/40" />
+      </div>
+      <div className="space-y-2">
+        {[0, 1, 2].map((i) => (
+          <div
+            key={i}
+            className="flex items-center gap-3 rounded-xl border border-amber-700/20 bg-amber-900/30 p-3"
+          >
+            <Skeleton className="size-12 rounded-full bg-amber-900/50" />
+            <div className="flex-1 space-y-2">
+              <Skeleton className="h-4 w-32 rounded bg-amber-900/40" />
+              <Skeleton className="h-3 w-20 rounded bg-amber-900/30" />
+            </div>
+            <div className="flex gap-1">
+              <Skeleton className="size-11 rounded bg-amber-900/30" />
+              <Skeleton className="size-11 rounded bg-amber-900/30" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 interface ChildManagerProps {
   crewMembers: Child[];

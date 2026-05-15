@@ -9,6 +9,7 @@ import { JobManager } from "@/components/features/parent-dashboard/JobManager";
 import { ChildOverview } from "@/components/features/parent-dashboard/ChildOverview";
 import { ChildManager } from "@/components/features/parent-dashboard/ChildManager";
 import { LuckyChestSettings } from "@/components/features/parent-dashboard/LuckyChestSettings";
+import { AppSkeleton } from "@/components/features/shared/AppSkeleton";
 import { usePocketMoney } from "@/hooks/use-pocket-money";
 import { useTranslation } from "@/hooks/use-translation";
 
@@ -28,7 +29,13 @@ export default function ParentPage() {
     return isTab(hashTab) ? hashTab : "quick_add";
   });
   const { t } = useTranslation();
-  const { familyChildren, addChild, editChild, deleteChild } = usePocketMoney();
+  const { familyChildren, addChild, editChild, deleteChild, isLoading } = usePocketMoney();
+
+  // G2: parent dashboard also benefits from a skeleton while Convex hydrates,
+  // so the tabs/widgets aren't visibly empty before data arrives.
+  if (isLoading) {
+    return <AppSkeleton variant="parent" />;
+  }
 
   const tabs: { id: Tab; label: string }[] = [
     { id: "quick_add", label: t("tab_quick_add") },

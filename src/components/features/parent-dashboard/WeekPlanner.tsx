@@ -18,8 +18,72 @@ import { useTranslation } from "@/hooks/use-translation";
 import { CHILD_ICON_CONFIG, DAYS_OF_WEEK, DAYS_OF_WEEK_JA } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 import { BudouXText } from "@/components/shared/BudouXText";
+import { Skeleton } from "@/components/ui/skeleton";
 import type { ChildIcon, JobPriority } from "@/types";
 import type { TranslationKey } from "@/lib/i18n/translations";
+
+/**
+ * G2: WeekPlannerSkeleton — week grid (7 columns × 3 rows of cells).
+ */
+function WeekPlannerSkeleton() {
+  return (
+    <div
+      aria-hidden="true"
+      data-testid="week-planner-skeleton"
+      className="space-y-4"
+    >
+      <div className="rounded-2xl border border-amber-700/20 bg-amber-900/20 p-4 space-y-3">
+        <div className="flex items-center justify-between">
+          <Skeleton className="h-6 w-40 rounded bg-amber-900/40" />
+          <div className="flex gap-2">
+            <Skeleton className="size-11 rounded-xl bg-amber-900/40" />
+            <Skeleton className="h-11 w-24 rounded bg-amber-900/40" />
+            <Skeleton className="size-11 rounded-xl bg-amber-900/40" />
+          </div>
+        </div>
+        <div className="grid gap-2 sm:grid-cols-3">
+          {[0, 1, 2].map((i) => (
+            <Skeleton key={i} className="h-11 w-full rounded-xl bg-amber-900/30" />
+          ))}
+        </div>
+      </div>
+      <div className="overflow-hidden rounded-2xl border border-amber-700/20 bg-amber-950/40">
+        <div className="grid grid-cols-[88px_repeat(7,minmax(80px,1fr))]">
+          {/* Header row */}
+          <div className="border-b border-r border-amber-700/20 bg-amber-950/95 p-3">
+            <Skeleton className="h-4 w-12 rounded bg-amber-900/40" />
+          </div>
+          {[0, 1, 2, 3, 4, 5, 6].map((day) => (
+            <div
+              key={`h-${day}`}
+              className="border-b border-r border-amber-700/20 bg-amber-900/20 p-3 space-y-2"
+            >
+              <Skeleton className="h-4 w-12 rounded bg-amber-900/40" />
+              <Skeleton className="h-11 w-full rounded bg-amber-900/30" />
+            </div>
+          ))}
+          {/* Body rows: 3 children × 7 days */}
+          {[0, 1, 2].map((row) => (
+            <div key={`r-${row}`} className="contents">
+              <div className="sticky left-0 z-10 flex min-h-[116px] items-start gap-2 border-b border-r border-amber-700/20 bg-amber-950/95 p-3">
+                <Skeleton className="size-8 rounded-full bg-amber-900/40" />
+                <Skeleton className="h-4 w-12 rounded bg-amber-900/40" />
+              </div>
+              {[0, 1, 2, 3, 4, 5, 6].map((c) => (
+                <div
+                  key={`r${row}c${c}`}
+                  className="min-h-[116px] border-b border-r border-amber-700/20 p-2"
+                >
+                  <Skeleton className="h-full w-full rounded-lg bg-amber-900/25" />
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 type DragPayload =
   | {
@@ -38,6 +102,7 @@ type DragPayload =
 export function WeekPlanner() {
   const { t, locale } = useTranslation();
   const {
+    isLoading,
     familyChildren,
     jobs,
     getScheduledJobsForChildDate,
@@ -241,6 +306,9 @@ export function WeekPlanner() {
       }))
     );
   };
+
+  // G2: skeleton while context hydrates. After hooks so order is stable.
+  if (isLoading) return <WeekPlannerSkeleton />;
 
   if (familyChildren.length === 0) {
     return (

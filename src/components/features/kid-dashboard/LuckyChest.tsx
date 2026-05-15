@@ -3,11 +3,33 @@
 import { useState } from "react";
 import { Gift, Lock, Moon, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { BudouXText } from "@/components/shared/BudouXText";
 import { usePocketMoney } from "@/hooks/use-pocket-money";
 import { useTranslation } from "@/hooks/use-translation";
 import { CURRENCY } from "@/lib/constants";
 import { mapConvexError } from "@/lib/convex-errors";
+
+/**
+ * G2: LuckyChestSkeleton — chest icon + lock-status text-line placeholder.
+ */
+function LuckyChestSkeleton() {
+  return (
+    <div
+      aria-hidden="true"
+      data-testid="lucky-chest-skeleton"
+      className="mx-4 rounded-2xl border border-yellow-300/15 bg-yellow-950/15 p-4 backdrop-blur-sm sm:mx-8"
+    >
+      <div className="flex items-start gap-3">
+        <Skeleton className="size-11 rounded-xl bg-yellow-900/40" />
+        <div className="flex-1 space-y-2">
+          <Skeleton className="h-5 w-40 rounded bg-yellow-900/40" />
+          <Skeleton className="h-4 w-56 rounded bg-yellow-900/30" />
+        </div>
+      </div>
+    </div>
+  );
+}
 
 interface LuckyChestProps {
   childId: string;
@@ -15,9 +37,14 @@ interface LuckyChestProps {
 
 export function LuckyChest({ childId }: LuckyChestProps) {
   const { t } = useTranslation();
-  const { getLuckyChestStatus, openLuckyChest } = usePocketMoney();
+  const { isLoading, getLuckyChestStatus, openLuckyChest } = usePocketMoney();
   const [isOpening, setIsOpening] = useState(false);
   const [error, setError] = useState("");
+
+  // G2: skeleton while context hydrates. After hydration, !status returns null
+  // (F11 already handles the "no chest yet" path inside the component below).
+  if (isLoading) return <LuckyChestSkeleton />;
+
   const status = getLuckyChestStatus(childId);
 
   if (!status) return null;

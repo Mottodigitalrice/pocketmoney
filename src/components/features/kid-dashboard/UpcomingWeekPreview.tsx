@@ -3,7 +3,38 @@
 import { useMemo } from "react";
 import { usePocketMoney } from "@/hooks/use-pocket-money";
 import { useTranslation } from "@/hooks/use-translation";
+import { Skeleton } from "@/components/ui/skeleton";
 import type { TranslationKey } from "@/lib/i18n/translations";
+
+/**
+ * G2: UpcomingWeekPreviewSkeleton — 7-day strip of mini-card skeletons.
+ */
+function UpcomingWeekPreviewSkeleton() {
+  return (
+    <div
+      aria-hidden="true"
+      data-testid="upcoming-week-skeleton"
+      className="mx-4 rounded-2xl border border-cyan-300/20 bg-cyan-950/20 p-4 backdrop-blur-sm sm:mx-8"
+    >
+      <div className="mb-3 flex items-center gap-2">
+        <Skeleton className="size-8 rounded bg-cyan-900/40" />
+        <Skeleton className="h-5 w-32 rounded bg-cyan-900/40" />
+      </div>
+      <div className="space-y-3">
+        {[0, 1, 2].map((day) => (
+          <div key={day} className="rounded-xl border border-white/10 bg-white/5 p-3 space-y-2">
+            <Skeleton className="h-4 w-24 rounded bg-cyan-900/40" />
+            <div className="flex flex-wrap gap-2">
+              {[0, 1, 2].map((j) => (
+                <Skeleton key={j} className="h-8 w-28 rounded-full bg-cyan-900/30" />
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 interface UpcomingWeekPreviewProps {
   childId: string;
@@ -11,7 +42,7 @@ interface UpcomingWeekPreviewProps {
 
 export function UpcomingWeekPreview({ childId }: UpcomingWeekPreviewProps) {
   const { t, locale } = useTranslation();
-  const { getScheduledJobsForWeek, getLocalDateString } = usePocketMoney();
+  const { isLoading, getScheduledJobsForWeek, getLocalDateString } = usePocketMoney();
 
   const today = getLocalDateString();
   const upcomingJobs = useMemo(
@@ -33,6 +64,9 @@ export function UpcomingWeekPreview({ childId }: UpcomingWeekPreviewProps) {
 
     return Array.from(groups.entries());
   }, [upcomingJobs]);
+
+  // G2: skeleton while context is hydrating — placed after hooks.
+  if (isLoading) return <UpcomingWeekPreviewSkeleton />;
 
   return (
     <div className="mx-4 rounded-2xl border border-cyan-300/20 bg-cyan-950/20 p-4 backdrop-blur-sm sm:mx-8">

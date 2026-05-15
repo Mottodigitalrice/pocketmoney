@@ -3,11 +3,48 @@
 import { usePocketMoney } from "@/hooks/use-pocket-money";
 import { useTranslation } from "@/hooks/use-translation";
 import { BudouXText } from "@/components/shared/BudouXText";
+import { Skeleton } from "@/components/ui/skeleton";
 import { ApprovalCard } from "./ApprovalCard";
 
+/**
+ * G2: ApprovalQueueSkeleton — 3 row placeholders (avatar + label + button).
+ */
+function ApprovalQueueSkeleton() {
+  return (
+    <div
+      aria-hidden="true"
+      data-testid="approval-queue-skeleton"
+      className="space-y-4"
+    >
+      <div className="flex items-center gap-2">
+        <Skeleton className="size-7 rounded bg-amber-900/40" />
+        <Skeleton className="h-5 w-44 rounded bg-amber-900/40" />
+      </div>
+      <div className="space-y-3">
+        {[0, 1, 2].map((i) => (
+          <div
+            key={i}
+            className="flex items-center gap-3 rounded-2xl border border-amber-700/20 bg-amber-900/30 p-3"
+          >
+            <Skeleton className="size-10 rounded-full bg-amber-900/50" />
+            <div className="flex-1 space-y-2">
+              <Skeleton className="h-4 w-40 rounded bg-amber-900/40" />
+              <Skeleton className="h-3 w-24 rounded bg-amber-900/30" />
+            </div>
+            <Skeleton className="h-10 w-20 rounded-xl bg-amber-900/40" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function ApprovalQueue() {
-  const { getPendingApprovals, approveJob, rejectJob } = usePocketMoney();
+  const { isLoading, getPendingApprovals, approveJob, rejectJob } = usePocketMoney();
   const { t } = useTranslation();
+
+  if (isLoading) return <ApprovalQueueSkeleton />;
+
   const pending = getPendingApprovals();
 
   const handleReject = (instanceId: string) => {

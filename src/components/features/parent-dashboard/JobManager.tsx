@@ -8,8 +8,49 @@ import { Button } from "@/components/ui/button";
 import { CURRENCY, CHILD_ICON_CONFIG } from "@/lib/constants";
 import { JobForm } from "./JobForm";
 import { OneOffTaskForm } from "./OneOffTaskForm";
+import { Skeleton } from "@/components/ui/skeleton";
 import type { TranslationKey } from "@/lib/i18n/translations";
 import type { ChildIcon, JobPriority, RecurrenceType } from "@/types";
+
+/**
+ * G2: JobManagerSkeleton — header + 4 row skeletons (title + amount + icons).
+ */
+function JobManagerSkeleton() {
+  return (
+    <div aria-hidden="true" data-testid="job-manager-skeleton" className="space-y-4">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Skeleton className="size-7 rounded bg-amber-900/40" />
+          <Skeleton className="h-5 w-32 rounded bg-amber-900/40" />
+        </div>
+        <div className="flex gap-2">
+          <Skeleton className="h-11 w-24 rounded-xl bg-amber-900/40" />
+          <Skeleton className="h-11 w-24 rounded-xl bg-amber-900/40" />
+        </div>
+      </div>
+      <div className="space-y-2">
+        {[0, 1, 2, 3].map((i) => (
+          <div
+            key={i}
+            className="flex items-center gap-3 rounded-xl border border-amber-700/20 bg-amber-900/30 p-3"
+          >
+            <Skeleton className="size-8 rounded bg-amber-900/50" />
+            <div className="flex-1 space-y-2">
+              <Skeleton className="h-4 w-40 rounded bg-amber-900/40" />
+              <Skeleton className="h-3 w-24 rounded bg-amber-900/30" />
+            </div>
+            <Skeleton className="h-7 w-16 rounded-full bg-amber-900/40" />
+            <div className="flex gap-1">
+              <Skeleton className="size-11 rounded bg-amber-900/30" />
+              <Skeleton className="size-11 rounded bg-amber-900/30" />
+              <Skeleton className="size-11 rounded bg-amber-900/30" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 import {
   Dialog,
   DialogBody,
@@ -22,7 +63,7 @@ import { BudouXText } from "@/components/shared/BudouXText";
 
 export function JobManager() {
   const { t, locale } = useTranslation();
-  const { jobs, addJob, editJob, deleteJob, familyChildren, quickAssign } =
+  const { isLoading, jobs, addJob, editJob, deleteJob, familyChildren, quickAssign } =
     usePocketMoney();
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<Job | undefined>();
@@ -31,6 +72,9 @@ export function JobManager() {
   // F12: confirm-dialog state for destructive delete. Same pattern as
   // ChildManager — orphans scheduled instances, so we gate behind confirm.
   const [deletingJobId, setDeletingJobId] = useState<string | null>(null);
+
+  // G2: skeleton while context hydrates.
+  if (isLoading) return <JobManagerSkeleton />;
 
   const handleAdd = () => {
     setEditing(undefined);

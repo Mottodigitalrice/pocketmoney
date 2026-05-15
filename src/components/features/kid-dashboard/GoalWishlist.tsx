@@ -7,6 +7,7 @@ import { useTranslation } from "@/hooks/use-translation";
 import { CURRENCY } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
 import { BudouXText } from "@/components/shared/BudouXText";
 
 interface GoalWishlistProps {
@@ -15,27 +16,57 @@ interface GoalWishlistProps {
 
 const emojiOptions = ["🎮", "⚽", "🧸", "📚", "🚲", "🎧", "🎁", "🏴‍☠️"];
 
+/**
+ * G2: GoalWishlistSkeleton — title row + progress bar + 2 line skeletons.
+ * Renders while `isLoading` is true from context. F11 empty-state copy still
+ * fires after hydration when goals.length === 0.
+ */
+function GoalWishlistSkeleton() {
+  return (
+    <div
+      aria-hidden="true"
+      data-testid="goal-wishlist-skeleton"
+      className="mx-4 overflow-hidden rounded-2xl border border-sky-300/30 bg-sky-950/40 p-4 backdrop-blur-sm sm:mx-8"
+    >
+      <div className="mb-4 flex items-center gap-3">
+        <Skeleton className="size-10 rounded-xl bg-sky-900/50" />
+        <div className="flex-1 space-y-2">
+          <Skeleton className="h-5 w-32 rounded bg-sky-900/50" />
+          <Skeleton className="h-3 w-44 rounded bg-sky-900/30" />
+        </div>
+      </div>
+      <div className="rounded-2xl border border-sky-300/20 bg-sky-900/40 p-4 space-y-3">
+        <div className="flex items-center gap-3">
+          <Skeleton className="size-12 rounded bg-sky-900/50" />
+          <Skeleton className="h-6 flex-1 rounded bg-sky-900/40" />
+        </div>
+        <Skeleton className="h-4 w-full rounded-full bg-sky-950" />
+        <div className="flex justify-between">
+          <Skeleton className="h-4 w-24 rounded bg-sky-900/40" />
+          <Skeleton className="h-4 w-20 rounded bg-sky-900/30" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function GoalWishlist({ childId }: GoalWishlistProps) {
   const { t } = useTranslation();
   const {
+    isLoading,
     getActiveGoalForChild,
     getGoalsForChild,
     getWalletBalance,
     createGoal,
   } = usePocketMoney();
+
   const [title, setTitle] = useState("");
   const [targetAmount, setTargetAmount] = useState("");
   const [emoji, setEmoji] = useState<string>(emojiOptions[0]!);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const saveBalance = getWalletBalance(childId, "save");
-  const activeGoal = getActiveGoalForChild(childId);
   const goals = getGoalsForChild(childId);
-  const target = activeGoal?.targetAmount ?? 0;
-  const progress = target > 0 ? Math.min(100, Math.round((saveBalance / target) * 100)) : 0;
-  const remaining = Math.max(0, target - saveBalance);
-
   const recentGoals = useMemo(
     () =>
       goals
@@ -44,6 +75,15 @@ export function GoalWishlist({ childId }: GoalWishlistProps) {
         .slice(0, 3),
     [goals]
   );
+
+  // G2: skeleton while context hydrates. Placed after hooks so order stays stable.
+  if (isLoading) return <GoalWishlistSkeleton />;
+
+  const saveBalance = getWalletBalance(childId, "save");
+  const activeGoal = getActiveGoalForChild(childId);
+  const target = activeGoal?.targetAmount ?? 0;
+  const progress = target > 0 ? Math.min(100, Math.round((saveBalance / target) * 100)) : 0;
+  const remaining = Math.max(0, target - saveBalance);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();

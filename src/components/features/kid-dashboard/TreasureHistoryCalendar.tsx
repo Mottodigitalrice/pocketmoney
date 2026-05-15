@@ -4,8 +4,41 @@ import { useMemo, useState } from "react";
 import { usePocketMoney } from "@/hooks/use-pocket-money";
 import { useTranslation } from "@/hooks/use-translation";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { CURRENCY, DAYS_OF_WEEK, DAYS_OF_WEEK_JA } from "@/lib/constants";
 import type { TranslationKey } from "@/lib/i18n/translations";
+
+/**
+ * G2: TreasureHistoryCalendarSkeleton — 7-column day grid of square skeletons.
+ * (Spec called for 7×4 grid; collapsed to 7 days × 1 row because the real
+ *  layout is one row of 7 day-cards, not a month grid.)
+ */
+function TreasureHistoryCalendarSkeleton() {
+  return (
+    <div
+      aria-hidden="true"
+      data-testid="treasure-history-skeleton"
+      className="mx-4 rounded-2xl border border-amber-300/20 bg-amber-950/20 p-4 backdrop-blur-sm sm:mx-8"
+    >
+      <div className="mb-4 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Skeleton className="size-8 rounded bg-amber-900/40" />
+          <Skeleton className="h-5 w-32 rounded bg-amber-900/40" />
+        </div>
+        <div className="flex items-center gap-2">
+          <Skeleton className="size-9 rounded bg-amber-900/30" />
+          <Skeleton className="h-4 w-24 rounded bg-amber-900/30" />
+          <Skeleton className="size-9 rounded bg-amber-900/30" />
+        </div>
+      </div>
+      <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+        {[0, 1, 2, 3, 4, 5, 6].map((i) => (
+          <Skeleton key={i} className="h-28 w-full rounded-xl bg-amber-900/30" />
+        ))}
+      </div>
+    </div>
+  );
+}
 
 interface TreasureHistoryCalendarProps {
   childId: string;
@@ -14,6 +47,7 @@ interface TreasureHistoryCalendarProps {
 export function TreasureHistoryCalendar({ childId }: TreasureHistoryCalendarProps) {
   const { t, locale } = useTranslation();
   const {
+    isLoading,
     getWeekDates,
     getInstancesForChild,
     getJobById,
@@ -26,6 +60,9 @@ export function TreasureHistoryCalendar({ childId }: TreasureHistoryCalendarProp
     base.setDate(base.getDate() + weekOffset * 7);
     return getWeekDates(base);
   }, [getWeekDates, weekOffset]);
+
+  // G2: skeleton while hydrating. Placed after hooks to keep hook order stable.
+  if (isLoading) return <TreasureHistoryCalendarSkeleton />;
 
   const approvedInstances = getInstancesForChild(childId).filter(
     (instance) => instance.status === "approved" && instance.approvedAt

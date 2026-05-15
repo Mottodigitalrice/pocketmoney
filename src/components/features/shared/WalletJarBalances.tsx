@@ -4,8 +4,33 @@ import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { CURRENCY } from "@/lib/constants";
 import { useTranslation } from "@/hooks/use-translation";
+import { Skeleton } from "@/components/ui/skeleton";
 import type { WalletJar } from "@/types";
 import type { TranslationKey } from "@/lib/i18n/translations";
+
+/**
+ * G2: WalletJarBalancesSkeleton — three jar placeholders (icon + amount line).
+ * Public so callers (e.g., WeeklyTracker) can render it while context is
+ * still hydrating.
+ */
+export function WalletJarBalancesSkeleton({ compact = false }: { compact?: boolean }) {
+  return (
+    <div className="space-y-3" aria-hidden="true" data-testid="wallet-jars-skeleton">
+      <div className="grid grid-cols-3 gap-2 sm:gap-3">
+        {[0, 1, 2].map((i) => (
+          <div
+            key={i}
+            className={`rounded-xl border border-white/10 bg-amber-900/30 ${compact ? "p-2" : "p-3"}`}
+          >
+            <Skeleton className={`mx-auto ${compact ? "h-5 w-5" : "h-7 w-7"} rounded-full bg-amber-900/50`} />
+            <Skeleton className={`mx-auto mt-2 ${compact ? "h-5" : "h-7"} w-16 rounded bg-amber-900/40`} />
+            <Skeleton className="mx-auto mt-1 h-3 w-10 rounded bg-amber-900/30" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 const jarConfig: Record<
   WalletJar,

@@ -10,6 +10,7 @@ import { UpcomingWeekPreview } from "@/components/features/kid-dashboard/Upcomin
 import { TreasureHistoryCalendar } from "@/components/features/kid-dashboard/TreasureHistoryCalendar";
 import { RankUpToast } from "@/components/features/kid-dashboard/RankUpToast";
 import { KanbanBoard } from "@/components/features/kanban/KanbanBoard";
+import { AppSkeleton } from "@/components/features/shared/AppSkeleton";
 import { usePocketMoney } from "@/hooks/use-pocket-money";
 import { useTranslation } from "@/hooks/use-translation";
 
@@ -25,12 +26,9 @@ export default function KidPage({ params }: KidPageProps) {
   const child = getChildById(childId);
   const currentRank = child ? getRankForChild(childId).rank : null;
 
+  // G2: polished kid-dashboard skeleton during initial Convex hydration.
   if (isLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center text-white">
-        <div className="animate-pulse text-2xl">{t("kid_loading")}</div>
-      </div>
-    );
+    return <AppSkeleton variant="kid" />;
   }
 
   if (!child) {

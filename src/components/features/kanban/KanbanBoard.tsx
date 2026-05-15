@@ -4,8 +4,36 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import dynamic from "next/dynamic";
 import { usePocketMoney } from "@/hooks/use-pocket-money";
 import { useTranslation } from "@/hooks/use-translation";
+import { Skeleton } from "@/components/ui/skeleton";
 import { KanbanColumn } from "./KanbanColumn";
 import { JobCard } from "./JobCard";
+
+/**
+ * G2: KanbanBoardSkeleton — 3 columns × 3 card slots while `isLoading` is true.
+ * Mostly covered by AppSkeleton for the kid page, but kept for standalone /
+ * future re-use (admin views, embedded panels).
+ */
+function KanbanBoardSkeleton() {
+  return (
+    <div
+      aria-hidden="true"
+      data-testid="kanban-board-skeleton"
+      className="grid gap-4 md:grid-cols-3 md:gap-6"
+    >
+      {[0, 1, 2].map((col) => (
+        <div
+          key={col}
+          className="space-y-3 rounded-2xl border border-blue-900/30 bg-blue-950/30 p-3"
+        >
+          <Skeleton className="h-7 w-24 rounded bg-blue-900/50" />
+          {[0, 1, 2].map((row) => (
+            <Skeleton key={row} className="h-20 w-full rounded-xl bg-blue-900/40" />
+          ))}
+        </div>
+      ))}
+    </div>
+  );
+}
 
 // F21: celebration only fires on job approval — defer the heavy motion bundle
 // until the user actually triggers it.
@@ -22,6 +50,7 @@ interface KanbanBoardProps {
 export function KanbanBoard({ childId }: KanbanBoardProps) {
   const { t } = useTranslation();
   const {
+    isLoading,
     getTodayAvailableJobs,
     getInProgressJobs,
     getCompletedJobs,
@@ -117,6 +146,13 @@ export function KanbanBoard({ childId }: KanbanBoardProps) {
   };
 
   const columnColors = ["bg-blue-500", "bg-amber-500", "bg-green-500"];
+
+  // G2: skeleton while context is still hydrating. Hooks above must run on
+  // every render, so this check is after all hooks — empty-state copy below
+  // (F11) continues to gate on length === 0 after hydration.
+  if (isLoading) {
+    return <KanbanBoardSkeleton />;
+  }
 
   // Show empty state if no jobs scheduled today at all
   const hasNoJobsToday = available.length === 0 && inProgress.length === 0 && completed.length === 0;
