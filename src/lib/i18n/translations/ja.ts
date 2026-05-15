@@ -93,6 +93,16 @@ const ja = {
   approval_reject_note_prompt: "もう一回やる前に、何を直してほしいですか?",
   approval_photo_proof: "写真のしょうこ",
   approval_photo_proof_alt: "お仕事完了の写真",
+  // F20 — tap-to-enlarge + close labels for the proof preview modal.
+  approval_photo_tap_to_enlarge: "タップで拡大",
+  approval_photo_preview_close: "閉じる",
+  // F20 — JobManager row icon button aria-labels.
+  job_manager_edit_aria: "お仕事を編集",
+  job_manager_delete_aria: "お仕事を削除",
+  // F20 — WeekPlanner mobile day-picker labels.
+  planner_day_picker_label: "曜日を選ぶ",
+  planner_view_mode_grid: "週ぜんぶ",
+  planner_view_mode_day: "1日ずつ",
 
   // Job manager
   job_manager_title: "おしごとライブラリ ({{count}})",

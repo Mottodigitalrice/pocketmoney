@@ -110,7 +110,8 @@ export function LuckyChest({ childId }: LuckyChestProps) {
           onClick={handleOpen}
           disabled={!status.unlocked || status.opened || isOpening}
           data-testid="lucky-chest-open-button"
-          className="shrink-0 gap-2 bg-yellow-500 font-extrabold text-yellow-950 hover:bg-yellow-400 disabled:opacity-60"
+          // F20: min-h-11 — kid taps this with their thumb on a phone.
+          className="min-h-11 shrink-0 gap-2 bg-yellow-500 font-extrabold text-yellow-950 hover:bg-yellow-400 disabled:opacity-60"
         >
           <Gift className="size-4" />
           {status.opened

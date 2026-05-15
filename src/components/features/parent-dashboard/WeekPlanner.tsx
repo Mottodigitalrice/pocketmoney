@@ -271,11 +271,12 @@ export function WeekPlanner() {
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
+            {/* F20: chevrons bumped from 36×36 to 44×44. */}
             <Button
               variant="ghost"
               size="icon"
               onClick={() => setWeekOffset((value) => value - 1)}
-              className="h-9 w-9 text-amber-300 hover:bg-amber-800/40"
+              className="h-11 w-11 text-amber-300 hover:bg-amber-800/40"
               aria-label={t("planner_prev_week")}
             >
               <ChevronLeft className="h-4 w-4" />
@@ -287,7 +288,7 @@ export function WeekPlanner() {
               variant="ghost"
               size="icon"
               onClick={() => setWeekOffset((value) => value + 1)}
-              className="h-9 w-9 text-amber-300 hover:bg-amber-800/40"
+              className="h-11 w-11 text-amber-300 hover:bg-amber-800/40"
               aria-label={t("planner_next_week")}
             >
               <ChevronRight className="h-4 w-4" />
@@ -297,7 +298,7 @@ export function WeekPlanner() {
                 variant="outline"
                 size="sm"
                 onClick={() => setWeekOffset(0)}
-                className="border-amber-600/50 text-amber-300 hover:bg-amber-800/40"
+                className="min-h-11 border-amber-600/50 text-amber-300 hover:bg-amber-800/40"
               >
                 {t("planner_today")}
               </Button>
@@ -334,7 +335,9 @@ export function WeekPlanner() {
                         setDragData(event, { type: "library-job", jobId: job._id })
                       }
                       onClick={() => setSelectedJobId(job._id)}
-                      className={`flex min-w-0 items-center gap-2 rounded-xl border px-3 py-2 text-left text-sm transition-all ${
+                      // F20: min-h-11 floor — library-job picker is the
+                      // entry point for "schedule this job" on mobile.
+                      className={`flex min-h-11 min-w-0 items-center gap-2 rounded-xl border px-3 py-2 text-left text-sm transition-all ${
                         isSelected
                           ? "border-amber-400 bg-amber-600/30 text-amber-50 ring-1 ring-amber-400"
                           : "border-amber-700/20 bg-amber-900/30 text-amber-200 hover:bg-amber-800/40"
@@ -370,7 +373,8 @@ export function WeekPlanner() {
                       key={child._id}
                       type="button"
                       onClick={() => toggleChild(child._id)}
-                      className={`flex items-center gap-2 rounded-full border px-3 py-2 text-sm font-semibold transition-all ${
+                      // F20: child-toggle pill min-h-11 (was ~36).
+                      className={`flex min-h-11 items-center gap-2 rounded-full border px-3 py-2 text-sm font-semibold transition-all ${
                         isSelected
                           ? "border-amber-400 bg-amber-600 text-white"
                           : "border-amber-700/20 bg-amber-900/30 text-amber-300/70 hover:bg-amber-800/40"
@@ -401,7 +405,8 @@ export function WeekPlanner() {
                     key={priority}
                     type="button"
                     onClick={() => setSelectedPriority(priority)}
-                    className={`rounded-xl border px-3 py-2 text-sm font-bold transition-all ${
+                    // F20: priority toggle min-h-11.
+                    className={`min-h-11 rounded-xl border px-3 py-2 text-sm font-bold transition-all ${
                       selectedPriority === priority
                         ? "border-amber-400 bg-amber-600 text-white"
                         : "border-amber-700/20 bg-amber-900/30 text-amber-300/70 hover:bg-amber-800/40"
@@ -417,10 +422,11 @@ export function WeekPlanner() {
           </div>
 
           <div className="grid min-w-0 content-start gap-2 sm:grid-cols-2 xl:grid-cols-1">
+            {/* F20: bulk-action buttons now min-h-11 (default Button is h-9). */}
             <Button
               onClick={copyLastWeek}
               variant="outline"
-              className="justify-start gap-2 border-amber-600/50 text-amber-300 hover:bg-amber-800/40"
+              className="min-h-11 justify-start gap-2 border-amber-600/50 text-amber-300 hover:bg-amber-800/40"
             >
               <Copy className="h-4 w-4" />
               {t("planner_copy_last_week")}
@@ -428,7 +434,7 @@ export function WeekPlanner() {
             <Button
               onClick={applyMondayTemplate}
               variant="outline"
-              className="justify-start gap-2 border-amber-600/50 text-amber-300 hover:bg-amber-800/40"
+              className="min-h-11 justify-start gap-2 border-amber-600/50 text-amber-300 hover:bg-amber-800/40"
             >
               <Wand2 className="h-4 w-4" />
               {t("planner_apply_monday")}
@@ -437,7 +443,7 @@ export function WeekPlanner() {
               onClick={applyRecurringTemplate}
               disabled={recurringJobs.length === 0}
               variant="outline"
-              className="justify-start gap-2 border-amber-600/50 text-amber-300 hover:bg-amber-800/40 disabled:opacity-50"
+              className="min-h-11 justify-start gap-2 border-amber-600/50 text-amber-300 hover:bg-amber-800/40 disabled:opacity-50"
             >
               <CalendarDays className="h-4 w-4" />
               {t("planner_apply_recurring")}
@@ -493,7 +499,10 @@ export function WeekPlanner() {
                   disabled={!selectedJobId}
                   data-testid="planner-add-selected"
                   data-date={date}
-                  className="mt-2 h-8 w-full gap-1 bg-amber-600 text-xs font-bold text-white hover:bg-amber-700 disabled:opacity-50"
+                  // F20: bumped from h-8 (32px) to min-h-11 (44px) — this is
+                  // the primary "add job to day" tap target. Real thumbs need
+                  // the height even when scrolling sideways in the grid.
+                  className="mt-2 min-h-11 w-full gap-1 bg-amber-600 text-xs font-bold text-white hover:bg-amber-700 disabled:opacity-50"
                 >
                   <Plus className="h-3.5 w-3.5" />
                   {t("planner_add_selected")}
@@ -578,7 +587,10 @@ export function WeekPlanner() {
                               <button
                                 type="button"
                                 onClick={() => removeScheduledJob(entry._id)}
-                                className="rounded p-0.5 text-red-300/75 transition hover:bg-red-500/15 hover:text-red-200"
+                                // F20: bumped from p-0.5 around a 14px icon
+                                // (~20×20) to min-h-11/min-w-11 so the remove
+                                // X is a real tap target inside the cell.
+                                className="inline-flex min-h-11 min-w-11 items-center justify-center rounded text-red-300/75 transition hover:bg-red-500/15 hover:text-red-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
                                 aria-label={t("planner_remove_job")}
                               >
                                 <X className="h-3.5 w-3.5" />
@@ -588,7 +600,9 @@ export function WeekPlanner() {
                           <button
                             type="button"
                             onClick={() => clearScheduledDay(child._id, date)}
-                            className="flex items-center gap-1 text-xs font-semibold text-red-300/80 hover:text-red-200"
+                            // F20: min-h-11 floor + larger hit area for the
+                            // per-cell clear button. Was a 16-18px text link.
+                            className="inline-flex min-h-11 items-center gap-1 rounded px-2 text-xs font-semibold text-red-300/80 hover:text-red-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
                           >
                             <Trash2 className="h-3.5 w-3.5" />
                             {t("planner_clear_day")}

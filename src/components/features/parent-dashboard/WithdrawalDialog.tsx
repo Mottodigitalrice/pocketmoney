@@ -11,7 +11,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { BudouXText } from "@/components/shared/BudouXText";
 import {
   Dialog,
+  DialogBody,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -118,7 +120,7 @@ export function WithdrawalDialog({
       <Button
         type="button"
         onClick={() => setOpen(true)}
-        className="gap-2 bg-amber-600 font-bold text-white hover:bg-amber-700"
+        className="min-h-11 gap-2 bg-amber-600 font-bold text-white hover:bg-amber-700"
       >
         <WalletCards className="size-4" />
         {t("withdraw_open")}
@@ -126,29 +128,79 @@ export function WithdrawalDialog({
 
       <Dialog open={open} onOpenChange={handleOpenChange}>
         <DialogContent className="border-amber-700/50 bg-amber-950 text-amber-100 sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="text-amber-100">
-              {t("withdraw_title", { name: childName })}
-            </DialogTitle>
-          </DialogHeader>
+          {/* F20: form wraps header/body/footer for keyboard-cover safety. */}
+          <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
+            <DialogHeader>
+              <DialogTitle className="text-amber-100">
+                {t("withdraw_title", { name: childName })}
+              </DialogTitle>
+            </DialogHeader>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-2 gap-3">
+            <DialogBody className="space-y-4">
+              <div className="grid grid-cols-2 gap-3">
+                <label className="space-y-2">
+                  <span className="text-sm font-semibold text-amber-200">
+                    {t("withdraw_jar")}
+                  </span>
+                  <Select
+                    value={jar}
+                    onValueChange={(value) => setJar(value as WalletJar)}
+                  >
+                    <SelectTrigger className="h-11 w-full border-amber-700/40 bg-amber-900/40 text-amber-100">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="border-amber-700/40 bg-amber-950 text-amber-100">
+                      {jarOptions.map((option) => (
+                        <SelectItem key={option} value={option}>
+                          {t(jarLabelKeys[option])}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </label>
+
+                <label className="space-y-2">
+                  <span className="text-sm font-semibold text-amber-200">
+                    {t("withdraw_amount")}
+                  </span>
+                  <Input
+                    inputMode="numeric"
+                    min={1}
+                    max={balance}
+                    type="number"
+                    value={amount}
+                    onChange={(event) => setAmount(event.target.value)}
+                    className="h-11 border-amber-700/40 bg-amber-900/40 text-amber-100"
+                    placeholder="500"
+                  />
+                </label>
+              </div>
+
+              <div className="rounded-xl border border-amber-700/20 bg-amber-900/30 p-3">
+                <p className="text-xs font-semibold uppercase tracking-wide text-amber-300/70">
+                  {t("withdraw_available")}
+                </p>
+                <p className="text-2xl font-extrabold text-amber-100">
+                  {CURRENCY}
+                  {balance.toLocaleString()}
+                </p>
+              </div>
+
               <label className="space-y-2">
                 <span className="text-sm font-semibold text-amber-200">
-                  {t("withdraw_jar")}
+                  {t("withdraw_reason")}
                 </span>
                 <Select
-                  value={jar}
-                  onValueChange={(value) => setJar(value as WalletJar)}
+                  value={reason}
+                  onValueChange={(value) => setReason(value as WithdrawalReason)}
                 >
-                  <SelectTrigger className="w-full border-amber-700/40 bg-amber-900/40 text-amber-100">
+                  <SelectTrigger className="h-11 w-full border-amber-700/40 bg-amber-900/40 text-amber-100">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="border-amber-700/40 bg-amber-950 text-amber-100">
-                    {jarOptions.map((option) => (
+                    {reasonOptions.map((option) => (
                       <SelectItem key={option} value={option}>
-                        {t(jarLabelKeys[option])}
+                        {t(reasonLabelKeys[option])}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -157,77 +209,32 @@ export function WithdrawalDialog({
 
               <label className="space-y-2">
                 <span className="text-sm font-semibold text-amber-200">
-                  {t("withdraw_amount")}
+                  {t("withdraw_note")}
                 </span>
-                <Input
-                  inputMode="numeric"
-                  min={1}
-                  max={balance}
-                  type="number"
-                  value={amount}
-                  onChange={(event) => setAmount(event.target.value)}
+                <Textarea
+                  value={note}
+                  onChange={(event) => setNote(event.target.value)}
                   className="border-amber-700/40 bg-amber-900/40 text-amber-100"
-                  placeholder="500"
+                  placeholder={t("withdraw_note_placeholder")}
                 />
               </label>
-            </div>
 
-            <div className="rounded-xl border border-amber-700/20 bg-amber-900/30 p-3">
-              <p className="text-xs font-semibold uppercase tracking-wide text-amber-300/70">
-                {t("withdraw_available")}
-              </p>
-              <p className="text-2xl font-extrabold text-amber-100">
-                {CURRENCY}
-                {balance.toLocaleString()}
-              </p>
-            </div>
+              {error && (
+                <p className="rounded-lg border border-red-400/30 bg-red-950/40 px-3 py-2 text-sm text-red-200">
+                  <BudouXText text={error} />
+                </p>
+              )}
+            </DialogBody>
 
-            <label className="space-y-2">
-              <span className="text-sm font-semibold text-amber-200">
-                {t("withdraw_reason")}
-              </span>
-              <Select
-                value={reason}
-                onValueChange={(value) => setReason(value as WithdrawalReason)}
+            <DialogFooter>
+              <Button
+                type="submit"
+                disabled={isSaving || balance <= 0}
+                className="min-h-11 w-full bg-amber-600 font-bold text-white hover:bg-amber-700 disabled:opacity-60"
               >
-                <SelectTrigger className="w-full border-amber-700/40 bg-amber-900/40 text-amber-100">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="border-amber-700/40 bg-amber-950 text-amber-100">
-                  {reasonOptions.map((option) => (
-                    <SelectItem key={option} value={option}>
-                      {t(reasonLabelKeys[option])}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </label>
-
-            <label className="space-y-2">
-              <span className="text-sm font-semibold text-amber-200">
-                {t("withdraw_note")}
-              </span>
-              <Textarea
-                value={note}
-                onChange={(event) => setNote(event.target.value)}
-                className="border-amber-700/40 bg-amber-900/40 text-amber-100"
-                placeholder={t("withdraw_note_placeholder")}
-              />
-            </label>
-
-            {error && (
-              <p className="rounded-lg border border-red-400/30 bg-red-950/40 px-3 py-2 text-sm text-red-200">
-                <BudouXText text={error} />
-              </p>
-            )}
-
-            <Button
-              type="submit"
-              disabled={isSaving || balance <= 0}
-              className="w-full bg-amber-600 font-bold text-white hover:bg-amber-700 disabled:opacity-60"
-            >
-              {isSaving ? t("withdraw_saving") : t("withdraw_submit")}
-            </Button>
+                {isSaving ? t("withdraw_saving") : t("withdraw_submit")}
+              </Button>
+            </DialogFooter>
           </form>
         </DialogContent>
       </Dialog>

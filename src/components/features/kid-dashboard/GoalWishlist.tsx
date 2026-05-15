@@ -158,11 +158,14 @@ export function GoalWishlist({ childId }: GoalWishlistProps) {
       )}
 
       <form onSubmit={handleSubmit} className="mt-4 space-y-3">
+        {/* F20: form inputs h-11 (was h-9 default) so the kid hits them
+            cleanly. Emoji tiles bumped from 40×40 to 44×44. Submit Button
+            also min-h-11. */}
         <div className="grid gap-3 sm:grid-cols-[1fr_120px]">
           <Input
             value={title}
             onChange={(event) => setTitle(event.target.value)}
-            className="border-sky-300/30 bg-sky-950/40 text-sky-50 placeholder:text-sky-100/40"
+            className="h-11 border-sky-300/30 bg-sky-950/40 text-sky-50 placeholder:text-sky-100/40"
             placeholder={t("goal_name_placeholder")}
           />
           <Input
@@ -171,7 +174,7 @@ export function GoalWishlist({ childId }: GoalWishlistProps) {
             inputMode="numeric"
             type="number"
             min={1}
-            className="border-sky-300/30 bg-sky-950/40 text-sky-50 placeholder:text-sky-100/40"
+            className="h-11 border-sky-300/30 bg-sky-950/40 text-sky-50 placeholder:text-sky-100/40"
             placeholder={t("goal_amount_placeholder")}
           />
         </div>
@@ -182,7 +185,7 @@ export function GoalWishlist({ childId }: GoalWishlistProps) {
               key={option}
               type="button"
               onClick={() => setEmoji(option)}
-              className={`flex size-10 items-center justify-center rounded-xl border text-xl transition-all ${
+              className={`flex size-11 items-center justify-center rounded-xl border text-xl transition-all ${
                 emoji === option
                   ? "border-sky-200 bg-sky-500/30"
                   : "border-sky-300/20 bg-sky-950/30"
@@ -194,7 +197,7 @@ export function GoalWishlist({ childId }: GoalWishlistProps) {
           <Button
             type="submit"
             disabled={isSaving}
-            className="ml-auto bg-sky-500 font-bold text-white hover:bg-sky-600 disabled:opacity-60"
+            className="ml-auto min-h-11 bg-sky-500 font-bold text-white hover:bg-sky-600 disabled:opacity-60"
           >
             {isSaving ? t("goal_saving") : t("goal_create")}
           </Button>

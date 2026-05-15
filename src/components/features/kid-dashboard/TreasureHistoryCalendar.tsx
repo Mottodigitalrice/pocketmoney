@@ -72,12 +72,16 @@ export function TreasureHistoryCalendar({ childId }: TreasureHistoryCalendarProp
           <span className="text-2xl">📚</span>
           <h2 className="text-lg font-bold text-white">{t("kid_history_title")}</h2>
         </div>
+        {/* F20: chevron buttons promoted to size="icon" (h-9 w-9) + min 11.
+            aria-label added so screen readers announce "previous week"
+            instead of "left arrow button". */}
         <div className="flex items-center gap-2">
           <Button
             variant="ghost"
-            size="sm"
+            size="icon"
             onClick={() => setWeekOffset((value) => value - 1)}
-            className="text-amber-200 hover:bg-amber-900/30"
+            aria-label={t("kid_history_prev_week")}
+            className="min-h-11 min-w-11 text-amber-200 hover:bg-amber-900/30"
           >
             ←
           </Button>
@@ -86,10 +90,11 @@ export function TreasureHistoryCalendar({ childId }: TreasureHistoryCalendarProp
           </span>
           <Button
             variant="ghost"
-            size="sm"
+            size="icon"
             onClick={() => setWeekOffset((value) => Math.min(value + 1, 0))}
             disabled={weekOffset === 0}
-            className="text-amber-200 hover:bg-amber-900/30 disabled:opacity-40"
+            aria-label={t("kid_history_next_week")}
+            className="min-h-11 min-w-11 text-amber-200 hover:bg-amber-900/30 disabled:opacity-40"
           >
             →
           </Button>

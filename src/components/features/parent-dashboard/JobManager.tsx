@@ -12,6 +12,7 @@ import type { TranslationKey } from "@/lib/i18n/translations";
 import type { ChildIcon, JobPriority, RecurrenceType } from "@/types";
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogHeader,
   DialogTitle,
@@ -90,13 +91,13 @@ export function JobManager() {
           <Button
             onClick={() => setOneOffOpen(true)}
             variant="outline"
-            className="border-amber-600/50 text-amber-300 hover:bg-amber-800/40"
+            className="min-h-11 border-amber-600/50 text-amber-300 hover:bg-amber-800/40"
           >
             {t("oneoff_title")}
           </Button>
           <Button
             onClick={handleAdd}
-            className="bg-amber-600 font-bold text-white hover:bg-amber-700"
+            className="min-h-11 bg-amber-600 font-bold text-white hover:bg-amber-700"
           >
             {t("job_manager_new")}
           </Button>
@@ -114,7 +115,7 @@ export function JobManager() {
           </p>
           <Button
             onClick={handleAdd}
-            className="mt-2 bg-amber-600 font-bold text-white hover:bg-amber-700"
+            className="mt-2 min-h-11 bg-amber-600 font-bold text-white hover:bg-amber-700"
           >
             {t("job_library_empty_cta")}
           </Button>
@@ -151,32 +152,39 @@ export function JobManager() {
               {CURRENCY}
               {job.yenAmount}
             </span>
+            {/* F20: bumped emoji icon buttons from size="sm" (h-8) to
+                size="icon" (h-9 w-9) + min-h-11/min-w-11 floors so each
+                hits the 44px Apple HIG. aria-label promoted from title so
+                screen readers + AT announce the action, not the emoji. */}
             <div className="flex gap-1">
               <Button
                 variant="ghost"
-                size="sm"
+                size="icon"
                 onClick={() => setAssigningJobId(job._id)}
-                className="text-xs text-green-400 hover:bg-green-900/40 hover:text-green-300"
+                className="min-h-11 min-w-11 text-base text-green-400 hover:bg-green-900/40 hover:text-green-300"
+                aria-label={t("job_manager_quick_assign")}
                 title={t("job_manager_quick_assign")}
               >
                 📅
               </Button>
               <Button
                 variant="ghost"
-                size="sm"
+                size="icon"
                 onClick={() => handleEdit(job)}
-                className="text-amber-300 hover:bg-amber-800/40 hover:text-amber-100"
+                aria-label={t("job_manager_edit_aria")}
+                className="min-h-11 min-w-11 text-base text-amber-300 hover:bg-amber-800/40 hover:text-amber-100"
               >
                 ✏️
               </Button>
               <Button
                 variant="ghost"
-                size="sm"
+                size="icon"
                 // F12: route delete through confirm dialog. Single-tap
                 // destructive delete is forbidden (F10 gap 5.9).
                 onClick={() => setDeletingJobId(job._id)}
                 data-testid="job-row-delete"
-                className="text-red-400 hover:bg-red-900/40 hover:text-red-300"
+                aria-label={t("job_manager_delete_aria")}
+                className="min-h-11 min-w-11 text-base text-red-400 hover:bg-red-900/40 hover:text-red-300"
               >
                 🗑️
               </Button>
@@ -222,7 +230,7 @@ export function JobManager() {
               {t("job_manager_choose_child")}
             </DialogTitle>
           </DialogHeader>
-          <div className="space-y-2">
+          <DialogBody className="space-y-2 pb-6">
             {familyChildren.map((child) => {
               const iconConfig = CHILD_ICON_CONFIG[child.icon as ChildIcon];
               return (
@@ -231,7 +239,9 @@ export function JobManager() {
                   onClick={() =>
                     assigningJobId && handleQuickAssign(assigningJobId, child._id)
                   }
-                  className="flex w-full items-center gap-3 rounded-xl bg-amber-900/30 p-4 text-left transition-all hover:bg-amber-800/40"
+                  // F20: explicit min-h-[60px] for tap target (p-4 already
+                  // hits 44 with 24px text, but explicit floor is safer).
+                  className="flex min-h-[60px] w-full items-center gap-3 rounded-xl bg-amber-900/30 p-4 text-left transition-all hover:bg-amber-800/40"
                 >
                   <span className="text-2xl">{iconConfig?.emoji ?? "👤"}</span>
                   <span className="font-semibold text-amber-100">
@@ -240,7 +250,7 @@ export function JobManager() {
                 </button>
               );
             })}
-          </div>
+          </DialogBody>
         </DialogContent>
       </Dialog>
     </div>

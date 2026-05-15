@@ -7,7 +7,9 @@ import { CURRENCY, CHILD_ICON_CONFIG } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
+  DialogBody,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -114,7 +116,10 @@ export function QuickAddToday() {
               key={job._id}
               type="button"
               onClick={() => openAssignDialog(job._id)}
-              className="rounded-2xl border border-amber-700/20 bg-amber-900/30 p-4 text-left backdrop-blur-sm transition-all hover:border-amber-500/40 hover:bg-amber-800/40"
+              // F20: explicit min-h-[60px] — these cards are p-4 with two
+              // lines of content so they're already comfortably tappable,
+              // but the floor guarantees ≥44 even with single-line content.
+              className="min-h-[60px] rounded-2xl border border-amber-700/20 bg-amber-900/30 p-4 text-left backdrop-blur-sm transition-all hover:border-amber-500/40 hover:bg-amber-800/40"
             >
               <div className="flex items-center gap-3">
                 <span className="text-3xl">{job.icon}</span>
@@ -152,7 +157,7 @@ export function QuickAddToday() {
                 </DialogTitle>
               </DialogHeader>
 
-              <div className="space-y-4">
+              <DialogBody className="space-y-4">
                 <div>
                   <p className="mb-2 text-sm font-semibold text-amber-200">
                     {t("quick_add_choose_who")}
@@ -167,7 +172,9 @@ export function QuickAddToday() {
                           key={child._id}
                           type="button"
                           onClick={() => toggleChild(child._id)}
-                          className={`rounded-xl border px-3 py-3 text-left transition-all ${
+                          // F20: child-pick tiles now min-h-11 — were py-3 only
+                          // which could end up <44 with short names on iPhone.
+                          className={`min-h-11 rounded-xl border px-3 py-3 text-left transition-all ${
                             isSelected
                               ? "border-amber-400 bg-amber-600/30 ring-1 ring-amber-400"
                               : "border-amber-700/20 bg-amber-900/30 hover:bg-amber-800/40"
@@ -202,15 +209,17 @@ export function QuickAddToday() {
                     />
                   </div>
                 </div>
+              </DialogBody>
 
+              <DialogFooter>
                 <Button
                   onClick={handleConfirm}
                   disabled={selectedChildIds.length === 0 || isSaving}
-                  className="w-full bg-amber-600 font-bold text-white hover:bg-amber-700 disabled:opacity-60"
+                  className="min-h-11 w-full bg-amber-600 font-bold text-white hover:bg-amber-700 disabled:opacity-60"
                 >
                   {isSaving ? t("quick_add_assigning") : t("quick_add_confirm")}
                 </Button>
-              </div>
+              </DialogFooter>
             </>
           )}
         </DialogContent>

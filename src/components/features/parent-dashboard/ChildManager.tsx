@@ -66,7 +66,7 @@ export function ChildManager({
         </div>
         <Button
           onClick={handleAdd}
-          className="bg-amber-600 font-bold text-white hover:bg-amber-700"
+          className="min-h-11 bg-amber-600 font-bold text-white hover:bg-amber-700"
         >
           {t("child_manager_add_btn")}
         </Button>
@@ -84,7 +84,7 @@ export function ChildManager({
           </p>
           <Button
             onClick={handleAdd}
-            className="mt-2 bg-amber-600 font-bold text-white hover:bg-amber-700"
+            className="mt-2 min-h-11 bg-amber-600 font-bold text-white hover:bg-amber-700"
           >
             {t("child_manager_empty_cta")}
           </Button>
@@ -127,19 +127,21 @@ export function ChildManager({
                 </div>
 
                 {/* Actions */}
+                {/* F20: icon buttons bumped to size="icon" (h-9 w-9) +
+                    min-h-11/min-w-11 floors so emoji actions hit ≥44px. */}
                 <div className="flex gap-1">
                   <Button
                     variant="ghost"
-                    size="sm"
+                    size="icon"
                     onClick={() => handleEdit(child)}
                     aria-label={t("child_manager_edit_aria", { name: child.name })}
-                    className="text-amber-300 hover:bg-amber-800/40 hover:text-amber-100"
+                    className="min-h-11 min-w-11 text-base text-amber-300 hover:bg-amber-800/40 hover:text-amber-100"
                   >
                     ✏️
                   </Button>
                   <Button
                     variant="ghost"
-                    size="sm"
+                    size="icon"
                     // F12: route delete through confirm dialog instead of
                     // calling onDelete immediately. The dialog confirms the
                     // cascade impact (wallet, history, scheduled jobs).
@@ -148,7 +150,7 @@ export function ChildManager({
                     }
                     data-testid="child-row-delete"
                     aria-label={t("child_manager_delete_aria", { name: child.name })}
-                    className="text-red-400 hover:bg-red-900/40 hover:text-red-300"
+                    className="min-h-11 min-w-11 text-base text-red-400 hover:bg-red-900/40 hover:text-red-300"
                   >
                     🗑️
                   </Button>

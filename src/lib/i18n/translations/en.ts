@@ -92,6 +92,16 @@ const en = {
   approval_reject_note_prompt: "What should they fix before trying again?",
   approval_photo_proof: "Photo proof",
   approval_photo_proof_alt: "Photo proof for completed job",
+  // F20 — tap-to-enlarge + close labels for the proof preview modal.
+  approval_photo_tap_to_enlarge: "Tap to enlarge",
+  approval_photo_preview_close: "Close",
+  // F20 — JobManager row icon button aria-labels (was title-only).
+  job_manager_edit_aria: "Edit job",
+  job_manager_delete_aria: "Delete job",
+  // F20 — WeekPlanner mobile day-picker labels.
+  planner_day_picker_label: "Pick a day",
+  planner_view_mode_grid: "Grid",
+  planner_view_mode_day: "Day",
 
   // Job manager
   job_manager_title: "Job Library ({{count}})",

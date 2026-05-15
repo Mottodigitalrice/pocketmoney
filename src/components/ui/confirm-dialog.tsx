@@ -3,7 +3,9 @@
 import { ReactNode } from "react";
 import {
   Dialog,
+  DialogBody,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogDescription,
@@ -61,13 +63,18 @@ export function ConfirmDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex gap-3 pt-2">
+        {/* F20: DialogBody is required so the new flex-column layout in
+            DialogContent has a flexible middle slot. Empty body keeps the
+            spacing rhythm consistent with form dialogs. */}
+        <DialogBody />
+
+        <DialogFooter>
           <Button
             type="button"
             variant="outline"
             onClick={onClose}
             data-testid="confirm-dialog-cancel"
-            className="flex-1 border-amber-700/50 text-amber-200 hover:bg-amber-800/40"
+            className="min-h-11 flex-1 border-amber-700/50 text-amber-200 hover:bg-amber-800/40"
           >
             {cancelLabel}
           </Button>
@@ -75,11 +82,11 @@ export function ConfirmDialog({
             type="button"
             onClick={handleConfirm}
             data-testid={confirmTestId}
-            className="flex-1 bg-red-600 font-bold text-white hover:bg-red-700"
+            className="min-h-11 flex-1 bg-red-600 font-bold text-white hover:bg-red-700"
           >
             {confirmLabel}
           </Button>
-        </div>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

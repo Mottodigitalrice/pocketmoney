@@ -10,7 +10,9 @@ import { CHILD_ICON_CONFIG } from "@/lib/constants";
 import type { ChildIcon } from "@/types";
 import {
   Dialog,
+  DialogBody,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -60,104 +62,111 @@ export function OneOffTaskForm({ open, onClose }: OneOffTaskFormProps) {
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
       <DialogContent className="border-amber-700/50 bg-amber-950 text-amber-100 sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle className="text-amber-100">
-            {t("oneoff_title")}
-          </DialogTitle>
-          <p className="text-sm text-amber-300/60">{t("oneoff_subtitle")}</p>
-        </DialogHeader>
+        {/* F20: form wraps header/body/footer for keyboard-cover safety. */}
+        <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
+          <DialogHeader>
+            <DialogTitle className="text-amber-100">
+              {t("oneoff_title")}
+            </DialogTitle>
+            <p className="text-sm text-amber-300/60">{t("oneoff_subtitle")}</p>
+          </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <Label className="text-amber-200">
-              {t("job_form_name_label")}
-            </Label>
-            <Input
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder={t("oneoff_name_placeholder")}
-              className="border-amber-700/50 bg-amber-900/50 text-amber-100 placeholder:text-amber-500"
-            />
-          </div>
-
-          <div>
-            <Label className="text-amber-200">
-              {t("job_form_icon_label")}
-            </Label>
-            <div className="mt-1 flex flex-wrap gap-2">
-              {ICONS.map((ic) => (
-                <button
-                  type="button"
-                  key={ic}
-                  onClick={() => setIcon(ic)}
-                  className={`rounded-lg p-2 text-xl transition-all ${
-                    icon === ic
-                      ? "bg-amber-600 ring-2 ring-amber-400"
-                      : "bg-amber-800/40 hover:bg-amber-800/60"
-                  }`}
-                >
-                  {ic}
-                </button>
-              ))}
+          <DialogBody className="space-y-4">
+            <div>
+              <Label className="text-amber-200">
+                {t("job_form_name_label")}
+              </Label>
+              <Input
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder={t("oneoff_name_placeholder")}
+                className="h-11 border-amber-700/50 bg-amber-900/50 text-amber-100 placeholder:text-amber-500"
+              />
             </div>
-          </div>
 
-          <div>
-            <Label className="text-amber-200">
-              {t("job_form_yen_label")}
-            </Label>
-            <Input
-              type="number"
-              value={yenAmount}
-              onChange={(e) => setYenAmount(Number(e.target.value))}
-              min={10}
-              step={10}
-              className="border-amber-700/50 bg-amber-900/50 text-amber-100"
-            />
-          </div>
-
-          <div>
-            <Label className="text-amber-200">
-              {t("oneoff_assign_to")}
-            </Label>
-            <div className="mt-1 flex flex-wrap gap-2">
-              {familyChildren.map((child) => {
-                const iconConfig = CHILD_ICON_CONFIG[child.icon as ChildIcon];
-                return (
+            <div>
+              <Label className="text-amber-200">
+                {t("job_form_icon_label")}
+              </Label>
+              <div className="mt-1 flex flex-wrap gap-2">
+                {ICONS.map((ic) => (
                   <button
                     type="button"
-                    key={child._id}
-                    onClick={() => setChildId(child._id)}
-                    className={`flex-1 rounded-lg px-3 py-2 text-sm font-semibold transition-all ${
-                      childId === child._id
-                        ? "bg-amber-600 text-white"
-                        : "bg-amber-800/40 text-amber-300 hover:bg-amber-800/60"
+                    key={ic}
+                    onClick={() => setIcon(ic)}
+                    aria-label={`${t("job_form_icon_label")} ${ic}`}
+                    aria-pressed={icon === ic}
+                    // F20: emoji tile 44×44.
+                    className={`flex h-11 w-11 items-center justify-center rounded-lg text-xl transition-all ${
+                      icon === ic
+                        ? "bg-amber-600 ring-2 ring-amber-400"
+                        : "bg-amber-800/40 hover:bg-amber-800/60"
                     }`}
                   >
-                    {iconConfig?.emoji ?? ""} {child.name}
+                    {ic}
                   </button>
-                );
-              })}
+                ))}
+              </div>
             </div>
-          </div>
 
-          <div className="flex gap-3 pt-2">
+            <div>
+              <Label className="text-amber-200">
+                {t("job_form_yen_label")}
+              </Label>
+              <Input
+                type="number"
+                value={yenAmount}
+                onChange={(e) => setYenAmount(Number(e.target.value))}
+                min={10}
+                step={10}
+                className="h-11 border-amber-700/50 bg-amber-900/50 text-amber-100"
+              />
+            </div>
+
+            <div>
+              <Label className="text-amber-200">
+                {t("oneoff_assign_to")}
+              </Label>
+              <div className="mt-1 flex flex-wrap gap-2">
+                {familyChildren.map((child) => {
+                  const iconConfig = CHILD_ICON_CONFIG[child.icon as ChildIcon];
+                  return (
+                    <button
+                      type="button"
+                      key={child._id}
+                      onClick={() => setChildId(child._id)}
+                      // F20: assign-to pill min-h-11.
+                      className={`min-h-11 flex-1 rounded-lg px-3 py-2 text-sm font-semibold transition-all ${
+                        childId === child._id
+                          ? "bg-amber-600 text-white"
+                          : "bg-amber-800/40 text-amber-300 hover:bg-amber-800/60"
+                      }`}
+                    >
+                      {iconConfig?.emoji ?? ""} {child.name}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </DialogBody>
+
+          <DialogFooter>
             <Button
               type="button"
               variant="outline"
               onClick={onClose}
-              className="flex-1 border-amber-700/50 text-amber-300 hover:bg-amber-800/40"
+              className="min-h-11 flex-1 border-amber-700/50 text-amber-300 hover:bg-amber-800/40"
             >
               {t("job_form_cancel")}
             </Button>
             <Button
               type="submit"
               disabled={isSaving || !title.trim() || !childId}
-              className="flex-1 bg-amber-600 font-bold text-white hover:bg-amber-700 disabled:opacity-60"
+              className="min-h-11 flex-1 bg-amber-600 font-bold text-white hover:bg-amber-700 disabled:opacity-60"
             >
               {isSaving ? "..." : t("oneoff_create")}
             </Button>
-          </div>
+          </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>
