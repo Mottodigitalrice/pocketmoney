@@ -58,7 +58,7 @@ const ja = {
   job_start: "やるぞ! 💪",
   job_complete: "やったよ! ✅",
   job_waiting: "ママかパパをまってるよ",
-  job_try_again_note: "もう一回やってみよう - ママかパパから: {{note}}",
+  job_try_again_note: "なにをなおして もういっかい やってほしい? {{note}}",
 
   // Celebration
   celebration_great_job: "よくできました!",
@@ -206,8 +206,9 @@ const ja = {
   withdraw_reason: "理由",
   withdraw_reason_cashOut: "現金で渡した",
   withdraw_reason_penalty: "ペナルティ",
-  withdraw_reason_correction: "修正",
+  withdraw_reason_correction: "まちがいなおし",
   withdraw_reason_other: "その他",
+  withdrawal_reason_penalty_kid: "ちょうせい",
   withdraw_note: "メモ",
   withdraw_note_placeholder: "何のための引き出し?",
   withdraw_submit: "引き出しを記録",
@@ -231,6 +232,8 @@ const ja = {
 
   // Lucky Chest
   lucky_chest_title: "ラッキーチェスト",
+  lucky_chest_sleeping_title: "今週は宝箱おやすみ",
+  lucky_chest_sleeping_hint: "マストドゥをついかすると、つぎのしゅうおきるよ!",
   lucky_chest_locked: "今週のぜったいおしごと {{total}}このうち{{done}}こ承認済み。",
   lucky_chest_unlocked: "あいたよ! 最高¥{{amount}}まで当たるよ。",
   lucky_chest_opened: "今週は¥{{amount}}をたからものに追加したよ。",
@@ -259,6 +262,7 @@ const ja = {
   goal_error_amount: "¥0より大きいゴール金額を入れてね。",
   goal_error_generic: "ゴールを保存できませんでした。",
   goal_swap_reassurance: "¥{{amount}}はなくならないよ。これからは{{name}}のためにたまるよ。",
+  goal_big_dream_hint: "おおきなゆめだね! まいしゅう ためていくと、もっとちかづくよ!",
 
   // Ranks
   rank_board_title: "クルーランク",

@@ -58,7 +58,7 @@ const en = {
   job_start: "Let's Do It! 💪",
   job_complete: "I Did It! ✅",
   job_waiting: "Waiting for Mummy or Daddy",
-  job_try_again_note: "Try again - note from Mum or Dad: {{note}}",
+  job_try_again_note: "Mum/Dad sent it back - here's what to fix: {{note}}",
 
   // Celebration
   celebration_great_job: "GREAT JOB!",
@@ -208,6 +208,7 @@ const en = {
   withdraw_reason_penalty: "Penalty",
   withdraw_reason_correction: "Correction",
   withdraw_reason_other: "Other",
+  withdrawal_reason_penalty_kid: "Adjustment",
   withdraw_note: "Note",
   withdraw_note_placeholder: "What was this for?",
   withdraw_submit: "Record Withdrawal",
@@ -231,6 +232,8 @@ const en = {
 
   // Lucky Chest
   lucky_chest_title: "Lucky Chest",
+  lucky_chest_sleeping_title: "The chest is sleeping this week",
+  lucky_chest_sleeping_hint: "Add some must-do jobs and it'll wake up next week!",
   lucky_chest_locked: "{{done}} / {{total}} must-do jobs approved this week.",
   lucky_chest_unlocked: "Unlocked! Open it for up to ¥{{amount}}.",
   lucky_chest_opened: "Opened this week: ¥{{amount}} added to your treasure.",
@@ -259,6 +262,7 @@ const en = {
   goal_error_amount: "Enter a goal amount above ¥0.",
   goal_error_generic: "Could not save the goal.",
   goal_swap_reassurance: "Your ¥{{amount}} is still saved. It will now go toward {{name}}.",
+  goal_big_dream_hint: "Big dream! Keep saving - every week your Save jar grows.",
 
   // Ranks
   rank_board_title: "Crew Ranks",

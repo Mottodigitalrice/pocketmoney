@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Gift, Lock, Sparkles } from "lucide-react";
+import { Gift, Lock, Moon, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { usePocketMoney } from "@/hooks/use-pocket-money";
 import { useTranslation } from "@/hooks/use-translation";
@@ -20,6 +20,36 @@ export function LuckyChest({ childId }: LuckyChestProps) {
   const status = getLuckyChestStatus(childId);
 
   if (!status) return null;
+
+  // F13: When no must-do jobs are scheduled this week, the chest is "sleeping"
+  // — don't show "0 / 0 approved" which reads like failure. Show a gentle
+  // informational state instead, no Open button (would be misleading).
+  if (status.mustDoTotal === 0) {
+    return (
+      <div
+        data-testid="lucky-chest"
+        data-sleeping="true"
+        data-unlocked="false"
+        data-opened="false"
+        className="mx-4 rounded-2xl border border-yellow-300/15 bg-yellow-950/15 p-4 backdrop-blur-sm sm:mx-8"
+      >
+        <div className="flex min-w-0 items-start gap-3">
+          <div className="relative flex size-11 shrink-0 items-center justify-center rounded-xl bg-yellow-400/10 text-yellow-100/60">
+            <Gift className="size-5" />
+            <Moon className="absolute -right-1 -top-1 size-3.5 text-yellow-100/80" />
+          </div>
+          <div className="min-w-0">
+            <h2 className="text-lg font-extrabold text-yellow-100/80">
+              {t("lucky_chest_sleeping_title")}
+            </h2>
+            <p className="mt-1 text-sm text-yellow-100/60">
+              {t("lucky_chest_sleeping_hint")}
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const handleOpen = async () => {
     if (!status.unlocked || status.opened || isOpening) return;

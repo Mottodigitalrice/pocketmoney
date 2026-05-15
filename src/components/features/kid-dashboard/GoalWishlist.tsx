@@ -131,6 +131,18 @@ export function GoalWishlist({ childId }: GoalWishlistProps) {
                   })}
             </span>
           </div>
+
+          {/* F14a: Big-dream hint — when the goal is still >10x what's saved,
+              show a gentle encouraging note instead of letting the progress
+              bar look impossible. No fear, no penalty — just reassurance. */}
+          {remaining > saveBalance * 10 && saveBalance >= 0 && (
+            <p
+              data-testid="goal-big-dream-hint"
+              className="mt-3 rounded-xl bg-sky-500/10 px-3 py-2 text-xs text-sky-100/80"
+            >
+              {t("goal_big_dream_hint")}
+            </p>
+          )}
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center gap-2 rounded-2xl border border-sky-300/20 bg-sky-900/40 px-6 py-10 text-center">
