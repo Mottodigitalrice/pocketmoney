@@ -370,6 +370,13 @@ const ja = {
   onboarding_save_failed_title: "嵐にあいました — クルーをほぞんできませんでした",
   onboarding_save_retry: "もう一度ためす",
 
+  // S1 (R4) — Onboarding copy refinements (F10 3.1 / 3.3 / 3.4 / 3.5 / 3.8)
+  onboarding_child_name_hint: "ここで決めた名前が、お子さまのダッシュボードに表示されます。",
+  onboarding_job_yen_tip: "ヒント: ちいさいクルーは ¥50〜¥300 がめやすです。",
+  onboarding_add_sibling: "+ きょうだいを追加",
+  onboarding_sibling_unlock_hint: "2人以上ふやすと、きょうだいランキングがひらきます。",
+  auth_env_missing_subtitle: "アカウントの読み込みでつまずいています。少しまってからもう一度ためすか、船長に設定を確認してもらってください。",
+
   // Math challenge
   math_challenge_title: "船長のコード",
   math_challenge_subtitle: "ブリッジに入るにはとけ!",

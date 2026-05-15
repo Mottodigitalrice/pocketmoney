@@ -354,6 +354,13 @@ const en = {
   onboarding_save_failed_title: "We hit a squall — couldn't save your crew",
   onboarding_save_retry: "Try again",
 
+  // S1 (R4) — Onboarding copy refinements (F10 3.1 / 3.3 / 3.4 / 3.5 / 3.8)
+  onboarding_child_name_hint: "This is the name your kid will see on their dashboard.",
+  onboarding_job_yen_tip: "Tip: ¥50–¥300 per chore is typical for younger crew.",
+  onboarding_add_sibling: "+ Add a Sibling",
+  onboarding_sibling_unlock_hint: "Add 2+ kids to unlock the sibling leaderboard.",
+  auth_env_missing_subtitle: "We're having trouble loading your account. Try again in a moment, or ask the captain to check the setup.",
+
   // Math challenge (parent gate)
   math_challenge_title: "Captain's Code",
   math_challenge_subtitle: "Solve to enter the bridge!",

@@ -35,8 +35,11 @@ export default function SignUpPage() {
             }}
           />
         ) : (
+          // S1 (R4) — F10 3.8: dev-facing "Clerk env vars required" replaced
+          // with a friendly bilingual fallback. The dev hint stays in the
+          // console for the engineer; the user sees a reassuring message.
           <div className="rounded-2xl border border-amber-800/40 bg-stone-900/90 px-6 py-5 text-center text-amber-100 shadow-2xl backdrop-blur-sm">
-            Clerk environment variables are required before sign-up can be used.
+            {t("auth_env_missing_subtitle")}
           </div>
         )}
       </div>

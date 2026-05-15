@@ -249,3 +249,68 @@ describe("OnboardingPage — H3 fixes", () => {
     expect(screen.queryByTestId("onboarding-save-error")).toBeNull();
   });
 });
+
+// S1 (R4) — StepAddChildren copy refinements
+//
+// These tests pin the F10 3.1 / 3.4 / 3.5 copy refinements so a future
+// reorganization can't silently drop them. They render StepAddChildren via the
+// welcome → children flow (same path as the H3 tests above).
+describe("OnboardingPage — S1 (R4) StepAddChildren copy", () => {
+  // Helper: get into StepAddChildren and let the float-up animation settle.
+  async function gotoStepChildren() {
+    renderOnboarding();
+    fireEvent.click(screen.getByText(/Get Started/));
+    await new Promise((r) => setTimeout(r, 250));
+  }
+
+  it("3.1 — kid-name hint is visible on the children step", async () => {
+    await gotoStepChildren();
+    expect(
+      screen.getByText(/This is the name your kid will see/i),
+    ).toBeInTheDocument();
+  });
+
+  it("3.4 — solo-child state shows '+ Add a Sibling' (not 'Add Another Crew Member')", async () => {
+    await gotoStepChildren();
+    // Solo state: 1 LocalChild prefilled — the add button should read "Add a Sibling".
+    expect(screen.getByText("+ Add a Sibling")).toBeInTheDocument();
+    // The generic 'Crew Member' copy is NOT shown when solo.
+    expect(screen.queryByText("+ Add Another Crew Member")).toBeNull();
+  });
+
+  it("3.5 — solo-child state surfaces the sibling-leaderboard unlock hint", async () => {
+    await gotoStepChildren();
+    expect(
+      screen.getByText(/Add 2\+ kids to unlock the sibling leaderboard/i),
+    ).toBeInTheDocument();
+  });
+
+  it("3.4 + 3.5 — adding a second child swaps the CTA back to 'Add Another Crew Member' and hides the hint", async () => {
+    await gotoStepChildren();
+    // Click "+ Add a Sibling" to go from 1 → 2 children.
+    fireEvent.click(screen.getByText("+ Add a Sibling"));
+    // Now the CTA reads the generic crew-member copy.
+    expect(screen.getByText("+ Add Another Crew Member")).toBeInTheDocument();
+    // And the unlock hint is gone (already unlocked).
+    expect(
+      screen.queryByText(/Add 2\+ kids to unlock the sibling leaderboard/i),
+    ).toBeNull();
+  });
+});
+
+// S1 (R4) — StepAddJobs copy refinements (F10 3.3)
+describe("OnboardingPage — S1 (R4) StepAddJobs copy", () => {
+  it("3.3 — yen tip is visible under the yen input on the job form card", async () => {
+    renderOnboarding();
+    fireEvent.click(screen.getByText(/Get Started/));
+    await new Promise((r) => setTimeout(r, 250));
+    fillFirstChild();
+    fireEvent.click(screen.getByText("Next"));
+    await new Promise((r) => setTimeout(r, 250));
+
+    // Now on StepAddJobs with the default seeded job card; tip should render.
+    expect(
+      screen.getByText(/¥50–¥300 per chore is typical/i),
+    ).toBeInTheDocument();
+  });
+});

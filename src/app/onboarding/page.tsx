@@ -197,6 +197,10 @@ function ChildFormCard({
           className="w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-white placeholder:text-white/40 focus:border-amber-400/50 focus:outline-none focus:ring-2 focus:ring-amber-400/30"
           maxLength={20}
         />
+        {/* S1 (R4) — F10 3.1: surface that this is the kid-visible name. */}
+        <p className="mt-1.5 text-xs text-white/50">
+          {t("onboarding_child_name_hint")}
+        </p>
       </div>
 
       <div className="space-y-2">
@@ -288,13 +292,24 @@ function StepAddChildren({
       </div>
 
       {localChildren.length < MAX_CHILDREN && (
-        <button
-          type="button"
-          onClick={addChild}
-          className="rounded-xl border-2 border-dashed border-white/30 bg-white/5 py-3 text-white/60 transition-all duration-200 hover:border-white/50 hover:bg-white/10 hover:text-white/80"
-        >
-          {t("onboarding_add_another")}
-        </button>
+        <>
+          <button
+            type="button"
+            onClick={addChild}
+            className="rounded-xl border-2 border-dashed border-white/30 bg-white/5 py-3 text-white/60 transition-all duration-200 hover:border-white/50 hover:bg-white/10 hover:text-white/80"
+          >
+            {/* S1 (R4) — F10 3.4: when solo, frame the next button as "Add a Sibling". */}
+            {localChildren.length === 1
+              ? t("onboarding_add_sibling")
+              : t("onboarding_add_another")}
+          </button>
+          {/* S1 (R4) — F10 3.5: surface the sibling-leaderboard unlock when solo. */}
+          {localChildren.length === 1 && (
+            <p className="-mt-2 text-center text-xs text-amber-200/70">
+              {t("onboarding_sibling_unlock_hint")}
+            </p>
+          )}
+        </>
       )}
 
       {!isValid && localChildren.length > 0 && (
@@ -383,6 +398,10 @@ function JobFormCard({
           step={10}
           className="w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-white focus:border-amber-400/50 focus:outline-none focus:ring-2 focus:ring-amber-400/30"
         />
+        {/* S1 (R4) — F10 3.3: anchor parents who have no reference point for chore pricing. */}
+        <p className="mt-1.5 text-xs text-white/50">
+          {t("onboarding_job_yen_tip")}
+        </p>
       </div>
 
       {/* Icon picker */}
