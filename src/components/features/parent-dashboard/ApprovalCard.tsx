@@ -1,5 +1,7 @@
 "use client";
 
+/* eslint-disable @next/next/no-img-element */
+
 import { Job, JobInstance } from "@/types";
 import { Button } from "@/components/ui/button";
 import { CURRENCY, CHILD_ICON_CONFIG } from "@/lib/constants";
@@ -30,7 +32,13 @@ export function ApprovalCard({ instance, onApprove, onReject }: ApprovalCardProp
     : "";
 
   return (
-    <div className="overflow-hidden rounded-xl border border-amber-700/30 bg-amber-900/40 p-4 backdrop-blur-sm">
+    <div
+      data-testid="approval-card"
+      data-instance-id={instance._id}
+      data-child-id={instance.childId}
+      data-job-id={instance.job._id}
+      className="overflow-hidden rounded-xl border border-amber-700/30 bg-amber-900/40 p-4 backdrop-blur-sm"
+    >
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3">
           <span className="text-3xl">{instance.job.icon}</span>
@@ -53,6 +61,20 @@ export function ApprovalCard({ instance, onApprove, onReject }: ApprovalCardProp
           {instance.job.yenAmount}
         </span>
       </div>
+
+      {instance.proofUrl && (
+        <div className="mt-4 overflow-hidden rounded-xl border border-sky-400/30 bg-sky-950/30">
+          <div className="flex items-center gap-2 px-3 py-2 text-sm font-bold text-sky-100">
+            <span>📷</span>
+            <span>{t("approval_photo_proof")}</span>
+          </div>
+          <img
+            src={instance.proofUrl}
+            alt={t("approval_photo_proof_alt")}
+            className="max-h-80 w-full object-cover"
+          />
+        </div>
+      )}
 
       <div className="mt-3 flex gap-2">
         <Button

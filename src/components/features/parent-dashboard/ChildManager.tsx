@@ -86,6 +86,9 @@ export function ChildManager({
             return (
               <div
                 key={child._id}
+                data-testid="child-row"
+                data-child-name={child.name}
+                data-child-id={child._id}
                 className="flex items-center gap-3 rounded-xl border border-amber-700/20 bg-amber-900/30 p-3 backdrop-blur-sm"
               >
                 {/* Icon */}
@@ -123,6 +126,8 @@ export function ChildManager({
                     variant="ghost"
                     size="sm"
                     onClick={() => onDelete(child._id)}
+                    data-testid="child-row-delete"
+                    aria-label={`Delete ${child.name}`}
                     className="text-red-400 hover:bg-red-900/40 hover:text-red-300"
                   >
                     🗑️
