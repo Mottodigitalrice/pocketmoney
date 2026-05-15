@@ -20,6 +20,10 @@ import type * as functions_transactions from "../functions/transactions.js";
 import type * as functions_users from "../functions/users.js";
 import type * as functions_wallets from "../functions/wallets.js";
 import type * as lib_auth from "../lib/auth.js";
+import type * as lib_cronMath from "../lib/cronMath.js";
+import type * as lib_rankMath from "../lib/rankMath.js";
+import type * as lib_recurrence from "../lib/recurrence.js";
+import type * as lib_walletMath from "../lib/walletMath.js";
 
 import type {
   ApiFromModules,
@@ -40,6 +44,10 @@ declare const fullApi: ApiFromModules<{
   "functions/users": typeof functions_users;
   "functions/wallets": typeof functions_wallets;
   "lib/auth": typeof lib_auth;
+  "lib/cronMath": typeof lib_cronMath;
+  "lib/rankMath": typeof lib_rankMath;
+  "lib/recurrence": typeof lib_recurrence;
+  "lib/walletMath": typeof lib_walletMath;
 }>;
 
 /**

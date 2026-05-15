@@ -1,15 +1,21 @@
 import { v } from "convex/values";
 import { internalMutation, mutation, query } from "../_generated/server";
-import type { Id } from "../_generated/dataModel";
+import type { Doc, Id } from "../_generated/dataModel";
 import type { MutationCtx } from "../_generated/server";
 import { getCurrentUser } from "./users";
 import { assertOwnedBy } from "../lib/auth";
 import { splitEarning as splitEarningPure } from "../lib/walletMath";
+import {
+  assertIsWeekStartISO,
+  hasTransactionInWeek,
+  weeksToBackfill,
+} from "../lib/cronMath";
 
 const jars = ["spend", "save", "give"] as const;
 type Jar = (typeof jars)[number];
 const SAVE_INTEREST_APR = 0.1;
 const WEEKS_PER_YEAR = 52;
+const INTEREST_BACKFILL_WEEKS = 4; // current week + 3 missed (F3 contract)
 
 // Re-export so existing import sites (`import { splitEarning } from "./wallets"`)
 // continue to work. The lib is the authoritative implementation now.
@@ -177,16 +183,6 @@ export async function creditBonus(
   }
 }
 
-function getJstWeekStart(timestamp: number) {
-  const jstOffsetMs = 9 * 60 * 60 * 1000;
-  const jstDate = new Date(timestamp + jstOffsetMs);
-  const day = jstDate.getUTCDay();
-  const diff = jstDate.getUTCDate() - day + (day === 0 ? -6 : 1);
-  jstDate.setUTCDate(diff);
-  jstDate.setUTCHours(0, 0, 0, 0);
-  return jstDate.getTime() - jstOffsetMs;
-}
-
 async function getApprovedLifetimeEarnings(
   ctx: MutationCtx,
   childId: Id<"children">
@@ -340,47 +336,145 @@ export const awardBonus = mutation({
   },
 });
 
+/**
+ * Compute interest for one save-jar wallet for one specific week, and credit
+ * it IF AND ONLY IF no interest transaction already exists in that week's
+ * half-open range `[weekStart, weekStart+7d)`.
+ *
+ * The idempotency check is the predicate from `cronMath.hasTransactionInWeek`.
+ * Re-running the same (wallet, week) is a no-op.
+ *
+ * Returns `true` if a credit was made, `false` if skipped (already credited,
+ * zero balance, or interest rounds to ¥0).
+ *
+ * @internal — called from the cron handler and `runInterestForWeek`.
+ */
+async function creditWeekIfMissing(
+  ctx: MutationCtx,
+  wallet: Doc<"wallets">,
+  weekStartMs: number
+): Promise<boolean> {
+  if (wallet.jar !== "save" || wallet.balance <= 0) return false;
+
+  const txs = await ctx.db
+    .query("transactions")
+    .withIndex("by_wallet", (q) => q.eq("walletId", wallet._id))
+    .collect();
+
+  if (hasTransactionInWeek(txs, weekStartMs, "interest")) return false;
+
+  // Preserve EXACT F2 formula: balance * 10% APR / 52 weeks, floored.
+  const amount = Math.floor(
+    (wallet.balance * SAVE_INTEREST_APR) / WEEKS_PER_YEAR
+  );
+  if (amount <= 0) return false;
+
+  await creditWallet(ctx, {
+    userId: wallet.userId,
+    childId: wallet.childId,
+    walletId: wallet._id,
+    jar: wallet.jar,
+    currentBalance: wallet.balance,
+    amount,
+    type: "interest",
+    note: "Weekly Save jar interest",
+    // Tag the credit at the week-start so future runs of the predicate
+    // place it unambiguously inside [weekStart, weekStart+7d).
+    createdAt: weekStartMs,
+  });
+  return true;
+}
+
+/**
+ * Weekly Save-interest cron handler.
+ *
+ * Walks back up to `INTEREST_BACKFILL_WEEKS` (= 4) week-starts and credits
+ * any (wallet, weekStart) pair that has no interest transaction in that
+ * week's range. Order: most-recent-first, but order doesn't matter for
+ * correctness — each (wallet, week) credit is independently idempotent.
+ *
+ * Re-running same-day is safe: the second run finds the credit we just
+ * inserted and skips. See `__tests__/cron-resilience.test.ts` for the
+ * idempotency proof.
+ */
 export const creditWeeklySaveInterest = internalMutation({
   args: {},
-  returns: v.object({ credited: v.number() }),
+  returns: v.object({
+    credited: v.number(),
+    creditsApplied: v.number(),
+    weeksConsidered: v.number(),
+  }),
   handler: async (ctx) => {
     const now = Date.now();
-    const weekStart = getJstWeekStart(now);
+    const weekStarts = weeksToBackfill(now, INTEREST_BACKFILL_WEEKS);
     const wallets = await ctx.db.query("wallets").collect();
+
     let credited = 0;
+    let creditsApplied = 0;
 
     for (const wallet of wallets) {
       if (wallet.jar !== "save" || wallet.balance <= 0) continue;
 
-      const alreadyCreditedThisWeek = (
-        await ctx.db
-          .query("transactions")
-          .withIndex("by_wallet", (q) => q.eq("walletId", wallet._id))
-          .collect()
-      ).some(
-        (transaction) =>
-          transaction.type === "interest" && transaction.createdAt >= weekStart
-      );
-
-      if (alreadyCreditedThisWeek) continue;
-
-      const amount = Math.floor((wallet.balance * SAVE_INTEREST_APR) / WEEKS_PER_YEAR);
-      if (amount <= 0) continue;
-
-      await creditWallet(ctx, {
-        userId: wallet.userId,
-        childId: wallet.childId,
-        walletId: wallet._id,
-        jar: wallet.jar,
-        currentBalance: wallet.balance,
-        amount,
-        type: "interest",
-        note: "Weekly Save jar interest",
-        createdAt: now,
-      });
-      credited += amount;
+      for (const iso of weekStarts) {
+        const weekStartMs = new Date(iso).getTime();
+        const before = wallet.balance;
+        const did = await creditWeekIfMissing(ctx, wallet, weekStartMs);
+        if (did) {
+          creditsApplied += 1;
+          credited += Math.floor((before * SAVE_INTEREST_APR) / WEEKS_PER_YEAR);
+        }
+      }
     }
 
-    return { credited };
+    return { credited, creditsApplied, weeksConsidered: weekStarts.length };
+  },
+});
+
+/**
+ * Owner-only manual recovery mutation. Lets a parent re-run interest for
+ * a single past week from the Convex dashboard if they suspect a missed
+ * cron beyond the 4-week auto-backfill window.
+ *
+ * Same idempotency rule as the cron: only credits children of the calling
+ * family that have no interest transaction in `[weekStart, weekStart+7d)`.
+ *
+ * @param weekStartISO Must be a Monday 00:00 UTC ISO timestamp
+ *                     (e.g. "2026-04-13T00:00:00.000Z"). Throws otherwise.
+ */
+export const runInterestForWeek = mutation({
+  args: { weekStartISO: v.string() },
+  returns: v.object({
+    creditedChildIds: v.array(v.id("children")),
+    skippedChildIds: v.array(v.id("children")),
+  }),
+  handler: async (ctx, args) => {
+    const user = await getCurrentUser(ctx);
+    const weekStart = assertIsWeekStartISO(args.weekStartISO);
+    const weekStartMs = weekStart.getTime();
+
+    const familyWallets = await ctx.db
+      .query("wallets")
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
+      .collect();
+
+    const credited = new Set<Id<"children">>();
+    const skipped = new Set<Id<"children">>();
+
+    for (const wallet of familyWallets) {
+      if (wallet.jar !== "save") continue;
+      const did = await creditWeekIfMissing(ctx, wallet, weekStartMs);
+      if (did) credited.add(wallet.childId);
+      else skipped.add(wallet.childId);
+    }
+
+    // A child should only appear in one bucket. If we credited any save-jar
+    // for them, they're "credited"; only fully-skipped children stay in
+    // skipped.
+    for (const id of credited) skipped.delete(id);
+
+    return {
+      creditedChildIds: Array.from(credited),
+      skippedChildIds: Array.from(skipped),
+    };
   },
 });

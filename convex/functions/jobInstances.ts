@@ -7,6 +7,19 @@ import { creditApprovedJob } from "./wallets";
 import { assertOwnedBy, assertOwnedByOrNull } from "../lib/auth";
 
 const PROOF_RETENTION_MS = 14 * 24 * 60 * 60 * 1000;
+/**
+ * Upper bound on how far back the cleanup cron sweeps for stale proofs.
+ *
+ * Rationale (F3): the cleanup cron is structured as "any approved instance
+ * with an undeleted proof older than 14 days is eligible" — it was already
+ * catch-up-safe in principle, but we cap the scan at 90 days back from now
+ * to bound DB scan cost. If a proof somehow lingered >90 days (cron offline
+ * for 3+ months), it'll get cleaned up the next time a parent approves a
+ * job for that child OR via manual intervention from the dashboard. 90d
+ * leaves a >2-month buffer past the 14-day retention contract, which covers
+ * any plausible outage scenario short of project abandonment.
+ */
+const PROOF_CLEANUP_MAX_LOOKBACK_MS = 90 * 24 * 60 * 60 * 1000;
 const MAX_PROOF_BYTES = 2.5 * 1024 * 1024;
 
 const proofArgs = v.object({
@@ -263,24 +276,49 @@ export const approve = mutation({
   },
 });
 
+/**
+ * Weekly photo-proof cleanup cron handler.
+ *
+ * F3 resilience guarantee: this sweep is structured to recover from missed
+ * runs. It is NOT scoped to "this week's approvals" — it considers ALL
+ * approved instances where the proof is still attached and 14+ days have
+ * passed since approval, up to a 90-day lookback floor.
+ *
+ * Idempotency: the predicate gates on `proofDeletedAt === undefined`. Once
+ * a row is patched with `proofDeletedAt`, subsequent runs skip it. Storage
+ * deletion is also wrapped in try/catch so a re-run after a partial failure
+ * never throws.
+ */
 export const cleanupApprovedPhotoProofs = internalMutation({
   args: {},
-  returns: v.object({ deleted: v.number() }),
+  returns: v.object({ deleted: v.number(), scanned: v.number() }),
   handler: async (ctx) => {
-    const cutoff = Date.now() - PROOF_RETENTION_MS;
+    const now = Date.now();
+    const cutoff = now - PROOF_RETENTION_MS;
+    const lookbackFloor = now - PROOF_CLEANUP_MAX_LOOKBACK_MS;
+
     const instances = await ctx.db.query("jobInstances").collect();
     let deleted = 0;
+    let scanned = 0;
 
     for (const instance of instances) {
+      // Skip anything that isn't a candidate.
       if (
         instance.status !== "approved" ||
         !instance.approvedAt ||
-        instance.approvedAt > cutoff ||
         !instance.proofStorageId ||
         instance.proofDeletedAt
       ) {
         continue;
       }
+
+      // Must be older than retention (14d) but within the lookback floor.
+      // The lookback floor bounds scan cost; anything older than 90d that
+      // somehow survived is left for a manual sweep.
+      if (instance.approvedAt > cutoff) continue;
+      if (instance.approvedAt < lookbackFloor) continue;
+
+      scanned += 1;
 
       try {
         await ctx.storage.delete(instance.proofStorageId);
@@ -289,12 +327,12 @@ export const cleanupApprovedPhotoProofs = internalMutation({
       }
 
       await ctx.db.patch(instance._id, {
-        proofDeletedAt: Date.now(),
+        proofDeletedAt: now,
       });
       deleted += 1;
     }
 
-    return { deleted };
+    return { deleted, scanned };
   },
 });
 
