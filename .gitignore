@@ -56,3 +56,9 @@ next-env.d.ts
 .claude/settings.local.json
 !.claude/settings.json
 .env*.local
+
+# Playwright
+/e2e/.auth/
+/playwright-report/
+/test-results/
+/blob-report/
