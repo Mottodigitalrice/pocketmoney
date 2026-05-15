@@ -280,7 +280,7 @@ const ja = {
   goal_empty_subtitle: "ほしいものを決めて、ためるつぼをいっぱいにしよう。",
   goal_save_balance: "ためるつぼ: ¥{{amount}}",
   goal_funded: "たまった",
-  goal_ready: "もう買えるよ!", // L2-review: 買 is 小2 — fine for 7yo, borderline for 4yo
+  goal_ready: "もうとどくよ!",
   goal_remaining: "あと¥{{amount}}",
   goal_name_placeholder: "何のためにためる?",
   goal_amount_placeholder: "¥ ゴール",
@@ -441,7 +441,7 @@ const ja = {
   // F18 (downgrades F12 CMO-review → L2-review): playful kid-friendly framing.
   // Parents may find it juvenile in a serious error context — a native L2-fluent
   // reader should sanity-check whether it lands warm or annoying.
-  error_page_title: "あれ、まいごになっちゃった!", // L2-review
+  error_page_title: "あれ、ちずをみうしなった!",
   error_page_subtitle: "だいじょうぶ、たからものはぶじだよ。下のボタンでもう一度ためしてね。",
   error_page_cta: "もう一度",
   not_found_page_title: "この地図にはなにもないよ!",

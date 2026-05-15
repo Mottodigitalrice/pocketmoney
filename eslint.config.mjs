@@ -13,6 +13,9 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
     "convex/_generated/**",
+    // Coverage output: vitest/c8 emit ts-nocheck'd files with stale
+    // eslint-disable directives that trigger "Unused eslint-disable" warnings.
+    "coverage/**",
   ]),
 ]);
 

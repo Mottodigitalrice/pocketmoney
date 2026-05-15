@@ -27,36 +27,11 @@
  * BrowserContext just to drive a kid dashboard for one mutation.
  */
 
-import { test, expect, type Page } from "@playwright/test";
+import { test, expect } from "@playwright/test";
 import { ConvexHttpClient } from "convex/browser";
 import { api } from "../convex/_generated/api";
-import type { Id } from "../convex/_generated/dataModel";
 
 const CONVEX_URL = process.env.NEXT_PUBLIC_CONVEX_URL ?? "";
-
-/**
- * Helper: read the in-progress jobInstance id for a given child by querying
- * Convex directly via cookie-passed identity. Falls back to scraping the DOM
- * if the Convex query path doesn't have the right auth claim shape.
- *
- * In practice, the simpler path is: scrape `data-instance-id` from the
- * `[data-testid="job-card"][data-status="in_progress"]` element on the kid
- * dashboard. But this spec is parent-side, so we read it via Convex.
- */
-async function getInProgressInstanceIdViaDom(
-  page: Page,
-  childId: string
-): Promise<string> {
-  // Navigate to kid dashboard briefly to scrape the instance id.
-  await page.goto(`/kid/${childId}`);
-  const card = page
-    .locator('[data-testid="job-card"][data-status="in_progress"]')
-    .first();
-  await expect(card).toBeVisible({ timeout: 15_000 });
-  const id = await card.getAttribute("data-instance-id");
-  expect(id, "in-progress job card must expose data-instance-id").toBeTruthy();
-  return id!;
-}
 
 test("parent: full happy-path (create child → job → schedule → approve → wallet ops → delete)", async ({
   page,
@@ -423,4 +398,3 @@ test("parent: full happy-path (create child → job → schedule → approve →
 void ConvexHttpClient; // satisfy linter — import retained for future use
 void api; // ditto
 void CONVEX_URL;
-type _ChildId = Id<"children">; // satisfy isolatedModules
