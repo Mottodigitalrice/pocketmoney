@@ -2,6 +2,7 @@
 
 import { usePocketMoney } from "@/hooks/use-pocket-money";
 import { useTranslation } from "@/hooks/use-translation";
+import { BudouXText } from "@/components/shared/BudouXText";
 import { ApprovalCard } from "./ApprovalCard";
 
 export function ApprovalQueue() {
@@ -23,7 +24,7 @@ export function ApprovalQueue() {
           {t("approvals_empty_title")}
         </p>
         <p className="mt-1 text-sm text-amber-300/70">
-          {t("approvals_empty_hint")}
+          <BudouXText>{t("approvals_empty_hint")}</BudouXText>
         </p>
       </div>
     );

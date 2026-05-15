@@ -141,6 +141,50 @@
   }
   body {
     @apply bg-background text-foreground;
+    /* F18 — Japanese-aware font stack. Inter (Latin) is loaded via next/font in
+       layout.tsx and applied via className. Once that wraps the body, the
+       fallbacks below kick in for any CJK glyphs Inter does not cover, in
+       priority order: Hiragino Kaku Gothic (macOS/iOS), Yu Gothic UI (Win 10+),
+       Meiryo (Win), then `system-ui` and generic sans-serif. We deliberately
+       avoid a webfont download (Noto Sans JP) here — PRD principle #4 says
+       free-to-run, and Google Fonts adds a ~500KB JP subset that we'd be
+       paying for in render-blocking CSS for marginal gain over system fonts. */
+    font-family:
+      Inter,
+      "Hiragino Kaku Gothic ProN",
+      "Hiragino Sans",
+      "Yu Gothic UI",
+      "Yu Gothic",
+      Meiryo,
+      system-ui,
+      sans-serif;
+  }
+
+  /* F18 — Japanese line-breaking baseline (JIS X 4051 kinsoku shori).
+     - `line-break: strict` prevents breaks before small kana, punctuation, etc.
+     - `word-break: auto-phrase` lets Chrome 119+ use its built-in BudouX
+       engine for free; older browsers + Safari/Firefox fall back to the
+       <BudouXText> wrapper for the worst-case strings.
+     - `text-wrap: balance` distributes headline text evenly.
+     We DO NOT use `word-break: keep-all` globally — it caused mobile overflow
+     on the AIOS landing page. <BudouXText>'s inline-block phrases handle
+     keep-all locally with `max-width: 100%` as a safety net. */
+  :where(:lang(ja)) :is(h1, h2, h3, h4, h5, h6, p, li, blockquote) {
+    overflow-wrap: break-word;
+    line-break: strict;
+    word-break: auto-phrase;
+  }
+  :where(:lang(ja)) :is(h1, h2, h3) {
+    text-wrap: balance;
+  }
+
+  /* F18 — JP body text wants slightly more breathing room than Latin. */
+  :where(:lang(ja)) body {
+    line-height: 1.75;
+    letter-spacing: 0.01em;
+  }
+  :where(:lang(ja)) :is(h1, h2, h3, h4, h5, h6) {
+    line-height: 1.4;
   }
 }
 

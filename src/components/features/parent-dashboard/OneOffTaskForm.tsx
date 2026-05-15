@@ -26,7 +26,7 @@ const ICONS = [
 ];
 
 export function OneOffTaskForm({ open, onClose }: OneOffTaskFormProps) {
-  const { t, locale } = useTranslation();
+  const { t } = useTranslation();
   const { familyChildren, createOneOff } = usePocketMoney();
 
   const [title, setTitle] = useState("");
@@ -50,30 +50,7 @@ export function OneOffTaskForm({ open, onClose }: OneOffTaskFormProps) {
 
     setIsSaving(true);
     try {
-      let titleEn = title.trim();
-      let titleJa: string | undefined;
-
-      // Auto-translate
-      try {
-        const res = await fetch("/api/translate", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text: title.trim(), from: locale }),
-        });
-        if (res.ok) {
-          const { translated } = await res.json();
-          if (locale === "ja") {
-            titleJa = title.trim();
-            titleEn = translated;
-          } else {
-            titleJa = translated;
-          }
-        }
-      } catch {
-        // Translation failed silently
-      }
-
-      await createOneOff(titleEn, titleJa, yenAmount, icon, childId);
+      await createOneOff(title.trim(), undefined, yenAmount, icon, childId);
       onClose();
     } finally {
       setIsSaving(false);

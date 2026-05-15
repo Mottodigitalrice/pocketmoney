@@ -5,18 +5,29 @@ import { CURRENCY } from "@/lib/constants";
 import { TreasureChestAnimation } from "./TreasureChestAnimation";
 import { useTranslation } from "@/hooks/use-translation";
 import { useState } from "react";
+import { WalletJarBalances } from "@/components/features/shared/WalletJarBalances";
 
 interface WeeklyTrackerProps {
   childId: string;
 }
 
 export function WeeklyTracker({ childId }: WeeklyTrackerProps) {
-  const { getWeeklyEarnings, getWeeklyPotential, getLifetimeEarnings } = usePocketMoney();
+  const {
+    getWeeklyEarnings,
+    getWeeklyPotential,
+    getWalletBalance,
+    getWalletTotal,
+  } = usePocketMoney();
   const [showTreasure, setShowTreasure] = useState(false);
   const { t } = useTranslation();
 
   const earned = getWeeklyEarnings(childId);
-  const lifetime = getLifetimeEarnings(childId);
+  const walletBalances = {
+    spend: getWalletBalance(childId, "spend"),
+    save: getWalletBalance(childId, "save"),
+    give: getWalletBalance(childId, "give"),
+  };
+  const walletTotal = getWalletTotal(childId);
   const potential = getWeeklyPotential(childId);
   const percentage = potential > 0 ? Math.round((earned / potential) * 100) : 0;
 
@@ -33,11 +44,11 @@ export function WeeklyTracker({ childId }: WeeklyTrackerProps) {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <p className="text-sm font-medium text-amber-200">
-                    {t("treasure_grand_total")}
+                    {t("wallet_total")}
                   </p>
                   <p className="text-2xl font-extrabold text-amber-100 sm:text-3xl">
                     {CURRENCY}
-                    {lifetime.toLocaleString()}
+                    {walletTotal.toLocaleString()}
                   </p>
                 </div>
                 <div>
@@ -62,6 +73,9 @@ export function WeeklyTracker({ childId }: WeeklyTrackerProps) {
                   total: potential.toLocaleString(),
                 })}
               </p>
+              <div className="mt-3">
+                <WalletJarBalances balances={walletBalances} compact />
+              </div>
             </div>
             <div className="text-2xl sm:text-4xl">💰</div>
           </div>
@@ -70,7 +84,7 @@ export function WeeklyTracker({ childId }: WeeklyTrackerProps) {
 
       {showTreasure && (
         <TreasureChestAnimation
-          totalYen={lifetime}
+          totalYen={walletTotal}
           onClose={() => setShowTreasure(false)}
         />
       )}

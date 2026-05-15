@@ -8,6 +8,7 @@ import { api } from "../../../convex/_generated/api";
 import { CHILD_ICON_CONFIG } from "@/lib/constants";
 import { hasAppDataEnv } from "@/lib/env";
 import { LanguageToggle } from "@/components/shared/LanguageToggle";
+import { BudouXText } from "@/components/shared/BudouXText";
 import { useTranslation } from "@/hooks/use-translation";
 import type { ChildIcon } from "@/types";
 
@@ -86,7 +87,7 @@ function StepWelcome({ onNext }: { onNext: () => void }) {
           {t("onboarding_welcome")}
         </h1>
         <p className="mx-auto max-w-md text-lg text-white/80 drop-shadow">
-          {t("onboarding_welcome_subtitle")}
+          <BudouXText>{t("onboarding_welcome_subtitle")}</BudouXText>
         </p>
       </div>
 
@@ -461,7 +462,7 @@ function StepAddJobs({
           {t("onboarding_add_jobs")}
         </h2>
         <p className="mt-2 text-white/70">
-          {t("onboarding_add_jobs_subtitle")}
+          <BudouXText>{t("onboarding_add_jobs_subtitle")}</BudouXText>
         </p>
       </div>
 
@@ -637,7 +638,7 @@ export default function OnboardingPage() {
             {t("onboarding_welcome")}
           </h1>
           <p className="text-white/75">
-            PocketMoney onboarding needs Clerk and Convex environment variables before it can run.
+            Pirate Money onboarding needs Clerk and Convex environment variables before it can run.
           </p>
         </div>
       </div>
@@ -650,15 +651,15 @@ export default function OnboardingPage() {
 function OnboardingPageInner() {
   const router = useRouter();
   const { user } = useUser();
-  const { locale } = useTranslation();
 
   // Convex
   const convexUser = useQuery(
-    api.functions.users.getByClerkId,
-    user?.id ? { clerkId: user.id } : "skip"
+    api.functions.users.getCurrent,
+    user?.id ? {} : "skip"
   );
   const createChild = useMutation(api.functions.children.create);
   const createJob = useMutation(api.functions.jobs.create);
+  const seedDefaults = useMutation(api.functions.jobs.seedDefaults);
 
   // Local state
   const [step, setStep] = useState(0);
@@ -694,43 +695,19 @@ function OnboardingPageInner() {
       for (const child of localChildren) {
         if (child.name.trim() && child.icon) {
           await createChild({
-            userId: convexUser._id,
             name: child.name.trim(),
             icon: child.icon,
           });
         }
       }
 
-      // Create all jobs (with auto-translation)
+      await seedDefaults();
+
+      // Create all custom jobs as the parent typed them.
       for (const job of localJobs) {
         if (job.title.trim()) {
-          let titleEn = job.title.trim();
-          let titleJa: string | undefined;
-
-          // Auto-translate job title
-          try {
-            const res = await fetch("/api/translate", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ text: job.title.trim(), from: locale }),
-            });
-            if (res.ok) {
-              const { translated } = await res.json();
-              if (locale === "ja") {
-                titleJa = job.title.trim();
-                titleEn = translated;
-              } else {
-                titleJa = translated;
-              }
-            }
-          } catch {
-            // Translation failed silently
-          }
-
           await createJob({
-            userId: convexUser._id,
-            title: titleEn,
-            titleJa,
+            title: job.title.trim(),
             yenAmount: job.yenAmount,
             icon: job.icon,
           });
@@ -743,7 +720,7 @@ function OnboardingPageInner() {
       console.error("Onboarding error:", error);
       setIsSaving(false);
     }
-  }, [convexUser, localChildren, localJobs, createChild, createJob, locale, router]);
+  }, [convexUser, localChildren, localJobs, createChild, createJob, seedDefaults, router]);
 
   return (
     <div className="flex min-h-screen flex-col items-center px-4 py-8">

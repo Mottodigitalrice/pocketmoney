@@ -149,7 +149,7 @@ function Navbar() {
     >
       <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3">
         <span className="text-lg font-extrabold tracking-tight text-white">
-          🏴‍☠️ PocketMoney
+          🏴‍☠️ Pirate Money
         </span>
         <div className="flex items-center gap-3">
           <Link
@@ -854,7 +854,7 @@ function Footer() {
       <div className="mx-auto max-w-6xl px-5">
         <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
           <span className="text-sm font-bold text-slate-400">
-            🏴‍☠️ PocketMoney
+            🏴‍☠️ Pirate Money
           </span>
           <div className="flex gap-6 text-sm text-slate-500">
             <Link href="/sign-in" className="transition hover:text-slate-300">

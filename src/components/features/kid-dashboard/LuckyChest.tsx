@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Gift, Lock, Moon, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { BudouXText } from "@/components/shared/BudouXText";
 import { usePocketMoney } from "@/hooks/use-pocket-money";
 import { useTranslation } from "@/hooks/use-translation";
 import { CURRENCY } from "@/lib/constants";
@@ -43,7 +44,7 @@ export function LuckyChest({ childId }: LuckyChestProps) {
               {t("lucky_chest_sleeping_title")}
             </h2>
             <p className="mt-1 text-sm text-yellow-100/60">
-              {t("lucky_chest_sleeping_hint")}
+              <BudouXText>{t("lucky_chest_sleeping_hint")}</BudouXText>
             </p>
           </div>
         </div>

@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ClerkClientProvider } from "@/components/providers/clerk-provider";
@@ -11,8 +11,19 @@ import { Toaster } from "@/components/ui/sonner";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "PocketMoney | Earn Yen!",
+  title: "Pirate Money | Earn Yen!",
   description: "Earn Yen by helping around the house!",
+  applicationName: "Pirate Money",
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    title: "Pirate Money",
+    statusBarStyle: "black-translucent",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#0e7490",
 };
 
 export default function RootLayout({

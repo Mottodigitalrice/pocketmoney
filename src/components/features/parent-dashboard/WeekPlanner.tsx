@@ -17,6 +17,7 @@ import { usePocketMoney } from "@/hooks/use-pocket-money";
 import { useTranslation } from "@/hooks/use-translation";
 import { CHILD_ICON_CONFIG, DAYS_OF_WEEK, DAYS_OF_WEEK_JA } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
+import { BudouXText } from "@/components/shared/BudouXText";
 import type { ChildIcon, JobPriority } from "@/types";
 import type { TranslationKey } from "@/lib/i18n/translations";
 
@@ -246,7 +247,7 @@ export function WeekPlanner() {
           {t("planner_empty_title")}
         </p>
         <p className="mt-1 text-sm text-amber-300/70">
-          {t("planner_empty_hint")}
+          <BudouXText>{t("planner_empty_hint")}</BudouXText>
         </p>
       </div>
     );
@@ -317,7 +318,7 @@ export function WeekPlanner() {
                     {t("planner_no_jobs_title")}
                   </p>
                   <p className="text-xs text-amber-300/70">
-                    {t("planner_no_jobs_hint")}
+                    <BudouXText>{t("planner_no_jobs_hint")}</BudouXText>
                   </p>
                 </div>
               ) : (
@@ -448,7 +449,9 @@ export function WeekPlanner() {
       {weekHasAnyScheduled === false && libraryJobs.length > 0 && (
         <div className="flex items-start gap-3 rounded-2xl border border-dashed border-amber-700/30 bg-amber-900/20 px-4 py-3 text-left text-sm text-amber-200">
           <span className="text-xl">🗓️</span>
-          <p className="flex-1">{t("planner_week_empty_banner")}</p>
+          <p className="flex-1">
+            <BudouXText>{t("planner_week_empty_banner")}</BudouXText>
+          </p>
         </div>
       )}
 

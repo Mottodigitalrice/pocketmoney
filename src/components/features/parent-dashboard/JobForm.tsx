@@ -1,11 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Job } from "@/types";
+import { Job, JobPriority, RecurrenceType } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { useTranslation } from "@/hooks/use-translation";
+import type { TranslationKey } from "@/lib/i18n/translations";
 import {
   Dialog,
   DialogContent,
@@ -21,6 +23,12 @@ interface JobFormProps {
     titleJa?: string;
     yenAmount: number;
     icon: string;
+    requiresPhotoProof?: boolean;
+    recurrence?: {
+      type: RecurrenceType;
+      daysOfWeek?: number[];
+      priority?: JobPriority;
+    };
   }) => void;
   editingJob?: Job;
 }
@@ -30,16 +38,24 @@ const ICONS = [
   "🏠", "🛋️", "🪥", "🎒", "🛒", "🪟", "♻️", "👨‍🍳", "🧽", "🪣",
 ];
 
+const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
 export function JobForm({
   open,
   onClose,
   onSave,
   editingJob,
 }: JobFormProps) {
-  const { t, locale } = useTranslation();
+  const { t } = useTranslation();
   const [title, setTitle] = useState("");
   const [yenAmount, setYenAmount] = useState(100);
   const [icon, setIcon] = useState("👕");
+  const [recurrenceType, setRecurrenceType] =
+    useState<RecurrenceType>("none");
+  const [recurrenceDays, setRecurrenceDays] = useState<number[]>([]);
+  const [recurrencePriority, setRecurrencePriority] =
+    useState<JobPriority>("optional");
+  const [requiresPhotoProof, setRequiresPhotoProof] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
@@ -47,8 +63,20 @@ export function JobForm({
       setTitle(editingJob?.title ?? "");
       setYenAmount(editingJob?.yenAmount ?? 100);
       setIcon(editingJob?.icon ?? "👕");
+      setRecurrenceType(editingJob?.recurrence?.type ?? "none");
+      setRecurrenceDays(editingJob?.recurrence?.daysOfWeek ?? []);
+      setRecurrencePriority(editingJob?.recurrence?.priority ?? "optional");
+      setRequiresPhotoProof(editingJob?.requiresPhotoProof ?? false);
     }
   }, [open, editingJob]);
+
+  const toggleRecurrenceDay = (index: number) => {
+    setRecurrenceDays((current) =>
+      current.includes(index)
+        ? current.filter((day) => day !== index)
+        : [...current, index].sort((a, b) => a - b)
+    );
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,34 +84,17 @@ export function JobForm({
 
     setIsSaving(true);
     try {
-      let titleEn = title.trim();
-      let titleJa: string | undefined;
-
-      // Auto-translate the title to the other language
-      try {
-        const res = await fetch("/api/translate", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text: title.trim(), from: locale }),
-        });
-        if (res.ok) {
-          const { translated } = await res.json();
-          if (locale === "ja") {
-            titleJa = title.trim();
-            titleEn = translated;
-          } else {
-            titleJa = translated;
-          }
-        }
-      } catch {
-        // Translation failed silently
-      }
-
       onSave({
-        title: titleEn,
-        titleJa,
+        title: title.trim(),
         yenAmount,
         icon,
+        requiresPhotoProof,
+        recurrence: {
+          type: recurrenceType,
+          daysOfWeek:
+            recurrenceType === "specificDays" ? recurrenceDays : undefined,
+          priority: recurrencePriority,
+        },
       });
       onClose();
     } finally {
@@ -147,6 +158,92 @@ export function JobForm({
               step={10}
               className="border-amber-700/50 bg-amber-900/50 text-amber-100"
             />
+          </div>
+
+          <div className="flex items-center justify-between rounded-xl border border-amber-700/25 bg-amber-900/25 p-3">
+            <div className="space-y-1">
+              <Label
+                htmlFor="requires-photo-proof"
+                className="text-amber-200"
+              >
+                {t("job_form_photo_proof_label")}
+              </Label>
+              <p className="text-xs text-amber-300/70">
+                {t("job_form_photo_proof_hint")}
+              </p>
+            </div>
+            <Switch
+              id="requires-photo-proof"
+              checked={requiresPhotoProof}
+              onCheckedChange={setRequiresPhotoProof}
+            />
+          </div>
+
+          <div className="space-y-3 rounded-xl border border-amber-700/25 bg-amber-900/25 p-3">
+            <Label className="text-amber-200">
+              {t("job_form_recurrence_label")}
+            </Label>
+            <div className="grid grid-cols-2 gap-2">
+              {(["none", "daily", "weekdays", "specificDays"] as RecurrenceType[]).map(
+                (type) => (
+                  <button
+                    key={type}
+                    type="button"
+                    onClick={() => setRecurrenceType(type)}
+                    className={`rounded-lg border px-3 py-2 text-sm font-semibold transition-all ${
+                      recurrenceType === type
+                        ? "border-amber-400 bg-amber-600 text-white"
+                        : "border-amber-700/30 bg-amber-950/30 text-amber-300 hover:bg-amber-800/40"
+                    }`}
+                  >
+                    {t(`recurrence_${type}` as TranslationKey)}
+                  </button>
+                )
+              )}
+            </div>
+
+            {recurrenceType === "specificDays" && (
+              <div className="flex flex-wrap gap-2">
+                {DAYS.map((day, index) => {
+                  const selected = recurrenceDays.includes(index);
+                  return (
+                    <button
+                      key={day}
+                      type="button"
+                      onClick={() => toggleRecurrenceDay(index)}
+                      className={`rounded-full border px-3 py-1 text-xs font-bold transition-all ${
+                        selected
+                          ? "border-amber-400 bg-amber-600 text-white"
+                          : "border-amber-700/30 bg-amber-950/30 text-amber-300 hover:bg-amber-800/40"
+                      }`}
+                    >
+                      {t(`recurrence_day_${index}` as TranslationKey)}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+
+            {recurrenceType !== "none" && (
+              <div className="grid grid-cols-2 gap-2">
+                {(["optional", "mustDo"] as JobPriority[]).map((priority) => (
+                  <button
+                    key={priority}
+                    type="button"
+                    onClick={() => setRecurrencePriority(priority)}
+                    className={`rounded-lg border px-3 py-2 text-sm font-bold transition-all ${
+                      recurrencePriority === priority
+                        ? "border-amber-400 bg-amber-600 text-white"
+                        : "border-amber-700/30 bg-amber-950/30 text-amber-300 hover:bg-amber-800/40"
+                    }`}
+                  >
+                    {priority === "mustDo"
+                      ? t("planner_priority_must")
+                      : t("planner_priority_optional")}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="flex gap-3 pt-2">

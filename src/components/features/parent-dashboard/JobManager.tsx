@@ -17,6 +17,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { BudouXText } from "@/components/shared/BudouXText";
 
 export function JobManager() {
   const { t, locale } = useTranslation();
@@ -109,7 +110,7 @@ export function JobManager() {
             {t("job_library_empty_title")}
           </p>
           <p className="text-sm text-amber-300/70">
-            {t("job_library_empty_hint")}
+            <BudouXText>{t("job_library_empty_hint")}</BudouXText>
           </p>
           <Button
             onClick={handleAdd}
@@ -204,7 +205,7 @@ export function JobManager() {
           if (deletingJobId) deleteJob(deletingJobId);
         }}
         title={t("job_delete_confirm_title")}
-        body={t("job_delete_confirm_body")}
+        body={<BudouXText>{t("job_delete_confirm_body")}</BudouXText>}
         confirmLabel={t("job_delete_confirm_cta")}
         cancelLabel={t("job_delete_confirm_cancel")}
         confirmTestId="job-delete-confirm"

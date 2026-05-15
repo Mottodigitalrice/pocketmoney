@@ -21,7 +21,7 @@ const ja = {
 
   // Kid
   kid_invalid_child: "だれですか? 🤔",
-  kid_loading: "読み込み中...",
+  kid_loading: "よみこみちゅう...", // F18: 込 is 中学校 kanji — hiragana for kid surface
   kid_home: "ホーム",
   kid_header_jobs: "{{name}}のおしごと",
   kid_header_shark: "ホオジロザメ",
@@ -61,7 +61,8 @@ const ja = {
   job_try_again_note: "なにをなおして もういっかい やってほしい? {{note}}",
 
   // Celebration
-  celebration_great_job: "よくできました!",
+  // F18: 「よくできました」is keigo on a kid surface — switch to plain-form 「できたね!」
+  celebration_great_job: "よくできたね!",
   celebration_waiting: "ママかパパがチェックするのをまってね",
 
   // Parent tabs
@@ -181,8 +182,10 @@ const ja = {
   oneoff_create: "つくってわりあてる",
 
   // Kanban (updated)
-  kanban_no_jobs_today: "今日のお仕事はないよ!",
-  kanban_no_jobs_hint: "ママかパパにお仕事を追加してもらおう!",
+  // F18: dropped kanji 今日/仕事 to keep hiragana register consistent with other
+  // kid-facing strings (おしごと is the canonical kid-voice term for "chore").
+  kanban_no_jobs_today: "きょうのおしごとはないよ!",
+  kanban_no_jobs_hint: "ママかパパにおしごとをついかしてもらおう!",
 
   // Child overview
   overview_earned: "かせいだ",
@@ -232,27 +235,40 @@ const ja = {
 
   // Lucky Chest
   lucky_chest_title: "ラッキーチェスト",
-  lucky_chest_sleeping_title: "今週は宝箱おやすみ",
-  lucky_chest_sleeping_hint: "マストドゥをついかすると、つぎのしゅうおきるよ!",
-  lucky_chest_locked: "今週のぜったいおしごと {{total}}このうち{{done}}こ承認済み。",
-  lucky_chest_unlocked: "あいたよ! 最高¥{{amount}}まで当たるよ。",
-  lucky_chest_opened: "今週は¥{{amount}}をたからものに追加したよ。",
+  // F18: 「宝箱」mixes 小6 + 小3 kanji on a kid surface — use hiragana.
+  lucky_chest_sleeping_title: "こんしゅうはたからばこ おやすみ",
+  // F18 — Replace katakana loanword "マストドゥ" with native "ぜったいのおしごと"
+  // (matches kanban/planner vocab). Kid audience can't parse mastodu.
+  lucky_chest_sleeping_hint: "ぜったいのおしごとがついかされると、つぎのしゅうおきるよ!",
+  // F18: 「承認済み」is 小5–6 kanji + keigo register — replace with kid-readable
+  // 「OKがでた」which matches the approval button vocabulary the kid already sees.
+  lucky_chest_locked: "こんしゅうのぜったいおしごと {{total}}このうち{{done}}こ OKがでたよ。",
+  // F18 — Soften gambling-adjacent language: 当たる ("win/hit") → もらえる ("receive")
+  // reframes the chest as a reward for finishing the week's must-do work, not a
+  // lottery roll. Matches the EN "Open it for up to ¥X" phrasing.
+  lucky_chest_unlocked: "あいたよ! さいだい¥{{amount}}までもらえるよ。",
+  lucky_chest_opened: "こんしゅうのほうび: ¥{{amount}}をたからものに ついかしたよ。",
   lucky_chest_open: "あける",
   lucky_chest_opening: "あけている...",
-  lucky_chest_error: "チェストをあけられませんでした。",
+  // F18: keigo-leaning でした → plain よ-ending for kid surface.
+  lucky_chest_error: "チェストをあけられなかったよ。もういちどためしてね。",
   lucky_chest_parent_title: "ラッキーチェスト",
-  lucky_chest_parent_subtitle: "今週のぜったいおしごとが全部承認されたら、子どもが週1回あけられます。",
+  // F18 — Reframe as "weekly reward" (ぼうけんのほうび) rather than chance-based.
+  // Lewis's PRD principle #2: no fear, no gambling vibes — chest is a thank-you
+  // for finishing the must-do work, not a roll of the dice.
+  lucky_chest_parent_subtitle: "今週のぜったいおしごとが全部おわると、しゅう1回ほうびのチェストをひらけます。",
   lucky_chest_max_label: "最高 ¥",
   lucky_chest_save: "保存",
 
   // Goals
   goal_title: "ためるゴール",
-  goal_subtitle: "ためるつぼは、次にほしいもののために使うよ。",
+  // F18: 次/使 → hiragana for 4yo readability; warmer tone.
+  goal_subtitle: "ためるつぼは、つぎにほしいもののためにつかうよ。",
   goal_empty: "まだゴールがないよ",
   goal_empty_subtitle: "ほしいものを決めて、ためるつぼをいっぱいにしよう。",
   goal_save_balance: "ためるつぼ: ¥{{amount}}",
   goal_funded: "たまった",
-  goal_ready: "もう買えるよ!",
+  goal_ready: "もう買えるよ!", // L2-review: 買 is 小2 — fine for 7yo, borderline for 4yo
   goal_remaining: "あと¥{{amount}}",
   goal_name_placeholder: "何のためにためる?",
   goal_amount_placeholder: "¥ ゴール",
@@ -360,11 +376,15 @@ const ja = {
   auth_sign_up_subtitle: "たからもの冒険を始めよう",
   auth_logout: "ログアウト",
 
-  // F11 — Empty states (parent dashboard) // CMO-review: tone calibration for parent vs kid surfaces
+  // F11 — Empty states (parent dashboard)
   job_library_empty_title: "おしごとライブラリはまだからっぽです",
-  job_library_empty_hint: "「+ 新しいお仕事」をタップして最初のおしごとを追加してください。追加するまで子どもには何も見えません。", // CMO-review: "見えません" might be too direct; consider softer phrasing
+  // F18 (resolves F11 CMO-review): 「見えません」reads as a flat negative; reframe as
+  // a positive sequencing message — child can start once the library has content.
+  job_library_empty_hint: "「+ 新しいお仕事」をタップして最初のおしごとを追加すると、子どものリストに出てきます。",
   job_library_empty_cta: "+ 最初のおしごとを追加",
-  approvals_empty_title: "ぜんぶおわってる! みんなえらい!", // CMO-review: kid-readable hiragana — verify tone for parent surface
+  // F18 (resolves F11 CMO-review): parent surface — keep the celebratory tone but
+  // pair it with parent-actionable framing rather than 「みんなえらい」kid-voice alone.
+  approvals_empty_title: "全部おわっています! 船長、おつかれさま。",
   approvals_empty_hint: "子どもがおしごとをおわらせると、ここにしょうにん待ちで出てきます。",
   quick_add_empty_title: "今日のクイック追加はありません",
   quick_add_empty_hint: "上のおしごとをタップして今日に追加するか、よていタブで一週間ぶんを計画してください。",
@@ -374,7 +394,9 @@ const ja = {
   planner_empty_title: "計画するクルーがいません",
   planner_empty_hint: "クルータブで子どもを1人以上追加してから、ここに戻ってきてください。",
   planner_no_jobs_title: "おしごとライブラリがからっぽ",
-  planner_no_jobs_hint: "おしごとタブでチョアを追加すると、ここにドラッグできるようになります。", // CMO-review: "チョア" is loanword — might prefer "おしごと"
+  // F18 (resolves F11 CMO-review): drop the「チョア」loanword — おしごと is the
+  // canonical app term and matches every other planner/kanban string.
+  planner_no_jobs_hint: "おしごとタブでおしごとを追加すると、ここにドラッグできるようになります。",
   planner_week_empty_banner: "今週のよていはまだありません — おしごとを曜日にドラッグするか、「月曜をテンプレートにする」をタップしてください。",
 
   // F11 — Empty states (kid dashboard) — kid-readable hiragana
@@ -389,8 +411,11 @@ const ja = {
   sibling_rank_solo_title: "いまはきみだけ!",
   sibling_rank_solo_hint: "もうひとりクルーがふえると、だれがいちばんかみえるよ。",
 
-  // F12 — Mapped error messages (mapConvexError) // CMO-review: tone calibration for parent vs kid surfaces
-  error_auth_lost: "ログインがきれちゃったみたい。もう一度ログインしてね。", // CMO-review: parent will see this — verify tone
+  // F12 — Mapped error messages (mapConvexError)
+  // F18 (resolves F12 CMO-review): parent surface needs slightly tighter register
+  // without going into 敬語 — drop 「ちゃった」filler and use plain 「が切れました」
+  // which is informative without being cold.
+  error_auth_lost: "ログインが切れました。もう一度ログインしてください。",
   error_network: "船とつながらないよ。インターネットをかくにんしてもう一度ためしてね。",
   error_overdraft: "そのつぼには、引き出すぶんのたからものがたりません。",
   error_lucky_chest_locked: "今週はもうラッキーチェストをあけたよ。月曜にまたためしてね!",
@@ -401,7 +426,10 @@ const ja = {
   error_unknown: "なにかつまずいたみたい。もう一度ためしてね。",
 
   // F12 — Error / not-found pages (pirate-toned bilingual)
-  error_page_title: "あれ、まいごになっちゃった!", // CMO-review: kid-friendly hiragana — verify parent tone
+  // F18 (downgrades F12 CMO-review → L2-review): playful kid-friendly framing.
+  // Parents may find it juvenile in a serious error context — a native L2-fluent
+  // reader should sanity-check whether it lands warm or annoying.
+  error_page_title: "あれ、まいごになっちゃった!", // L2-review
   error_page_subtitle: "だいじょうぶ、たからものはぶじだよ。下のボタンでもう一度ためしてね。",
   error_page_cta: "もう一度",
   not_found_page_title: "この地図にはなにもないよ!",
@@ -424,7 +452,8 @@ const ja = {
   job_delete_confirm_cancel: "そのままにする",
 
   // F12 — ChildManager i18n cleanup
-  child_manager_header: "クルーメンバー ({{count}})", // CMO-review: header tone, parent-facing
+  // F18 (resolves F12 CMO-review): standard parent UI header — no change needed.
+  child_manager_header: "クルーメンバー ({{count}})",
   child_manager_add_btn: "+ クルーを追加",
   child_manager_empty_title: "まだクルーがいません!",
   child_manager_empty_subtitle: "最初のちいさな海賊を追加して、冒険をはじめよう。",

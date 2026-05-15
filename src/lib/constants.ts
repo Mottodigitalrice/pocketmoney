@@ -1,6 +1,6 @@
 import { ChildIcon } from "@/types";
 
-export const APP_NAME = "PocketMoney";
+export const APP_NAME = "Pirate Money";
 export const APP_DESCRIPTION = "Earn Yen by helping around the house!";
 export const APP_AUTHOR = "Mottodigital";
 export const CURRENCY = "¥";

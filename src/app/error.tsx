@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { BudouXText } from "@/components/shared/BudouXText";
 import { useTranslation } from "@/hooks/use-translation";
 
 /**
@@ -41,7 +42,7 @@ export default function Error({
           {t("error_page_title")}
         </h1>
         <p className="text-base text-amber-300/80">
-          {t("error_page_subtitle")}
+          <BudouXText>{t("error_page_subtitle")}</BudouXText>
         </p>
         <Button
           onClick={reset}

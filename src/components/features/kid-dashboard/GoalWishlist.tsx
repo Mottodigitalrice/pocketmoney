@@ -7,6 +7,7 @@ import { useTranslation } from "@/hooks/use-translation";
 import { CURRENCY } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { BudouXText } from "@/components/shared/BudouXText";
 
 interface GoalWishlistProps {
   childId: string;
@@ -140,7 +141,7 @@ export function GoalWishlist({ childId }: GoalWishlistProps) {
               data-testid="goal-big-dream-hint"
               className="mt-3 rounded-xl bg-sky-500/10 px-3 py-2 text-xs text-sky-100/80"
             >
-              {t("goal_big_dream_hint")}
+              <BudouXText>{t("goal_big_dream_hint")}</BudouXText>
             </p>
           )}
         </div>
@@ -201,10 +202,12 @@ export function GoalWishlist({ childId }: GoalWishlistProps) {
 
         {activeGoal && (
           <p className="text-xs text-sky-100/70">
-            {t("goal_swap_reassurance", {
-              amount: saveBalance.toLocaleString(),
-              name: title.trim() || activeGoal.title,
-            })}
+            <BudouXText
+              text={t("goal_swap_reassurance", {
+                amount: saveBalance.toLocaleString(),
+                name: title.trim() || activeGoal.title,
+              })}
+            />
           </p>
         )}
 

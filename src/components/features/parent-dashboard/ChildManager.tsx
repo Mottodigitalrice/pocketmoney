@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useTranslation } from "@/hooks/use-translation";
 import { ChildForm } from "./ChildForm";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { BudouXText } from "@/components/shared/BudouXText";
 
 interface ChildManagerProps {
   crewMembers: Child[];
@@ -175,7 +176,7 @@ export function ChildManager({
           if (deletingChild) onDelete(deletingChild.id);
         }}
         title={t("child_delete_confirm_title", { name: deletingChild?.name ?? "" })}
-        body={t("child_delete_confirm_body")}
+        body={<BudouXText>{t("child_delete_confirm_body")}</BudouXText>}
         confirmLabel={t("child_delete_confirm_cta")}
         cancelLabel={t("child_delete_confirm_cancel")}
         confirmTestId="child-delete-confirm"

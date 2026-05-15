@@ -81,7 +81,7 @@ function ParentHeaderInner() {
           </p>
         </div>
         <div className="h-12 w-12">
-          <PirateAvatar />
+          <PirateAvatar className="h-full w-full" />
         </div>
       </div>
     </header>
@@ -147,7 +147,7 @@ function ParentHeaderInnerWithoutClerk() {
           </p>
         </div>
         <div className="h-12 w-12">
-          <PirateAvatar />
+          <PirateAvatar className="h-full w-full" />
         </div>
       </div>
     </header>

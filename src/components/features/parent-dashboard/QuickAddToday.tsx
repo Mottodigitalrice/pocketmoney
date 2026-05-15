@@ -12,6 +12,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
+import { BudouXText } from "@/components/shared/BudouXText";
 import type { ChildIcon } from "@/types";
 import type { TranslationKey } from "@/lib/i18n/translations";
 
@@ -101,7 +102,7 @@ export function QuickAddToday() {
                 {t("quick_add_title")}
               </h2>
               <p className="mt-1 text-sm text-amber-300/70">
-                {t("quick_add_subtitle")}
+                <BudouXText>{t("quick_add_subtitle")}</BudouXText>
               </p>
             </div>
           </div>
@@ -191,7 +192,7 @@ export function QuickAddToday() {
                         {t("quick_add_preapprove")}
                       </p>
                       <p className="mt-1 text-sm text-amber-300/70">
-                        {t("quick_add_preapprove_hint")}
+                        <BudouXText>{t("quick_add_preapprove_hint")}</BudouXText>
                       </p>
                     </div>
                     <Switch

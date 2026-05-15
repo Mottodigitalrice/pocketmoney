@@ -10,6 +10,7 @@ export default defineSchema({
     name: v.optional(v.string()),
     imageUrl: v.optional(v.string()),
     captainCodeEnabled: v.optional(v.boolean()),
+    luckyChestMaxAmount: v.optional(v.number()),
     createdAt: v.number(),
   })
     .index("by_clerk_id", ["clerkId"])
@@ -20,6 +21,8 @@ export default defineSchema({
     userId: v.id("users"),
     name: v.string(),
     icon: v.string(), // avatar key: "shark", "dolphin", "turtle", "octopus", "starfish", "whale", "crab", "fish"
+    age: v.optional(v.number()),
+    rankMultiplier: v.optional(v.number()),
     createdAt: v.number(),
   }).index("by_user", ["userId"]),
 
@@ -32,6 +35,19 @@ export default defineSchema({
     yenAmount: v.number(),
     icon: v.string(),
     isOneOff: v.optional(v.boolean()),
+    requiresPhotoProof: v.optional(v.boolean()),
+    recurrence: v.optional(
+      v.object({
+        type: v.union(
+          v.literal("none"),
+          v.literal("daily"),
+          v.literal("weekdays"),
+          v.literal("specificDays")
+        ),
+        daysOfWeek: v.optional(v.array(v.number())),
+        priority: v.optional(v.union(v.literal("mustDo"), v.literal("optional"))),
+      })
+    ),
     // Legacy fields kept optional for migration
     assignedTo: v.optional(v.string()),
     dailyLimit: v.optional(v.number()),
@@ -45,6 +61,7 @@ export default defineSchema({
     jobId: v.id("jobs"),
     childId: v.id("children"),
     date: v.string(), // "YYYY-MM-DD" format
+    priority: v.optional(v.union(v.literal("mustDo"), v.literal("optional"))),
     createdAt: v.number(),
   })
     .index("by_user", ["userId"])
@@ -66,6 +83,15 @@ export default defineSchema({
     startedAt: v.optional(v.number()),
     completedAt: v.optional(v.number()),
     approvedAt: v.optional(v.number()),
+    rejectedAt: v.optional(v.number()),
+    rejectionCount: v.optional(v.number()),
+    parentNote: v.optional(v.string()),
+    proofStorageId: v.optional(v.id("_storage")),
+    proofFileName: v.optional(v.string()),
+    proofContentType: v.optional(v.string()),
+    proofFileSize: v.optional(v.number()),
+    proofUploadedAt: v.optional(v.number()),
+    proofDeletedAt: v.optional(v.number()),
     createdAt: v.number(),
   })
     .index("by_user", ["userId"])
@@ -73,4 +99,77 @@ export default defineSchema({
     .index("by_job", ["jobId"])
     .index("by_child_status", ["childId", "status"])
     .index("by_scheduled_job", ["scheduledJobId"]),
+
+  wallets: defineTable({
+    userId: v.id("users"),
+    childId: v.id("children"),
+    jar: v.union(v.literal("spend"), v.literal("save"), v.literal("give")),
+    balance: v.number(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_child", ["childId"])
+    .index("by_child_jar", ["childId", "jar"]),
+
+  transactions: defineTable({
+    userId: v.id("users"),
+    childId: v.id("children"),
+    walletId: v.optional(v.id("wallets")),
+    jar: v.optional(v.union(v.literal("spend"), v.literal("save"), v.literal("give"))),
+    amount: v.number(),
+    type: v.union(
+      v.literal("earning"),
+      v.literal("interest"),
+      v.literal("withdrawal"),
+      v.literal("migration"),
+      v.literal("correction"),
+      v.literal("bonus"),
+      v.literal("luckyChest")
+    ),
+    reason: v.optional(
+      v.union(
+        v.literal("cashOut"),
+        v.literal("penalty"),
+        v.literal("correction"),
+        v.literal("other")
+      )
+    ),
+    note: v.optional(v.string()),
+    jobInstanceId: v.optional(v.id("jobInstances")),
+    createdAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_child", ["childId"])
+    .index("by_wallet", ["walletId"])
+    .index("by_job_instance", ["jobInstanceId"]),
+
+  goals: defineTable({
+    userId: v.id("users"),
+    childId: v.id("children"),
+    title: v.string(),
+    targetAmount: v.number(),
+    emoji: v.string(),
+    status: v.union(
+      v.literal("active"),
+      v.literal("completed"),
+      v.literal("archived")
+    ),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_child", ["childId"])
+    .index("by_child_status", ["childId", "status"]),
+
+  luckyChests: defineTable({
+    userId: v.id("users"),
+    childId: v.id("children"),
+    weekStart: v.string(),
+    amount: v.number(),
+    openedAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_child", ["childId"])
+    .index("by_child_week", ["childId", "weekStart"]),
 });

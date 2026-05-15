@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { BudouXText } from "@/components/shared/BudouXText";
 import { useTranslation } from "@/hooks/use-translation";
 
 /**
@@ -24,7 +25,7 @@ export default function NotFound() {
           {t("not_found_page_title")}
         </h1>
         <p className="text-base text-amber-300/80">
-          {t("not_found_page_subtitle")}
+          <BudouXText>{t("not_found_page_subtitle")}</BudouXText>
         </p>
         <Link href="/">
           <Button

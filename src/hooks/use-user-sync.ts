@@ -23,7 +23,6 @@ export function useUserSync() {
     if (!email) return;
 
     upsertUser({
-      clerkId: user.id,
       email,
       name: user.fullName || undefined,
       imageUrl: user.imageUrl || undefined,

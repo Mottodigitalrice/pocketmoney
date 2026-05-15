@@ -8,13 +8,25 @@ import { WeekPlanner } from "@/components/features/parent-dashboard/WeekPlanner"
 import { JobManager } from "@/components/features/parent-dashboard/JobManager";
 import { ChildOverview } from "@/components/features/parent-dashboard/ChildOverview";
 import { ChildManager } from "@/components/features/parent-dashboard/ChildManager";
+import { LuckyChestSettings } from "@/components/features/parent-dashboard/LuckyChestSettings";
 import { usePocketMoney } from "@/hooks/use-pocket-money";
 import { useTranslation } from "@/hooks/use-translation";
 
 type Tab = "quick_add" | "approvals" | "planner" | "jobs" | "overview" | "children";
 
+const tabIds: Tab[] = ["quick_add", "approvals", "planner", "jobs", "overview", "children"];
+
+function isTab(value: string): value is Tab {
+  return tabIds.includes(value as Tab);
+}
+
 export default function ParentPage() {
-  const [activeTab, setActiveTab] = useState<Tab>("quick_add");
+  const [activeTab, setActiveTab] = useState<Tab>(() => {
+    if (typeof window === "undefined") return "quick_add";
+
+    const hashTab = window.location.hash.replace("#", "");
+    return isTab(hashTab) ? hashTab : "quick_add";
+  });
   const { t } = useTranslation();
   const { familyChildren, addChild, editChild, deleteChild } = usePocketMoney();
 
@@ -36,7 +48,10 @@ export default function ParentPage() {
         {tabs.map((tab) => (
           <button
             key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
+            onClick={() => {
+              setActiveTab(tab.id);
+              window.history.replaceState(null, "", `#${tab.id}`);
+            }}
             className={`whitespace-nowrap rounded-xl px-4 py-3 text-center text-sm font-bold transition-all sm:flex-1 sm:text-base ${
               activeTab === tab.id
                 ? "bg-amber-600 text-white shadow-lg"
@@ -56,6 +71,7 @@ export default function ParentPage() {
         {activeTab === "jobs" && <JobManager />}
         {activeTab === "overview" && (
           <div className="space-y-6">
+            <LuckyChestSettings />
             {familyChildren.map((child) => (
               <ChildOverview key={child._id} childId={child._id} />
             ))}
