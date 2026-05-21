@@ -86,6 +86,16 @@ npm run test:backend     # Backend (node) tests only
 npm run test:ui          # UI (jsdom) tests only
 ```
 
+## Development
+
+Commits trigger an auto-format pre-commit hook (via `simple-git-hooks` +
+`lint-staged`). On `git commit`, staged files are run through
+`prettier --write` then `eslint --fix` before the commit is finalized — so
+manually running `npm run format` is no longer required. The hook is installed
+automatically by `npm install` (via the `prepare` script). To bypass it on a
+specific commit, use `git commit --no-verify` (discouraged — only for emergency
+fixups).
+
 ## Continuous Integration
 
 `.github/workflows/test.yml` runs `lint → typecheck → test` on every push to
