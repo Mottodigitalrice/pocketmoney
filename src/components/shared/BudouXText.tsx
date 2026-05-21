@@ -51,7 +51,11 @@ export function BudouXText({ text, children, className }: BudouXTextProps) {
 
   // EN locale, non-string children, or trivially short strings: passthrough.
   if (locale !== "ja" || source == null || source.length < 4) {
-    return className ? <span className={className}>{children ?? source}</span> : <>{children ?? source}</>;
+    return className ? (
+      <span className={className}>{children ?? source}</span>
+    ) : (
+      <>{children ?? source}</>
+    );
   }
 
   return (

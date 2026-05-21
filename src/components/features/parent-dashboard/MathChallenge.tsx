@@ -46,7 +46,11 @@ function generateProblem(): Problem {
   return { a, b, operator, answer };
 }
 
-export function MathChallenge({ open, onSuccess, onClose }: MathChallengeProps) {
+export function MathChallenge({
+  open,
+  onSuccess,
+  onClose,
+}: MathChallengeProps) {
   const { t } = useTranslation();
   const [problem, setProblem] = useState<Problem>(generateProblem);
   const [userAnswer, setUserAnswer] = useState("");
@@ -107,7 +111,9 @@ export function MathChallenge({ open, onSuccess, onClose }: MathChallengeProps) 
           {/* Answer form */}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <Label className="text-amber-200">{t("math_challenge_placeholder")}</Label>
+              <Label className="text-amber-200">
+                {t("math_challenge_placeholder")}
+              </Label>
               <Input
                 type="number"
                 value={userAnswer}

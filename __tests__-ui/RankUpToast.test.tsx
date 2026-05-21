@@ -17,7 +17,10 @@
  */
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render } from "@testing-library/react";
-import { LanguageProvider, LanguageContext } from "@/components/providers/LanguageProvider";
+import {
+  LanguageProvider,
+  LanguageContext,
+} from "@/components/providers/LanguageProvider";
 import { renderWithProviders } from "./test-utils";
 
 // `vi.mock(...)` calls are hoisted above all `import` statements at the top

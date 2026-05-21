@@ -6,11 +6,13 @@ description: Zod v4 validation patterns — schema definitions, error handling, 
 # Zod v4 Validation Patterns
 
 ## Overview
+
 Our projects use **Zod v4** (4.x). Zod v4 has significant API changes from v3. Using v3 patterns will cause TypeScript errors.
 
 ## Breaking Changes from v3
 
 ### Email Validation
+
 ```typescript
 // WRONG (v3 — deprecated in v4)
 z.string().email("Invalid email");
@@ -20,6 +22,7 @@ z.string().check(z.email({ message: "Please enter a valid email" }));
 ```
 
 ### Literal with Custom Error
+
 ```typescript
 // WRONG (v3)
 z.literal(true, { errorMap: () => ({ message: "Required" }) });
@@ -29,6 +32,7 @@ z.literal(true, { message: "You must accept the privacy policy" });
 ```
 
 ### Error Access
+
 ```typescript
 // WRONG (v3)
 const result = schema.safeParse(data);
@@ -44,6 +48,7 @@ if (!result.success) {
 ```
 
 ### URL Validation
+
 ```typescript
 // WRONG (v3)
 z.string().url("Invalid URL");
@@ -55,6 +60,7 @@ z.string().check(z.url({ message: "Please enter a valid URL" }));
 ## Common Schema Patterns
 
 ### Basic Types
+
 ```typescript
 import { z } from "zod";
 
@@ -68,6 +74,7 @@ const schema = z.object({
 ```
 
 ### Enum / Union
+
 ```typescript
 const statusSchema = z.union([
   z.literal("draft"),
@@ -80,6 +87,7 @@ const roleSchema = z.enum(["admin", "user", "guest"]);
 ```
 
 ### Arrays
+
 ```typescript
 const tagsSchema = z.array(z.string()).min(1, "Select at least one");
 
@@ -87,24 +95,28 @@ const optionalTags = z.optional(z.array(z.string()));
 ```
 
 ### Conditional Validation
+
 ```typescript
 // Optional field that validates format when present
 const websiteSchema = z.optional(
   z.union([
     z.literal(""), // Allow empty string
     z.string().check(z.url({ message: "Invalid URL" })),
-  ])
+  ]),
 );
 ```
 
 ## Form Validation Pattern
 
 ### Per-Step Validation (Multi-Step Forms)
+
 ```typescript
 const stepSchemas: Record<number, z.ZodType> = {
   1: z.object({
     email: z.string().check(z.email({ message: "Please enter a valid email" })),
-    privacyConsent: z.literal(true, { message: "You must accept the privacy policy" }),
+    privacyConsent: z.literal(true, {
+      message: "You must accept the privacy policy",
+    }),
   }),
   2: z.object({
     name: z.string().min(1, "Please enter your name"),
@@ -116,7 +128,10 @@ const stepSchemas: Record<number, z.ZodType> = {
   }),
 };
 
-function validateStep(step: number, data: Record<string, unknown>): string | null {
+function validateStep(
+  step: number,
+  data: Record<string, unknown>,
+): string | null {
   const schema = stepSchemas[step];
   if (!schema) return null;
 
@@ -129,6 +144,7 @@ function validateStep(step: number, data: Record<string, unknown>): string | nul
 ```
 
 ### Full Form Validation
+
 ```typescript
 const formSchema = z.object({
   name: z.string().min(1, "Required"),
@@ -184,11 +200,11 @@ function MyForm() {
 
 ## Quick Reference
 
-| v3 (Old) | v4 (Current) |
-|-----------|-------------|
-| `z.string().email()` | `z.string().check(z.email())` |
-| `z.string().url()` | `z.string().check(z.url())` |
-| `z.string().uuid()` | `z.string().check(z.uuid())` |
+| v3 (Old)                       | v4 (Current)                  |
+| ------------------------------ | ----------------------------- |
+| `z.string().email()`           | `z.string().check(z.email())` |
+| `z.string().url()`             | `z.string().check(z.url())`   |
+| `z.string().uuid()`            | `z.string().check(z.uuid())`  |
 | `z.literal(val, { errorMap })` | `z.literal(val, { message })` |
-| `result.error.errors` | `result.error.issues` |
-| `z.string().regex()` | `z.string().check(z.regex())` |
+| `result.error.errors`          | `result.error.issues`         |
+| `z.string().regex()`           | `z.string().check(z.regex())` |

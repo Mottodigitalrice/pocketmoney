@@ -16,7 +16,8 @@ const en = {
   error_description: "An unexpected error occurred. Please try again.",
   error_retry: "Try again",
   not_found_title: "Page not found",
-  not_found_description: "The page you're looking for doesn't exist or has been moved.",
+  not_found_description:
+    "The page you're looking for doesn't exist or has been moved.",
   not_found_go_home: "Go home",
 
   // Kid
@@ -92,11 +93,14 @@ const en = {
   approval_reject_note_prompt: "What should they fix before trying again?",
   // S6 (R4) — F10 5.17: styled reject-note dialog replaces window.prompt.
   approval_reject_dialog_title: "Send back for a do-over",
-  approval_reject_dialog_subtitle: "Leave a kind note so they know what to fix.",
-  approval_reject_dialog_placeholder: "e.g. The bed still has socks under the pillow!",
+  approval_reject_dialog_subtitle:
+    "Leave a kind note so they know what to fix.",
+  approval_reject_dialog_placeholder:
+    "e.g. The bed still has socks under the pillow!",
   approval_reject_dialog_cancel: "Cancel",
   approval_reject_dialog_submit: "Send Back",
-  approval_reject_dialog_empty_error: "Please write a quick note before sending it back.",
+  approval_reject_dialog_empty_error:
+    "Please write a quick note before sending it back.",
   approval_photo_proof: "Photo proof",
   approval_photo_proof_alt: "Photo proof for completed job",
   // F20 — tap-to-enlarge + close labels for the proof preview modal.
@@ -117,7 +121,8 @@ const en = {
   job_manager_choose_child: "Choose who",
   job_manager_photo_proof: "Photo proof required",
   // S2 (R4) — F10 5.10: disabled-state aria-label when no kids exist.
-  job_manager_quick_assign_no_kids_aria: "Add a crew member before assigning a job",
+  job_manager_quick_assign_no_kids_aria:
+    "Add a crew member before assigning a job",
 
   // Job form
   job_form_edit_title: "Edit Job",
@@ -128,7 +133,8 @@ const en = {
   job_form_yen_label: "Yen Amount (¥)",
   job_form_recurrence_label: "Repeats",
   job_form_photo_proof_label: "Require photo proof",
-  job_form_photo_proof_hint: "Kids must upload a photo before this job can be sent for approval.",
+  job_form_photo_proof_hint:
+    "Kids must upload a photo before this job can be sent for approval.",
   job_form_cancel: "Cancel",
   job_form_save: "Save Changes",
   job_form_add: "Add Job",
@@ -185,12 +191,14 @@ const en = {
 
   // Quick add today
   quick_add_title: "Quick Add Today",
-  quick_add_subtitle: "Tap a job, pick who it's for, and add it to today in a couple of taps.",
+  quick_add_subtitle:
+    "Tap a job, pick who it's for, and add it to today in a couple of taps.",
   quick_add_empty_jobs: "Add some jobs to your library first.",
   quick_add_empty_children: "Add your crew first before assigning jobs.",
   quick_add_choose_who: "Who is this for?",
   quick_add_preapprove: "Pre-approve and pay now",
-  quick_add_preapprove_hint: "Skips the kid list and approval queue, and adds the treasure straight away.",
+  quick_add_preapprove_hint:
+    "Skips the kid list and approval queue, and adds the treasure straight away.",
   quick_add_confirm: "Add Jobs",
   quick_add_assigning: "Adding...",
 
@@ -250,7 +258,8 @@ const en = {
   bonus_amount: "Amount",
   bonus_note: "Reason",
   bonus_note_placeholder: "What did they do well?",
-  bonus_split_hint: "Bonus treasure is split into Spend / Save / Give using 70 / 20 / 10.",
+  bonus_split_hint:
+    "Bonus treasure is split into Spend / Save / Give using 70 / 20 / 10.",
   bonus_submit: "Award Bonus",
   bonus_saving: "Awarding...",
   bonus_error_amount: "Enter an amount above ¥0.",
@@ -259,7 +268,8 @@ const en = {
   // Lucky Chest
   lucky_chest_title: "Lucky Chest",
   lucky_chest_sleeping_title: "The chest is sleeping this week",
-  lucky_chest_sleeping_hint: "Add some must-do jobs and it'll wake up next week!",
+  lucky_chest_sleeping_hint:
+    "Add some must-do jobs and it'll wake up next week!",
   lucky_chest_locked: "{{done}} / {{total}} must-do jobs approved this week.",
   lucky_chest_unlocked: "Unlocked! Open it for up to ¥{{amount}}.",
   lucky_chest_opened: "Opened this week: ¥{{amount}} added to your treasure.",
@@ -267,17 +277,20 @@ const en = {
   lucky_chest_opening: "Opening...",
   lucky_chest_error: "Could not open the chest.",
   lucky_chest_parent_title: "Lucky Chest",
-  lucky_chest_parent_subtitle: "Kids can open it once per week after all must-do jobs are approved.",
+  lucky_chest_parent_subtitle:
+    "Kids can open it once per week after all must-do jobs are approved.",
   lucky_chest_max_label: "Max ¥",
   lucky_chest_save: "Save",
   // S2 (R4) — F10 5.19: surface the Monday-roll schedule + amount range.
-  lucky_chest_schedule_explainer: "Each Monday, every kid who finished must-do chores rolls between ¥10 and ¥{{max}}.",
+  lucky_chest_schedule_explainer:
+    "Each Monday, every kid who finished must-do chores rolls between ¥10 and ¥{{max}}.",
 
   // Goals
   goal_title: "Save Goal",
   goal_subtitle: "Your Save jar goes toward the thing you want next.",
   goal_empty: "No save goal yet",
-  goal_empty_subtitle: "Pick something you want and start filling the Save jar.",
+  goal_empty_subtitle:
+    "Pick something you want and start filling the Save jar.",
   goal_save_balance: "Save jar: ¥{{amount}}",
   goal_funded: "funded",
   goal_ready: "Ready!",
@@ -289,8 +302,10 @@ const en = {
   goal_error_title: "Name your goal first.",
   goal_error_amount: "Enter a goal amount above ¥0.",
   goal_error_generic: "Could not save the goal.",
-  goal_swap_reassurance: "Your ¥{{amount}} is still saved. It will now go toward {{name}}.",
-  goal_big_dream_hint: "Big dream! Keep saving - every week your Save jar grows.",
+  goal_swap_reassurance:
+    "Your ¥{{amount}} is still saved. It will now go toward {{name}}.",
+  goal_big_dream_hint:
+    "Big dream! Keep saving - every week your Save jar grows.",
 
   // Ranks
   rank_board_title: "Crew Ranks",
@@ -335,10 +350,12 @@ const en = {
 
   // Onboarding
   onboarding_welcome: "Welcome to Pirate Money!",
-  onboarding_welcome_subtitle: "Ahoy, Captain! Ready to set sail on a treasure-filled adventure? Let's get your crew together and start earning some booty!",
+  onboarding_welcome_subtitle:
+    "Ahoy, Captain! Ready to set sail on a treasure-filled adventure? Let's get your crew together and start earning some booty!",
   onboarding_get_started: "Get Started",
   onboarding_add_crew: "Who's in your crew?",
-  onboarding_add_crew_subtitle: "Add your little pirates below. You can add up to 6 crew members.",
+  onboarding_add_crew_subtitle:
+    "Add your little pirates below. You can add up to 6 crew members.",
   onboarding_child_name: "Crew member's name",
   onboarding_choose_icon: "Choose their sea creature",
   onboarding_add_another: "+ Add Another Crew Member",
@@ -355,25 +372,31 @@ const en = {
 
   // Onboarding - Jobs step
   onboarding_add_jobs: "Set Up Some Jobs",
-  onboarding_add_jobs_subtitle: "What chores can your crew do to earn treasure? Add your own, or skip and we'll start you with 20 built-in chores.",
+  onboarding_add_jobs_subtitle:
+    "What chores can your crew do to earn treasure? Add your own, or skip and we'll start you with 20 built-in chores.",
   onboarding_job_name: "Job name",
   onboarding_job_name_placeholder: "e.g. Clean up toys",
   onboarding_job_yen: "Yen (¥)",
   onboarding_add_job: "+ Add Another Job",
   onboarding_remove_job: "Remove",
   // H3 — skip-jobs path: empty custom list is fine, defaults always seed.
-  onboarding_use_defaults_only: "Or skip this and we'll set up 20 starter chores for you",
+  onboarding_use_defaults_only:
+    "Or skip this and we'll set up 20 starter chores for you",
 
   // H3 — onboarding save error UX (mapped from mapConvexError + retry affordance)
   onboarding_save_failed_title: "We hit a squall — couldn't save your crew",
   onboarding_save_retry: "Try again",
 
   // S1 (R4) — Onboarding copy refinements (F10 3.1 / 3.3 / 3.4 / 3.5 / 3.8)
-  onboarding_child_name_hint: "This is the name your kid will see on their dashboard.",
-  onboarding_job_yen_tip: "Tip: ¥50–¥300 per chore is typical for younger crew.",
+  onboarding_child_name_hint:
+    "This is the name your kid will see on their dashboard.",
+  onboarding_job_yen_tip:
+    "Tip: ¥50–¥300 per chore is typical for younger crew.",
   onboarding_add_sibling: "+ Add a Sibling",
-  onboarding_sibling_unlock_hint: "Add 2+ kids to unlock the sibling leaderboard.",
-  auth_env_missing_subtitle: "We're having trouble loading your account. Try again in a moment, or ask the captain to check the setup.",
+  onboarding_sibling_unlock_hint:
+    "Add 2+ kids to unlock the sibling leaderboard.",
+  auth_env_missing_subtitle:
+    "We're having trouble loading your account. Try again in a moment, or ask the captain to check the setup.",
 
   // S3 (R4) — Kid dashboard polish (F10 6.3 / 6.5)
   kanban_empty_today_action: "🦜 Tell a grown-up if you want more!",
@@ -423,24 +446,31 @@ const en = {
 
   // F11 — Empty states (parent dashboard)
   job_library_empty_title: "No chores in your library yet",
-  job_library_empty_hint: "Tap + New Job to add your first chore — the kids can't see anything until you do.",
+  job_library_empty_hint:
+    "Tap + New Job to add your first chore — the kids can't see anything until you do.",
   job_library_empty_cta: "+ Add Your First Job",
   approvals_empty_title: "Nothing waiting — kids are caught up!",
   approvals_empty_hint: "Finished chores will show up here for you to review.",
   quick_add_empty_title: "No quick-add tasks today",
-  quick_add_empty_hint: "Pick a chore above to add it to today, or use Planner for the rest of the week.",
+  quick_add_empty_hint:
+    "Pick a chore above to add it to today, or use Planner for the rest of the week.",
   quick_add_empty_jobs_title: "No chores in your library yet",
   child_manager_no_kids: "No crew aboard yet",
-  child_manager_no_kids_hint: "Add your first kid to get the adventure started.",
+  child_manager_no_kids_hint:
+    "Add your first kid to get the adventure started.",
   planner_empty_title: "No crew to plan for",
-  planner_empty_hint: "Add at least one kid in the Crew tab, then come back to plan the week.",
+  planner_empty_hint:
+    "Add at least one kid in the Crew tab, then come back to plan the week.",
   planner_no_jobs_title: "Your job library is empty",
-  planner_no_jobs_hint: "Add chores in the Jobs tab — they'll show up here to drag onto days.",
-  planner_week_empty_banner: "No chores scheduled this week yet — drag a job onto a day or tap Apply Monday template.",
+  planner_no_jobs_hint:
+    "Add chores in the Jobs tab — they'll show up here to drag onto days.",
+  planner_week_empty_banner:
+    "No chores scheduled this week yet — drag a job onto a day or tap Apply Monday template.",
 
   // F11 — Empty states (kid dashboard)
   kanban_empty_today_title: "All done for today!",
-  kanban_empty_today_hint: "Try checking back tomorrow — or ask a captain if you want more.",
+  kanban_empty_today_hint:
+    "Try checking back tomorrow — or ask a captain if you want more.",
   goals_empty_title: "No goal yet",
   goals_empty_hint: "Pick something cool to save for!",
   history_empty_title: "Your treasure log is empty",
@@ -448,27 +478,36 @@ const en = {
   // S3 (R4) — F10 6.9: warmer tone. Frames the empty state as "your captain
   // hasn't sailed there yet" instead of telling the kid to nag.
   upcoming_empty_title: "Nothing planned yet",
-  upcoming_empty_hint: "Your captain hasn't charted the rest of the week — sit tight!",
+  upcoming_empty_hint:
+    "Your captain hasn't charted the rest of the week — sit tight!",
   sibling_rank_solo_title: "Just you for now!",
-  sibling_rank_solo_hint: "When another crew member joins, you'll see who's ahead.",
+  sibling_rank_solo_hint:
+    "When another crew member joins, you'll see who's ahead.",
 
   // F12 — Mapped error messages (mapConvexError → human-readable strings)
   error_auth_lost: "You've been signed out — please log back in to keep going.",
-  error_network: "We can't reach the ship right now. Check your connection and try again.",
+  error_network:
+    "We can't reach the ship right now. Check your connection and try again.",
   error_overdraft: "That jar doesn't have enough treasure for this withdrawal.",
-  error_lucky_chest_locked: "You already opened the Lucky Chest this week — try again on Monday!",
-  error_child_deleted: "That crew member is no longer aboard. The page will refresh.",
-  error_already_approved: "This chore was already approved — no take-backs needed!",
+  error_lucky_chest_locked:
+    "You already opened the Lucky Chest this week — try again on Monday!",
+  error_child_deleted:
+    "That crew member is no longer aboard. The page will refresh.",
+  error_already_approved:
+    "This chore was already approved — no take-backs needed!",
   error_ownership: "That doesn't belong to your crew.",
-  error_validation: "Something in that form isn't quite right. Please check and try again.",
+  error_validation:
+    "Something in that form isn't quite right. Please check and try again.",
   error_unknown: "Something hit a reef. Please try again in a moment.",
 
   // F12 — Error / not-found pages (pirate-toned)
   error_page_title: "Something hit a reef!",
-  error_page_subtitle: "Don't worry — your treasure is safe. Tap below to try again.",
+  error_page_subtitle:
+    "Don't worry — your treasure is safe. Tap below to try again.",
   error_page_cta: "Try Again",
   not_found_page_title: "This map leads nowhere!",
-  not_found_page_subtitle: "We couldn't find that page. Let's get you back to safe waters.",
+  not_found_page_subtitle:
+    "We couldn't find that page. Let's get you back to safe waters.",
   not_found_page_cta: "Back to Safe Harbour",
 
   // F12 — Photo upload retry
@@ -476,13 +515,15 @@ const en = {
 
   // F12 — Destructive confirmation dialogs (child)
   child_delete_confirm_title: "Delete {{name}}?",
-  child_delete_confirm_body: "This removes their wallet, history, and all scheduled jobs. This cannot be undone.",
+  child_delete_confirm_body:
+    "This removes their wallet, history, and all scheduled jobs. This cannot be undone.",
   child_delete_confirm_cta: "Yes, delete crew member",
   child_delete_confirm_cancel: "Keep them aboard",
 
   // F12 — Destructive confirmation dialogs (job)
   job_delete_confirm_title: "Delete this chore?",
-  job_delete_confirm_body: "Any scheduled instances of this chore will be removed. Past completed history stays. This cannot be undone.",
+  job_delete_confirm_body:
+    "Any scheduled instances of this chore will be removed. Past completed history stays. This cannot be undone.",
   job_delete_confirm_cta: "Yes, delete chore",
   job_delete_confirm_cancel: "Keep it",
 

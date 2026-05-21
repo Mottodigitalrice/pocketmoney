@@ -45,14 +45,14 @@ describe("weekStartUTC — calendar edge cases", () => {
     // of .getUTCDay().
     const monAfterDST = new Date("2026-03-30T12:00:00.000Z"); // Mon
     expect(weekStartUTC(monAfterDST).toISOString()).toBe(
-      "2026-03-30T00:00:00.000Z"
+      "2026-03-30T00:00:00.000Z",
     );
 
     // And the Sunday IN the DST week (Mar 29) should snap to the prior
     // Monday (Mar 23), not to Mar 30.
     const sunDuringDST = new Date("2026-03-29T15:00:00.000Z");
     expect(weekStartUTC(sunDuringDST).toISOString()).toBe(
-      "2026-03-23T00:00:00.000Z"
+      "2026-03-23T00:00:00.000Z",
     );
   });
 
@@ -60,7 +60,7 @@ describe("weekStartUTC — calendar edge cases", () => {
     // 2024-02-29 is a Thursday. Its week's Monday is 2024-02-26.
     const leapDay = new Date("2024-02-29T10:00:00.000Z");
     expect(weekStartUTC(leapDay).toISOString()).toBe(
-      "2024-02-26T00:00:00.000Z"
+      "2024-02-26T00:00:00.000Z",
     );
   });
 
@@ -69,7 +69,7 @@ describe("weekStartUTC — calendar edge cases", () => {
     // above, since they're in the same week).
     const dayAfterLeap = new Date("2024-03-01T08:00:00.000Z");
     expect(weekStartUTC(dayAfterLeap).toISOString()).toBe(
-      "2024-02-26T00:00:00.000Z"
+      "2024-02-26T00:00:00.000Z",
     );
   });
 
@@ -129,8 +129,8 @@ describe("hasTransactionInWeek — half-open interval boundary (×̅)", () => {
     expect(
       hasTransactionInWeek(
         [{ type: "interest", createdAt: oneMsBeforeEnd }],
-        weekStartMs
-      )
+        weekStartMs,
+      ),
     ).toBe(true);
   });
 
@@ -141,8 +141,8 @@ describe("hasTransactionInWeek — half-open interval boundary (×̅)", () => {
     expect(
       hasTransactionInWeek(
         [{ type: "interest", createdAt: exactlyAtEnd }],
-        weekStartMs
-      )
+        weekStartMs,
+      ),
     ).toBe(false);
   });
 });

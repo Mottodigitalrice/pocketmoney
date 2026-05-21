@@ -6,20 +6,25 @@ description: Use this skill when working with Clerk authentication—sign-in/sig
 # Clerk Authentication Skill
 
 ## Overview
+
 This project uses Clerk for authentication. Clerk provides pre-built UI components and works with both Convex (demo) and Supabase (production).
 
 ## Key Components
 
 ### ClerkProvider
+
 Already set up in `src/app/layout.tsx`. Wraps entire app.
 
 ### Sign In/Up Pages
+
 Pre-built at `/sign-in` and `/sign-up`.
 
 ### Middleware (`src/middleware.ts`)
+
 Protects routes. Public routes defined in `isPublicRoute` matcher.
 
 ### Server-Side Auth
+
 ```typescript
 import { auth, currentUser } from "@clerk/nextjs/server";
 
@@ -35,6 +40,7 @@ export default async function Page() {
 ```
 
 ### Client-Side Auth
+
 ```typescript
 "use client";
 import { useUser, useAuth } from "@clerk/nextjs";
@@ -51,6 +57,7 @@ function Profile() {
 ```
 
 ### UserButton Component
+
 ```typescript
 import { UserButton } from "@clerk/nextjs";
 
@@ -61,6 +68,7 @@ import { UserButton } from "@clerk/nextjs";
 ## Syncing Users with Convex
 
 When a user signs in, sync their data to Convex:
+
 ```typescript
 "use client";
 import { useUser } from "@clerk/nextjs";
@@ -88,6 +96,7 @@ function UserSync() {
 ```
 
 ## Environment Variables
+
 ```env
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_...
 CLERK_SECRET_KEY=sk_...
@@ -98,6 +107,7 @@ NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/dashboard
 ```
 
 ## Get Keys
+
 1. Go to https://dashboard.clerk.com
 2. Create or select project
 3. Copy keys from "API Keys" section

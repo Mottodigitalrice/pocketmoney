@@ -85,13 +85,13 @@ export const update = mutation({
     const child = assertOwnedByOrNull(
       await ctx.db.get(args.childId),
       user._id,
-      "child"
+      "child",
     );
     if (!child) return null;
 
     const { childId, ...updates } = args;
     const filteredUpdates = Object.fromEntries(
-      Object.entries(updates).filter(([, value]) => value !== undefined)
+      Object.entries(updates).filter(([, value]) => value !== undefined),
     );
     await ctx.db.patch(childId, filteredUpdates);
     return null;
@@ -108,7 +108,7 @@ export const remove = mutation({
     const child = assertOwnedByOrNull(
       await ctx.db.get(args.childId),
       user._id,
-      "child"
+      "child",
     );
     if (!child) return null;
 
@@ -166,7 +166,7 @@ export const remove = mutation({
  */
 async function cascadeChildSimpleTables(
   ctx: MutationCtx,
-  childId: Id<"children">
+  childId: Id<"children">,
 ) {
   // Compile-time guard: if a new table is added to CHILD_CASCADE_TABLES,
   // this switch must be updated. The default-case `assertNever` enforces
@@ -179,7 +179,7 @@ async function cascadeChildSimpleTables(
 async function cascadeOneTable(
   ctx: MutationCtx,
   table: ChildCascadeTable,
-  childId: Id<"children">
+  childId: Id<"children">,
 ) {
   switch (table) {
     case "wallets": {

@@ -4,29 +4,31 @@
 
 When a client signs a paid contract, we migrate from this demo stack to the production stack.
 
-| Component | Demo | Production | Migration Effort |
-|-----------|------|------------|------------------|
-| Database | Convex | Supabase | Medium |
-| Auth | Clerk | Clerk | None |
-| Frontend | Next.js | Next.js | Minor changes |
-| AI | OpenRouter | OpenRouter | None |
-| Deployment | Vercel | Vercel | None |
+| Component  | Demo       | Production | Migration Effort |
+| ---------- | ---------- | ---------- | ---------------- |
+| Database   | Convex     | Supabase   | Medium           |
+| Auth       | Clerk      | Clerk      | None             |
+| Frontend   | Next.js    | Next.js    | Minor changes    |
+| AI         | OpenRouter | OpenRouter | None             |
+| Deployment | Vercel     | Vercel     | None             |
 
 ## What Changes
 
 ### 1. Database Schema
 
 **Convex (`convex/schema.ts`):**
+
 ```typescript
 users: defineTable({
   clerkId: v.string(),
   email: v.string(),
   name: v.optional(v.string()),
   createdAt: v.number(),
-}).index("by_clerk_id", ["clerkId"])
+}).index("by_clerk_id", ["clerkId"]);
 ```
 
 **Supabase (SQL):**
+
 ```sql
 CREATE TABLE users (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -41,11 +43,13 @@ CREATE INDEX idx_users_clerk_id ON users(clerk_id);
 ### 2. Queries
 
 **Convex:**
+
 ```typescript
 const user = useQuery(api.functions.users.getByClerkId, { clerkId });
 ```
 
 **Supabase:**
+
 ```typescript
 const { data: user } = await supabase
   .from("users")
@@ -57,12 +61,14 @@ const { data: user } = await supabase
 ### 3. Mutations
 
 **Convex:**
+
 ```typescript
 const createItem = useMutation(api.functions.items.create);
 await createItem({ title: "New Item", userId });
 ```
 
 **Supabase:**
+
 ```typescript
 const { data, error } = await supabase
   .from("items")
@@ -76,16 +82,21 @@ const { data, error } = await supabase
 **Convex:** Built into `useQuery` automatically.
 
 **Supabase:**
+
 ```typescript
 const channel = supabase
   .channel("items")
-  .on("postgres_changes", {
-    event: "*",
-    schema: "public",
-    table: "items"
-  }, (payload) => {
-    // Handle change
-  })
+  .on(
+    "postgres_changes",
+    {
+      event: "*",
+      schema: "public",
+      table: "items",
+    },
+    (payload) => {
+      // Handle change
+    },
+  )
   .subscribe();
 ```
 
@@ -112,6 +123,7 @@ npx convex dashboard
 ## Environment Variables to Change
 
 Remove:
+
 ```env
 CONVEX_DEPLOYMENT=
 NEXT_PUBLIC_CONVEX_URL=
@@ -119,6 +131,7 @@ NEXT_PUBLIC_CONVEX_SITE_URL=
 ```
 
 Add:
+
 ```env
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=

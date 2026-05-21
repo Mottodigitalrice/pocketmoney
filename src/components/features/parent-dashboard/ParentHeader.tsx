@@ -41,9 +41,14 @@ function ParentHeaderInner() {
   return (
     <header className="flex flex-col gap-4 border-b border-amber-800/30 px-4 py-4 sm:px-8 lg:flex-row lg:items-center lg:justify-between">
       <div className="flex flex-wrap items-center gap-3">
-        <Link href="/" className="flex items-center gap-2 text-amber-300/80 transition-colors hover:text-amber-200">
+        <Link
+          href="/"
+          className="flex items-center gap-2 text-amber-300/80 transition-colors hover:text-amber-200"
+        >
           <span className="text-2xl">🏠</span>
-          <span className="hidden text-sm font-medium sm:inline">{t("parent_home")}</span>
+          <span className="hidden text-sm font-medium sm:inline">
+            {t("parent_home")}
+          </span>
         </Link>
         <LanguageToggle />
         <div className="flex items-center gap-3 rounded-full bg-white/10 px-3 py-1.5 text-amber-200/90">
@@ -52,7 +57,9 @@ function ParentHeaderInner() {
               {t("parent_captain_code")}
             </p>
             <p className="text-[11px] text-amber-300/70">
-              {captainCodeEnabled ? t("parent_captain_code_on") : t("parent_captain_code_off")}
+              {captainCodeEnabled
+                ? t("parent_captain_code_on")
+                : t("parent_captain_code_off")}
             </p>
           </div>
           <Switch
@@ -107,9 +114,14 @@ function ParentHeaderInnerWithoutClerk() {
   return (
     <header className="flex flex-col gap-4 border-b border-amber-800/30 px-4 py-4 sm:px-8 lg:flex-row lg:items-center lg:justify-between">
       <div className="flex flex-wrap items-center gap-3">
-        <Link href="/" className="flex items-center gap-2 text-amber-300/80 transition-colors hover:text-amber-200">
+        <Link
+          href="/"
+          className="flex items-center gap-2 text-amber-300/80 transition-colors hover:text-amber-200"
+        >
           <span className="text-2xl">🏠</span>
-          <span className="hidden text-sm font-medium sm:inline">{t("parent_home")}</span>
+          <span className="hidden text-sm font-medium sm:inline">
+            {t("parent_home")}
+          </span>
         </Link>
         <LanguageToggle />
         <div className="flex items-center gap-3 rounded-full bg-white/10 px-3 py-1.5 text-amber-200/90">
@@ -118,7 +130,9 @@ function ParentHeaderInnerWithoutClerk() {
               {t("parent_captain_code")}
             </p>
             <p className="text-[11px] text-amber-300/70">
-              {captainCodeEnabled ? t("parent_captain_code_on") : t("parent_captain_code_off")}
+              {captainCodeEnabled
+                ? t("parent_captain_code_on")
+                : t("parent_captain_code_off")}
             </p>
           </div>
           <Switch

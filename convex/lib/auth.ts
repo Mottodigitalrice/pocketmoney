@@ -31,7 +31,7 @@ type OwnedDoc = { userId: Id<"users"> } & { _id: unknown };
 export function assertOwnedBy<T extends OwnedDoc>(
   doc: T | null,
   userId: Id<"users">,
-  resource: string
+  resource: string,
 ): T {
   if (!doc) {
     throw new Error(`${capitalize(resource)} not found`);
@@ -50,7 +50,7 @@ export function assertOwnedBy<T extends OwnedDoc>(
 export function assertOwnedByOrNull<T extends OwnedDoc>(
   doc: T | null,
   userId: Id<"users">,
-  resource: string
+  resource: string,
 ): T | null {
   if (!doc) return null;
   if (doc.userId !== userId) {
@@ -63,14 +63,28 @@ export function assertOwnedByOrNull<T extends OwnedDoc>(
  * Fetch a doc by id and assert ownership in one call. Throws on missing OR
  * wrong-owner. Convenience wrapper over `ctx.db.get` + `assertOwnedBy`.
  */
-export async function getOwnedById<TableName extends "children" | "jobs" | "scheduledJobs" | "jobInstances" | "wallets" | "goals" | "luckyChests" | "transactions">(
+export async function getOwnedById<
+  TableName extends
+    | "children"
+    | "jobs"
+    | "scheduledJobs"
+    | "jobInstances"
+    | "wallets"
+    | "goals"
+    | "luckyChests"
+    | "transactions",
+>(
   ctx: QueryCtx | MutationCtx,
   id: Id<TableName>,
   userId: Id<"users">,
-  resource: string
+  resource: string,
 ): Promise<Doc<TableName>> {
   const doc = await ctx.db.get(id);
-  return assertOwnedBy(doc as (Doc<TableName> & OwnedDoc) | null, userId, resource) as Doc<TableName>;
+  return assertOwnedBy(
+    doc as (Doc<TableName> & OwnedDoc) | null,
+    userId,
+    resource,
+  ) as Doc<TableName>;
 }
 
 function capitalize(s: string) {

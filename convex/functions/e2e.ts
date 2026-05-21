@@ -45,7 +45,7 @@ function assertDevDeployment() {
   const deployment = process.env.CONVEX_DEPLOYMENT;
   if (!deployment || !deployment.startsWith("dev:")) {
     throw new Error(
-      "E2E helpers disabled: CONVEX_DEPLOYMENT must start with 'dev:'."
+      "E2E helpers disabled: CONVEX_DEPLOYMENT must start with 'dev:'.",
     );
   }
 }
@@ -64,11 +64,11 @@ export const setJobInstanceCompleted = mutation({
     const instance = assertOwnedBy(
       await ctx.db.get(args.instanceId),
       user._id,
-      "job instance"
+      "job instance",
     );
     if (instance.status !== "in_progress") {
       throw new Error(
-        `E2E helper: instance must be in_progress, got '${instance.status}'`
+        `E2E helper: instance must be in_progress, got '${instance.status}'`,
       );
     }
     await ctx.db.patch(args.instanceId, {
@@ -94,9 +94,7 @@ export const seedKidScenario = mutation({
     jobYenAmount: v.number(),
     jobRequiresPhotoProof: v.optional(v.boolean()),
     date: v.string(), // YYYY-MM-DD
-    priority: v.optional(
-      v.union(v.literal("mustDo"), v.literal("optional"))
-    ),
+    priority: v.optional(v.union(v.literal("mustDo"), v.literal("optional"))),
   },
   returns: v.object({
     childId: v.id("children"),

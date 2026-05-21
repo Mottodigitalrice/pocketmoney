@@ -62,7 +62,11 @@ function scheduled(id: string, job: Job): ScheduledJobWithJob {
   };
 }
 
-function instance(id: string, job: Job, status: "in_progress" | "completed"): JobInstanceWithJob {
+function instance(
+  id: string,
+  job: Job,
+  status: "in_progress" | "completed",
+): JobInstanceWithJob {
   return {
     _id: id,
     userId: "u1",
@@ -123,7 +127,9 @@ describe("KanbanBoard", () => {
     // 1 in each of 3 columns = 3 cards total.
     expect(cards).toHaveLength(3);
 
-    const statuses = Array.from(cards).map((c) => c.getAttribute("data-status"));
+    const statuses = Array.from(cards).map((c) =>
+      c.getAttribute("data-status"),
+    );
     expect(statuses).toContain("available");
     expect(statuses).toContain("in_progress");
     expect(statuses).toContain("completed");

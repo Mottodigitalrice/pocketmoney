@@ -35,8 +35,26 @@ const MAX_CHILDREN = 6;
 const MAX_JOBS = 10;
 
 const JOB_ICONS = [
-  "👕", "🧸", "🛏️", "🍽️", "🌱", "👟", "🐾", "📚", "🧹", "🧺",
-  "🏠", "🛋️", "🪥", "🎒", "🛒", "🪟", "♻️", "👨‍🍳", "🧽", "🪣",
+  "👕",
+  "🧸",
+  "🛏️",
+  "🍽️",
+  "🌱",
+  "👟",
+  "🐾",
+  "📚",
+  "🧹",
+  "🧺",
+  "🏠",
+  "🛋️",
+  "🪥",
+  "🎒",
+  "🛒",
+  "🪟",
+  "♻️",
+  "👨‍🍳",
+  "🧽",
+  "🪣",
 ];
 
 // ---------------------------------------------------------------------------
@@ -165,7 +183,10 @@ function ChildFormCard({
   index: number;
   canRemove: boolean;
   takenIcons: Set<string>;
-  onUpdate: (id: string, updates: Partial<Pick<LocalChild, "name" | "icon">>) => void;
+  onUpdate: (
+    id: string,
+    updates: Partial<Pick<LocalChild, "name" | "icon">>,
+  ) => void;
   onRemove: (id: string) => void;
 }) {
   const { t } = useTranslation();
@@ -235,7 +256,7 @@ function StepAddChildren({
   const { t } = useTranslation();
 
   const takenIcons = new Set(
-    localChildren.map((c) => c.icon).filter(Boolean) as string[]
+    localChildren.map((c) => c.icon).filter(Boolean) as string[],
   );
 
   const isValid =
@@ -254,16 +275,16 @@ function StepAddChildren({
     (id: string) => {
       setChildren((prev) => prev.filter((c) => c.id !== id));
     },
-    [setChildren]
+    [setChildren],
   );
 
   const updateChild = useCallback(
     (id: string, updates: Partial<Pick<LocalChild, "name" | "icon">>) => {
       setChildren((prev) =>
-        prev.map((c) => (c.id === id ? { ...c, ...updates } : c))
+        prev.map((c) => (c.id === id ? { ...c, ...updates } : c)),
       );
     },
-    [setChildren]
+    [setChildren],
   );
 
   return (
@@ -351,7 +372,10 @@ function JobFormCard({
 }: {
   job: LocalJob;
   canRemove: boolean;
-  onUpdate: (id: string, updates: Partial<Pick<LocalJob, "title" | "icon" | "yenAmount">>) => void;
+  onUpdate: (
+    id: string,
+    updates: Partial<Pick<LocalJob, "title" | "icon" | "yenAmount">>,
+  ) => void;
   onRemove: (id: string) => void;
 }) {
   const { t } = useTranslation();
@@ -393,7 +417,11 @@ function JobFormCard({
         <input
           type="number"
           value={job.yenAmount}
-          onChange={(e) => onUpdate(job.id, { yenAmount: Math.max(10, Number(e.target.value)) })}
+          onChange={(e) =>
+            onUpdate(job.id, {
+              yenAmount: Math.max(10, Number(e.target.value)),
+            })
+          }
           min={10}
           step={10}
           className="w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-white focus:border-amber-400/50 focus:outline-none focus:ring-2 focus:ring-amber-400/30"
@@ -464,16 +492,19 @@ function StepAddJobs({
     (id: string) => {
       setJobs((prev) => prev.filter((j) => j.id !== id));
     },
-    [setJobs]
+    [setJobs],
   );
 
   const updateJob = useCallback(
-    (id: string, updates: Partial<Pick<LocalJob, "title" | "icon" | "yenAmount">>) => {
+    (
+      id: string,
+      updates: Partial<Pick<LocalJob, "title" | "icon" | "yenAmount">>,
+    ) => {
       setJobs((prev) =>
-        prev.map((j) => (j.id === id ? { ...j, ...updates } : j))
+        prev.map((j) => (j.id === id ? { ...j, ...updates } : j)),
       );
     },
-    [setJobs]
+    [setJobs],
   );
 
   return (
@@ -589,7 +620,9 @@ function StepDone({
         </h3>
         <div className="flex flex-wrap justify-center gap-4">
           {localChildren.map((child) => {
-            const iconConfig = child.icon ? CHILD_ICON_CONFIG[child.icon] : null;
+            const iconConfig = child.icon
+              ? CHILD_ICON_CONFIG[child.icon]
+              : null;
             return (
               <div
                 key={child.id}
@@ -705,7 +738,8 @@ export default function OnboardingPage() {
             {t("onboarding_welcome")}
           </h1>
           <p className="text-white/75">
-            Pirate Money onboarding needs Clerk and Convex environment variables before it can run.
+            Pirate Money onboarding needs Clerk and Convex environment variables
+            before it can run.
           </p>
         </div>
       </div>
@@ -723,7 +757,7 @@ function OnboardingPageInner() {
   // Convex
   const convexUser = useQuery(
     api.functions.users.getCurrent,
-    user?.id ? {} : "skip"
+    user?.id ? {} : "skip",
   );
   const createChild = useMutation(api.functions.children.create);
   const createJob = useMutation(api.functions.jobs.create);
@@ -745,16 +779,13 @@ function OnboardingPageInner() {
   // Step transition with a small fade delay
   const [visible, setVisible] = useState(true);
 
-  const goToStep = useCallback(
-    (next: number) => {
-      setVisible(false);
-      setTimeout(() => {
-        setStep(next);
-        setVisible(true);
-      }, 200);
-    },
-    []
-  );
+  const goToStep = useCallback((next: number) => {
+    setVisible(false);
+    setTimeout(() => {
+      setStep(next);
+      setVisible(true);
+    }, 200);
+  }, []);
 
   // Complete onboarding: save children + jobs, then redirect.
   // H3 — punchlist 3.7: any failure here is mapped through `mapConvexError`
@@ -802,7 +833,16 @@ function OnboardingPageInner() {
       setSaveError(mapped.message);
       setIsSaving(false);
     }
-  }, [convexUser, localChildren, localJobs, createChild, createJob, seedDefaults, router, t]);
+  }, [
+    convexUser,
+    localChildren,
+    localJobs,
+    createChild,
+    createJob,
+    seedDefaults,
+    router,
+    t,
+  ]);
 
   return (
     <div className="flex min-h-screen flex-col items-center px-4 py-8">

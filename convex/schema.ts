@@ -42,11 +42,13 @@ export default defineSchema({
           v.literal("none"),
           v.literal("daily"),
           v.literal("weekdays"),
-          v.literal("specificDays")
+          v.literal("specificDays"),
         ),
         daysOfWeek: v.optional(v.array(v.number())),
-        priority: v.optional(v.union(v.literal("mustDo"), v.literal("optional"))),
-      })
+        priority: v.optional(
+          v.union(v.literal("mustDo"), v.literal("optional")),
+        ),
+      }),
     ),
     // Legacy fields kept optional for migration
     assignedTo: v.optional(v.string()),
@@ -78,7 +80,7 @@ export default defineSchema({
       v.literal("in_progress"),
       v.literal("completed"),
       v.literal("approved"),
-      v.literal("rejected")
+      v.literal("rejected"),
     ),
     startedAt: v.optional(v.number()),
     completedAt: v.optional(v.number()),
@@ -116,7 +118,9 @@ export default defineSchema({
     userId: v.id("users"),
     childId: v.id("children"),
     walletId: v.optional(v.id("wallets")),
-    jar: v.optional(v.union(v.literal("spend"), v.literal("save"), v.literal("give"))),
+    jar: v.optional(
+      v.union(v.literal("spend"), v.literal("save"), v.literal("give")),
+    ),
     amount: v.number(),
     type: v.union(
       v.literal("earning"),
@@ -125,15 +129,15 @@ export default defineSchema({
       v.literal("migration"),
       v.literal("correction"),
       v.literal("bonus"),
-      v.literal("luckyChest")
+      v.literal("luckyChest"),
     ),
     reason: v.optional(
       v.union(
         v.literal("cashOut"),
         v.literal("penalty"),
         v.literal("correction"),
-        v.literal("other")
-      )
+        v.literal("other"),
+      ),
     ),
     note: v.optional(v.string()),
     jobInstanceId: v.optional(v.id("jobInstances")),
@@ -153,7 +157,7 @@ export default defineSchema({
     status: v.union(
       v.literal("active"),
       v.literal("completed"),
-      v.literal("archived")
+      v.literal("archived"),
     ),
     createdAt: v.number(),
     updatedAt: v.number(),

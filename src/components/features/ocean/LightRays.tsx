@@ -5,21 +5,24 @@ import { motion } from "motion/react";
 
 export function LightRays() {
   const [rays] = useState(() =>
-      Array.from({ length: 5 }, (_, i) => ({
-        id: i,
-        left: 15 + i * 18 + Math.random() * 8, // spread across top
-        width: 30 + Math.random() * 50, // 30-80px wide
-        rotation: 15 + Math.random() * 15, // 15-30 degrees
-        duration: 8 + Math.random() * 7, // 8-15s cycle
-        delay: Math.random() * 5,
-        maxOpacity: 0.04 + Math.random() * 0.06, // 0.04-0.10 very subtle
-      }))
+    Array.from({ length: 5 }, (_, i) => ({
+      id: i,
+      left: 15 + i * 18 + Math.random() * 8, // spread across top
+      width: 30 + Math.random() * 50, // 30-80px wide
+      rotation: 15 + Math.random() * 15, // 15-30 degrees
+      duration: 8 + Math.random() * 7, // 8-15s cycle
+      delay: Math.random() * 5,
+      maxOpacity: 0.04 + Math.random() * 0.06, // 0.04-0.10 very subtle
+    })),
   );
 
   if (rays.length === 0) return null;
 
   return (
-    <div className="pointer-events-none absolute inset-0 overflow-hidden" style={{ zIndex: 5 }}>
+    <div
+      className="pointer-events-none absolute inset-0 overflow-hidden"
+      style={{ zIndex: 5 }}
+    >
       {rays.map((ray) => (
         <motion.div
           key={ray.id}

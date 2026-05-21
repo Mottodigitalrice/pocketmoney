@@ -68,7 +68,11 @@ interface RejectNoteDialogProps {
   onSubmit: (note: string) => void;
 }
 
-function RejectNoteDialog({ open, onOpenChange, onSubmit }: RejectNoteDialogProps) {
+function RejectNoteDialog({
+  open,
+  onOpenChange,
+  onSubmit,
+}: RejectNoteDialogProps) {
   const { t } = useTranslation();
   const [note, setNote] = useState("");
   const [showError, setShowError] = useState(false);
@@ -160,7 +164,8 @@ function RejectNoteDialog({ open, onOpenChange, onSubmit }: RejectNoteDialogProp
 }
 
 export function ApprovalQueue() {
-  const { isLoading, getPendingApprovals, approveJob, rejectJob } = usePocketMoney();
+  const { isLoading, getPendingApprovals, approveJob, rejectJob } =
+    usePocketMoney();
   const { t } = useTranslation();
   // S6 (R4) — track which instance is being rejected so the dialog knows
   // which one to attach its note to. null = dialog closed.

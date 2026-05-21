@@ -50,7 +50,7 @@ function formatViolations(violations: AxeViolation[]): string {
         `  - [${v.impact}] ${v.id}: ${v.description}\n    ${v.helpUrl}\n    nodes: ${v.nodes
           .slice(0, 3)
           .map((n) => n.target.join(" "))
-          .join(" | ")}`
+          .join(" | ")}`,
     )
     .join("\n");
 }
@@ -71,7 +71,7 @@ test.describe("F19 a11y scan", () => {
     const blocking = (result.violations as AxeViolation[]).filter(isBlocking);
     expect(
       blocking,
-      `Found ${blocking.length} critical/serious axe violations on /onboarding:\n${formatViolations(blocking)}`
+      `Found ${blocking.length} critical/serious axe violations on /onboarding:\n${formatViolations(blocking)}`,
     ).toHaveLength(0);
   });
 
@@ -90,7 +90,7 @@ test.describe("F19 a11y scan", () => {
     const blocking = (result.violations as AxeViolation[]).filter(isBlocking);
     expect(
       blocking,
-      `Found ${blocking.length} critical/serious axe violations on /parent:\n${formatViolations(blocking)}`
+      `Found ${blocking.length} critical/serious axe violations on /parent:\n${formatViolations(blocking)}`,
     ).toHaveLength(0);
   });
 
@@ -102,7 +102,7 @@ test.describe("F19 a11y scan", () => {
     await page.goto("/parent#planner");
     // Wait for the planner tab to be selected (hash routing flips active tab).
     await expect(
-      page.locator('[role="tab"][aria-selected="true"]')
+      page.locator('[role="tab"][aria-selected="true"]'),
     ).toContainText(/Planner|よてい/, { timeout: 15_000 });
 
     const result = await new AxeBuilder({ page })
@@ -112,7 +112,7 @@ test.describe("F19 a11y scan", () => {
     const blocking = (result.violations as AxeViolation[]).filter(isBlocking);
     expect(
       blocking,
-      `Found ${blocking.length} critical/serious axe violations on /parent#planner:\n${formatViolations(blocking)}`
+      `Found ${blocking.length} critical/serious axe violations on /parent#planner:\n${formatViolations(blocking)}`,
     ).toHaveLength(0);
   });
 
@@ -125,7 +125,7 @@ test.describe("F19 a11y scan", () => {
     // kid-happy-path.spec.ts.
     const today = new Date();
     const todayStr = `${today.getFullYear()}-${String(
-      today.getMonth() + 1
+      today.getMonth() + 1,
     ).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
 
     await page.goto("/parent");
@@ -165,7 +165,7 @@ test.describe("F19 a11y scan", () => {
         });
         if (!res.ok) {
           throw new Error(
-            `seedKidScenario failed: ${res.status} ${await res.text()}`
+            `seedKidScenario failed: ${res.status} ${await res.text()}`,
           );
         }
         const json = (await res.json()) as {
@@ -174,22 +174,24 @@ test.describe("F19 a11y scan", () => {
         };
         return json.value;
       },
-      { date: todayStr, convexUrl: CONVEX_URL }
+      { date: todayStr, convexUrl: CONVEX_URL },
     );
 
     await page.goto(`/kid/${result.childId}`);
-    await expect(
-      page.locator('[data-testid="job-card"]').first()
-    ).toBeVisible({ timeout: 15_000 });
+    await expect(page.locator('[data-testid="job-card"]').first()).toBeVisible({
+      timeout: 15_000,
+    });
 
     const axeResult = await new AxeBuilder({ page })
       .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
       .analyze();
 
-    const blocking = (axeResult.violations as AxeViolation[]).filter(isBlocking);
+    const blocking = (axeResult.violations as AxeViolation[]).filter(
+      isBlocking,
+    );
     expect(
       blocking,
-      `Found ${blocking.length} critical/serious axe violations on /kid/[childId]:\n${formatViolations(blocking)}`
+      `Found ${blocking.length} critical/serious axe violations on /kid/[childId]:\n${formatViolations(blocking)}`,
     ).toHaveLength(0);
   });
 });

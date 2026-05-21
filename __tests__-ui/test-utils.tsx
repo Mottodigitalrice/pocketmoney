@@ -25,7 +25,9 @@ import type { RankProgress } from "@/types";
 // We pull the full context type off the exported Context — that way if the
 // provider's interface evolves, this helper picks up the change without
 // duplicating shape.
-export type FullContext = NonNullable<React.ContextType<typeof PocketMoneyContext>>;
+export type FullContext = NonNullable<
+  React.ContextType<typeof PocketMoneyContext>
+>;
 
 export const DEFAULT_RANK_PROGRESS: RankProgress = {
   rank: "Noob",
@@ -133,7 +135,10 @@ export function renderWithProviders(
     window.localStorage.setItem("pocketmoney-lang", initialLang);
   }
 
-  const mergedContext: FullContext = { ...DEFAULT_CONTEXT_VALUE, ...contextValue };
+  const mergedContext: FullContext = {
+    ...DEFAULT_CONTEXT_VALUE,
+    ...contextValue,
+  };
 
   function Wrapper({ children }: { children: ReactNode }) {
     return (

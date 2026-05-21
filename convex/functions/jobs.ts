@@ -9,7 +9,7 @@ const recurrenceValidator = v.object({
     v.literal("none"),
     v.literal("daily"),
     v.literal("weekdays"),
-    v.literal("specificDays")
+    v.literal("specificDays"),
   ),
   daysOfWeek: v.optional(v.array(v.number())),
   priority: v.optional(v.union(v.literal("mustDo"), v.literal("optional"))),
@@ -112,13 +112,13 @@ export const update = mutation({
     const job = assertOwnedByOrNull(
       await ctx.db.get(args.jobId),
       user._id,
-      "job"
+      "job",
     );
     if (!job) return null;
 
     const { jobId, ...updates } = args;
     const filteredUpdates = Object.fromEntries(
-      Object.entries(updates).filter(([, value]) => value !== undefined)
+      Object.entries(updates).filter(([, value]) => value !== undefined),
     );
     await ctx.db.patch(jobId, filteredUpdates);
     return null;
@@ -134,7 +134,7 @@ export const remove = mutation({
     const job = assertOwnedByOrNull(
       await ctx.db.get(args.jobId),
       user._id,
-      "job"
+      "job",
     );
     if (!job) return null;
 
@@ -178,26 +178,126 @@ export const seedDefaults = mutation({
     if (existingJob) return null;
 
     const defaults = [
-      { title: "Fold the washing", titleKey: "job_fold_washing", yenAmount: 100, icon: "\u{1F455}" },
-      { title: "Clean up toys", titleKey: "job_clean_toys", yenAmount: 50, icon: "\u{1F9F8}" },
-      { title: "Make the bed", titleKey: "job_make_bed", yenAmount: 50, icon: "\u{1F6CF}️" },
-      { title: "Set the table", titleKey: "job_set_table", yenAmount: 100, icon: "\u{1F37D}️" },
-      { title: "Water the plants", titleKey: "job_water_plants", yenAmount: 100, icon: "\u{1F331}" },
-      { title: "Put shoes away", titleKey: "job_put_shoes_away", yenAmount: 50, icon: "\u{1F45F}" },
-      { title: "Feed the pets", titleKey: "job_feed_pets", yenAmount: 150, icon: "\u{1F43E}" },
-      { title: "Put dishes in the sink", titleKey: "job_dishes_sink", yenAmount: 50, icon: "\u{1F37D}️" },
-      { title: "Pick up books", titleKey: "job_pick_books", yenAmount: 50, icon: "\u{1F4DA}" },
-      { title: "Wipe the table", titleKey: "job_wipe_table", yenAmount: 100, icon: "\u{1F9F9}" },
-      { title: "Dirty clothes in basket", titleKey: "job_dirty_clothes", yenAmount: 50, icon: "\u{1F9FA}" },
-      { title: "Tidy your room", titleKey: "job_tidy_room", yenAmount: 200, icon: "\u{1F3E0}" },
-      { title: "Help set up the futon", titleKey: "job_setup_futon", yenAmount: 150, icon: "\u{1F6CB}️" },
-      { title: "Brush teeth (no asking!)", titleKey: "job_brush_teeth", yenAmount: 100, icon: "\u{1FAA5}" },
-      { title: "Pack school bag", titleKey: "job_pack_school_bag", yenAmount: 100, icon: "\u{1F392}" },
-      { title: "Put away groceries", titleKey: "job_put_away_groceries", yenAmount: 200, icon: "\u{1F6D2}" },
-      { title: "Sweep the floor", titleKey: "job_sweep_floor", yenAmount: 200, icon: "\u{1F9F9}" },
-      { title: "Wipe windows", titleKey: "job_wipe_windows", yenAmount: 300, icon: "\u{1FA9F}" },
-      { title: "Sort the recycling", titleKey: "job_sort_recycling", yenAmount: 150, icon: "♻️" },
-      { title: "Help cook dinner", titleKey: "job_help_cook", yenAmount: 500, icon: "\u{1F468}‍\u{1F373}" },
+      {
+        title: "Fold the washing",
+        titleKey: "job_fold_washing",
+        yenAmount: 100,
+        icon: "\u{1F455}",
+      },
+      {
+        title: "Clean up toys",
+        titleKey: "job_clean_toys",
+        yenAmount: 50,
+        icon: "\u{1F9F8}",
+      },
+      {
+        title: "Make the bed",
+        titleKey: "job_make_bed",
+        yenAmount: 50,
+        icon: "\u{1F6CF}️",
+      },
+      {
+        title: "Set the table",
+        titleKey: "job_set_table",
+        yenAmount: 100,
+        icon: "\u{1F37D}️",
+      },
+      {
+        title: "Water the plants",
+        titleKey: "job_water_plants",
+        yenAmount: 100,
+        icon: "\u{1F331}",
+      },
+      {
+        title: "Put shoes away",
+        titleKey: "job_put_shoes_away",
+        yenAmount: 50,
+        icon: "\u{1F45F}",
+      },
+      {
+        title: "Feed the pets",
+        titleKey: "job_feed_pets",
+        yenAmount: 150,
+        icon: "\u{1F43E}",
+      },
+      {
+        title: "Put dishes in the sink",
+        titleKey: "job_dishes_sink",
+        yenAmount: 50,
+        icon: "\u{1F37D}️",
+      },
+      {
+        title: "Pick up books",
+        titleKey: "job_pick_books",
+        yenAmount: 50,
+        icon: "\u{1F4DA}",
+      },
+      {
+        title: "Wipe the table",
+        titleKey: "job_wipe_table",
+        yenAmount: 100,
+        icon: "\u{1F9F9}",
+      },
+      {
+        title: "Dirty clothes in basket",
+        titleKey: "job_dirty_clothes",
+        yenAmount: 50,
+        icon: "\u{1F9FA}",
+      },
+      {
+        title: "Tidy your room",
+        titleKey: "job_tidy_room",
+        yenAmount: 200,
+        icon: "\u{1F3E0}",
+      },
+      {
+        title: "Help set up the futon",
+        titleKey: "job_setup_futon",
+        yenAmount: 150,
+        icon: "\u{1F6CB}️",
+      },
+      {
+        title: "Brush teeth (no asking!)",
+        titleKey: "job_brush_teeth",
+        yenAmount: 100,
+        icon: "\u{1FAA5}",
+      },
+      {
+        title: "Pack school bag",
+        titleKey: "job_pack_school_bag",
+        yenAmount: 100,
+        icon: "\u{1F392}",
+      },
+      {
+        title: "Put away groceries",
+        titleKey: "job_put_away_groceries",
+        yenAmount: 200,
+        icon: "\u{1F6D2}",
+      },
+      {
+        title: "Sweep the floor",
+        titleKey: "job_sweep_floor",
+        yenAmount: 200,
+        icon: "\u{1F9F9}",
+      },
+      {
+        title: "Wipe windows",
+        titleKey: "job_wipe_windows",
+        yenAmount: 300,
+        icon: "\u{1FA9F}",
+      },
+      {
+        title: "Sort the recycling",
+        titleKey: "job_sort_recycling",
+        yenAmount: 150,
+        icon: "♻️",
+      },
+      {
+        title: "Help cook dinner",
+        titleKey: "job_help_cook",
+        yenAmount: 500,
+        icon: "\u{1F468}‍\u{1F373}",
+      },
     ];
 
     const now = Date.now();

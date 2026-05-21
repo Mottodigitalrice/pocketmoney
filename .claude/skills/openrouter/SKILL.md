@@ -6,32 +6,39 @@ description: Use this skill when integrating AI capabilities—model selection, 
 # OpenRouter AI Skill
 
 ## Overview
+
 This project uses OpenRouter for AI capabilities. OpenRouter provides access to 100+ models through one API.
 
 ## Setup
+
 Already configured in `src/lib/openrouter.ts`.
 
 ## Available Models
+
 ```typescript
 const MODELS = {
-  fast: "openai/gpt-4o-mini",        // Quick, cheap
+  fast: "openai/gpt-4o-mini", // Quick, cheap
   smart: "anthropic/claude-3.5-sonnet", // Complex reasoning
-  creative: "anthropic/claude-3-opus",  // Creative writing
-  japanese: "openai/gpt-4o",            // Japanese language
+  creative: "anthropic/claude-3-opus", // Creative writing
+  japanese: "openai/gpt-4o", // Japanese language
 };
 ```
 
 ## Usage
 
 ### Server-Side (API Route)
+
 ```typescript
 import { chat, chatStream } from "@/lib/openrouter";
 
 // Simple completion
-const response = await chat([
-  { role: "system", content: "You are a helpful assistant." },
-  { role: "user", content: "Hello!" }
-], "fast");
+const response = await chat(
+  [
+    { role: "system", content: "You are a helpful assistant." },
+    { role: "user", content: "Hello!" },
+  ],
+  "fast",
+);
 
 // Streaming
 const stream = await chatStream(messages, "smart");
@@ -41,6 +48,7 @@ for await (const chunk of stream) {
 ```
 
 ### Client-Side (via API)
+
 ```typescript
 const response = await fetch("/api/ai", {
   method: "POST",
@@ -57,6 +65,7 @@ console.log(data.content);
 ```
 
 ### Streaming on Client
+
 ```typescript
 const response = await fetch("/api/ai", {
   method: "POST",
@@ -80,16 +89,19 @@ while (true) {
 ```
 
 ## Environment Variables
+
 ```env
 OPENROUTER_API_KEY=sk-or-...
 ```
 
 ## Get API Key
+
 1. Go to https://openrouter.ai/keys
 2. Create new key
 3. Add to `.env.local`
 
 ## Cost Optimization
+
 - Use `fast` model for simple tasks (summarization, classification)
 - Use `smart` model for complex reasoning
 - Use `japanese` model for Japanese language tasks

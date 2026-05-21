@@ -68,7 +68,11 @@ describe("splitEarning — exact rounding cases (default split)", () => {
   });
 
   it("¥10000 → 7000/2000/1000 (clean split)", () => {
-    expect(splitEarning(10_000)).toEqual({ spend: 7_000, save: 2_000, give: 1_000 });
+    expect(splitEarning(10_000)).toEqual({
+      spend: 7_000,
+      save: 2_000,
+      give: 1_000,
+    });
   });
 });
 
@@ -111,19 +115,19 @@ describe("splitEarning — custom splits", () => {
 
   it("throws when split does not sum to 100", () => {
     expect(() => splitEarning(100, { spend: 50, save: 30, give: 10 })).toThrow(
-      /sum to 100/
+      /sum to 100/,
     );
     expect(() => splitEarning(100, { spend: 60, save: 30, give: 20 })).toThrow(
-      /sum to 100/
+      /sum to 100/,
     );
     expect(() => splitEarning(100, { spend: 0, save: 0, give: 0 })).toThrow(
-      /sum to 100/
+      /sum to 100/,
     );
   });
 
   it("throws when any split is negative", () => {
     expect(() => splitEarning(100, { spend: 110, save: -5, give: -5 })).toThrow(
-      /non-negative/
+      /non-negative/,
     );
   });
 

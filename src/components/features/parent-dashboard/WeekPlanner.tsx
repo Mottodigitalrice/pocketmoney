@@ -15,7 +15,11 @@ import {
 } from "lucide-react";
 import { usePocketMoney } from "@/hooks/use-pocket-money";
 import { useTranslation } from "@/hooks/use-translation";
-import { CHILD_ICON_CONFIG, DAYS_OF_WEEK, DAYS_OF_WEEK_JA } from "@/lib/constants";
+import {
+  CHILD_ICON_CONFIG,
+  DAYS_OF_WEEK,
+  DAYS_OF_WEEK_JA,
+} from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 import { BudouXText } from "@/components/shared/BudouXText";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -43,7 +47,10 @@ function WeekPlannerSkeleton() {
         </div>
         <div className="grid gap-2 sm:grid-cols-3">
           {[0, 1, 2].map((i) => (
-            <Skeleton key={i} className="h-11 w-full rounded-xl bg-amber-900/30" />
+            <Skeleton
+              key={i}
+              className="h-11 w-full rounded-xl bg-amber-900/30"
+            />
           ))}
         </div>
       </div>
@@ -132,15 +139,15 @@ export function WeekPlanner({ onNavigateToChildren }: WeekPlannerProps = {}) {
 
   const libraryJobs = useMemo(
     () => jobs.filter((job) => !job.isOneOff),
-    [jobs]
+    [jobs],
   );
 
   const recurringJobs = useMemo(
     () =>
       libraryJobs.filter(
-        (job) => job.recurrence && job.recurrence.type !== "none"
+        (job) => job.recurrence && job.recurrence.type !== "none",
       ),
-    [libraryJobs]
+    [libraryJobs],
   );
 
   const weekDates = useMemo(() => {
@@ -195,12 +202,14 @@ export function WeekPlanner({ onNavigateToChildren }: WeekPlannerProps = {}) {
     setSelectedChildIds((current) =>
       current.includes(childId)
         ? current.filter((id) => id !== childId)
-        : [...current, childId]
+        : [...current, childId],
     );
   };
 
   const isScheduled = (childId: string, date: string, jobId: string) =>
-    getScheduledJobsForChildDate(childId, date).some((entry) => entry.jobId === jobId);
+    getScheduledJobsForChildDate(childId, date).some(
+      (entry) => entry.jobId === jobId,
+    );
 
   const addSelectedJobToDate = (date: string) => {
     if (!selectedJobId || activeChildIds.length === 0) return;
@@ -223,7 +232,7 @@ export function WeekPlanner({ onNavigateToChildren }: WeekPlannerProps = {}) {
     jobId: string,
     childId: string,
     date: string,
-    priority: JobPriority = selectedPriority
+    priority: JobPriority = selectedPriority,
   ) => {
     if (!isScheduled(childId, date, jobId)) {
       scheduleJobBatch([{ jobId, childId, date, priority }]);
@@ -250,13 +259,15 @@ export function WeekPlanner({ onNavigateToChildren }: WeekPlannerProps = {}) {
     if (isSameCell) return;
 
     removeScheduledJob(payload.scheduledJobId);
-    scheduleJobIfMissing(payload.jobId, childId, date, payload.priority ?? "optional");
+    scheduleJobIfMissing(
+      payload.jobId,
+      childId,
+      date,
+      payload.priority ?? "optional",
+    );
   };
 
-  const setDragData = (
-    event: DragEvent<HTMLElement>,
-    payload: DragPayload
-  ) => {
+  const setDragData = (event: DragEvent<HTMLElement>, payload: DragPayload) => {
     event.dataTransfer.setData("application/json", JSON.stringify(payload));
     event.dataTransfer.effectAllowed = "move";
   };
@@ -274,7 +285,7 @@ export function WeekPlanner({ onNavigateToChildren }: WeekPlannerProps = {}) {
             date: targetDate,
             priority: entry.priority ?? "optional",
           }));
-      })
+      }),
     );
 
     if (entries.length > 0) {
@@ -296,7 +307,7 @@ export function WeekPlanner({ onNavigateToChildren }: WeekPlannerProps = {}) {
             childId,
             date,
             priority: entry.priority ?? "optional",
-          }))
+          })),
       );
     });
 
@@ -312,7 +323,7 @@ export function WeekPlanner({ onNavigateToChildren }: WeekPlannerProps = {}) {
       recurringJobs.map((job) => ({
         jobId: job._id,
         childIds: activeChildIds,
-      }))
+      })),
     );
   };
 
@@ -346,8 +357,8 @@ export function WeekPlanner({ onNavigateToChildren }: WeekPlannerProps = {}) {
 
   const weekHasAnyScheduled = familyChildren.some((child) =>
     weekDates.some(
-      (date) => getScheduledJobsForChildDate(child._id, date).length > 0
-    )
+      (date) => getScheduledJobsForChildDate(child._id, date).length > 0,
+    ),
   );
 
   return (
@@ -414,40 +425,43 @@ export function WeekPlanner({ onNavigateToChildren }: WeekPlannerProps = {}) {
                   </p>
                 </div>
               ) : (
-              <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-                {libraryJobs.map((job) => {
-                  const isSelected = selectedJobId === job._id;
-                  return (
-                    <button
-                      key={job._id}
-                      type="button"
-                      draggable
-                      onDragStart={(event) =>
-                        setDragData(event, { type: "library-job", jobId: job._id })
-                      }
-                      onClick={() => setSelectedJobId(job._id)}
-                      // F20: min-h-11 floor — library-job picker is the
-                      // entry point for "schedule this job" on mobile.
-                      className={`flex min-h-11 min-w-0 items-center gap-2 rounded-xl border px-3 py-2 text-left text-sm transition-all ${
-                        isSelected
-                          ? "border-amber-400 bg-amber-600/30 text-amber-50 ring-1 ring-amber-400"
-                          : "border-amber-700/20 bg-amber-900/30 text-amber-200 hover:bg-amber-800/40"
-                      }`}
-                    >
-                      <span className="shrink-0 text-xl">{job.icon}</span>
-                      <span className="min-w-0 flex-1 truncate font-semibold">
-                        {getJobTitle(job)}
-                        {getRecurrenceLabel(job) && (
-                          <span className="mt-1 block truncate text-[10px] font-bold uppercase text-amber-200/70">
-                            {getRecurrenceLabel(job)}
-                          </span>
-                        )}
-                      </span>
-                      {isSelected && <Check className="h-4 w-4 shrink-0" />}
-                    </button>
-                  );
-                })}
-              </div>
+                <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                  {libraryJobs.map((job) => {
+                    const isSelected = selectedJobId === job._id;
+                    return (
+                      <button
+                        key={job._id}
+                        type="button"
+                        draggable
+                        onDragStart={(event) =>
+                          setDragData(event, {
+                            type: "library-job",
+                            jobId: job._id,
+                          })
+                        }
+                        onClick={() => setSelectedJobId(job._id)}
+                        // F20: min-h-11 floor — library-job picker is the
+                        // entry point for "schedule this job" on mobile.
+                        className={`flex min-h-11 min-w-0 items-center gap-2 rounded-xl border px-3 py-2 text-left text-sm transition-all ${
+                          isSelected
+                            ? "border-amber-400 bg-amber-600/30 text-amber-50 ring-1 ring-amber-400"
+                            : "border-amber-700/20 bg-amber-900/30 text-amber-200 hover:bg-amber-800/40"
+                        }`}
+                      >
+                        <span className="shrink-0 text-xl">{job.icon}</span>
+                        <span className="min-w-0 flex-1 truncate font-semibold">
+                          {getJobTitle(job)}
+                          {getRecurrenceLabel(job) && (
+                            <span className="mt-1 block truncate text-[10px] font-bold uppercase text-amber-200/70">
+                              {getRecurrenceLabel(job)}
+                            </span>
+                          )}
+                        </span>
+                        {isSelected && <Check className="h-4 w-4 shrink-0" />}
+                      </button>
+                    );
+                  })}
+                </div>
               )}
             </div>
 
@@ -574,7 +588,7 @@ export function WeekPlanner({ onNavigateToChildren }: WeekPlannerProps = {}) {
                     <p className="text-xs text-amber-300/70">
                       {new Date(`${date}T00:00:00`).toLocaleDateString(
                         locale === "ja" ? "ja-JP" : "en-US",
-                        { month: "short", day: "numeric" }
+                        { month: "short", day: "numeric" },
                       )}
                     </p>
                   </div>
@@ -607,13 +621,18 @@ export function WeekPlanner({ onNavigateToChildren }: WeekPlannerProps = {}) {
             return (
               <div key={child._id} className="contents">
                 <div className="sticky left-0 z-10 flex min-h-[116px] items-start gap-2 border-b border-r border-amber-700/20 bg-amber-950/95 p-3">
-                  <span className="shrink-0 text-xl">{iconConfig?.emoji ?? "👤"}</span>
+                  <span className="shrink-0 text-xl">
+                    {iconConfig?.emoji ?? "👤"}
+                  </span>
                   <span className="min-w-0 break-words text-sm font-bold text-amber-100">
                     {child.name}
                   </span>
                 </div>
                 {weekDates.map((date) => {
-                  const scheduled = getScheduledJobsForChildDate(child._id, date);
+                  const scheduled = getScheduledJobsForChildDate(
+                    child._id,
+                    date,
+                  );
                   return (
                     <div
                       key={`${child._id}-${date}`}
@@ -631,7 +650,7 @@ export function WeekPlanner({ onNavigateToChildren }: WeekPlannerProps = {}) {
                         handleDrop(
                           child._id,
                           date,
-                          event.dataTransfer.getData("application/json")
+                          event.dataTransfer.getData("application/json"),
                         );
                       }}
                       className={`min-h-[116px] border-b border-r border-amber-700/20 p-2 transition-colors ${
@@ -662,7 +681,9 @@ export function WeekPlanner({ onNavigateToChildren }: WeekPlannerProps = {}) {
                               }
                               className="group flex min-w-0 items-start gap-2 rounded-lg bg-amber-800/35 px-2 py-2 text-xs text-amber-100"
                             >
-                              <span className="shrink-0 text-base">{entry.job.icon}</span>
+                              <span className="shrink-0 text-base">
+                                {entry.job.icon}
+                              </span>
                               <span className="min-w-0 flex-1 break-words font-semibold">
                                 {entry.job.titleKey
                                   ? t(entry.job.titleKey as TranslationKey)

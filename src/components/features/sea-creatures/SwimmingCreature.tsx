@@ -12,7 +12,10 @@ import { Mosasaurus } from "./Mosasaurus";
 import { Starfish } from "./Starfish";
 import { SnappingTurtle } from "./SnappingTurtle";
 
-const CREATURE_COMPONENTS: Record<CreatureType, React.FC<{ className?: string }>> = {
+const CREATURE_COMPONENTS: Record<
+  CreatureType,
+  React.FC<{ className?: string }>
+> = {
   "sea-turtle": SeaTurtle,
   shark: Shark,
   "manta-ray": MantaRay,
@@ -25,16 +28,23 @@ const CREATURE_COMPONENTS: Record<CreatureType, React.FC<{ className?: string }>
 
 // Per-creature click reaction animation configs
 type Easing = "easeIn" | "easeOut" | "easeInOut" | "linear";
-const CLICK_ANIMATIONS: Record<CreatureType, {
-  keyframes: Record<string, number[]>;
-  transition: { duration: number; ease?: Easing };
-}> = {
+const CLICK_ANIMATIONS: Record<
+  CreatureType,
+  {
+    keyframes: Record<string, number[]>;
+    transition: { duration: number; ease?: Easing };
+  }
+> = {
   shark: {
     keyframes: { x: [0, 30, -5, 0], scale: [1, 1.15, 1, 1] },
     transition: { duration: 0.5, ease: "easeOut" },
   },
   dolphin: {
-    keyframes: { y: [0, -80, -70, 0], rotate: [0, -15, 360, 0], scale: [1, 1.1, 1.1, 1] },
+    keyframes: {
+      y: [0, -80, -70, 0],
+      rotate: [0, -15, 360, 0],
+      scale: [1, 1.1, 1.1, 1],
+    },
     transition: { duration: 0.8, ease: "easeInOut" },
   },
   "sea-turtle": {
@@ -46,7 +56,11 @@ const CLICK_ANIMATIONS: Record<CreatureType, {
     transition: { duration: 0.8, ease: "easeInOut" },
   },
   "whale-shark": {
-    keyframes: { scaleY: [1, 1.2, 1], scaleX: [1, 0.95, 1], rotate: [0, 3, -2, 0] },
+    keyframes: {
+      scaleY: [1, 1.2, 1],
+      scaleX: [1, 0.95, 1],
+      rotate: [0, 3, -2, 0],
+    },
     transition: { duration: 0.9, ease: "easeInOut" },
   },
   mosasaurus: {
@@ -74,13 +88,21 @@ interface SwimmingCreatureProps {
 }
 
 // Bubble burst particle component
-function BubbleBurst({ x, y, onDone }: { x: number; y: number; onDone: () => void }) {
+function BubbleBurst({
+  x,
+  y,
+  onDone,
+}: {
+  x: number;
+  y: number;
+  onDone: () => void;
+}) {
   const [particles] = useState(() =>
-      Array.from({ length: 5 }, () => ({
+    Array.from({ length: 5 }, () => ({
       dx: (Math.random() - 0.5) * 40,
       dy: (Math.random() - 0.5) * 40,
       size: 4 + Math.random() * 6,
-    }))
+    })),
   );
 
   return (
@@ -92,12 +114,18 @@ function BubbleBurst({ x, y, onDone }: { x: number; y: number; onDone: () => voi
           style={{
             width: p.size,
             height: p.size,
-            background: "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.8), rgba(173,216,230,0.3))",
+            background:
+              "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.8), rgba(173,216,230,0.3))",
             left: -p.size / 2,
             top: -p.size / 2,
           }}
           initial={{ scale: 0, x: 0, y: 0, opacity: 0.8 }}
-          animate={{ scale: [0, 1.2, 0], x: p.dx, y: p.dy, opacity: [0.8, 0.6, 0] }}
+          animate={{
+            scale: [0, 1.2, 0],
+            x: p.dx,
+            y: p.dy,
+            opacity: [0.8, 0.6, 0],
+          }}
           transition={{ duration: 0.5, ease: "easeOut" }}
           {...(i === 0 ? { onAnimationComplete: onDone } : {})}
         />
@@ -118,7 +146,7 @@ export function SwimmingCreature({
   const [isReacting, setIsReacting] = useState(false);
   const [burst, setBurst] = useState<{ x: number; y: number } | null>(null);
   const [viewportWidth, setViewportWidth] = useState(() =>
-    typeof window === "undefined" ? 1200 : window.innerWidth
+    typeof window === "undefined" ? 1200 : window.innerWidth,
   );
   const reactionControls = useAnimationControls();
   const CreatureComponent = CREATURE_COMPONENTS[type];
@@ -148,7 +176,7 @@ export function SwimmingCreature({
       }
       setIsReacting(false);
     },
-    [isReacting, type, reactionControls]
+    [isReacting, type, reactionControls],
   );
 
   const isRight = direction === "right";

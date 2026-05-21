@@ -25,7 +25,11 @@
  *   - If all three deltas are zero, the migration is a no-op for that child.
  */
 
-import { splitEarning as splitEarningPure, type JarSplit, DEFAULT_SPLIT } from "./walletMath";
+import {
+  splitEarning as splitEarningPure,
+  type JarSplit,
+  DEFAULT_SPLIT,
+} from "./walletMath";
 
 export { splitEarningPure as splitEarning, DEFAULT_SPLIT };
 export type { JarSplit };
@@ -54,7 +58,7 @@ export interface MigrationDiffResult {
  */
 export function computeMigrationDelta(
   input: MigrationDiffInput,
-  split: JarSplit = DEFAULT_SPLIT
+  split: JarSplit = DEFAULT_SPLIT,
 ): MigrationDiffResult {
   const expected = splitEarningPure(input.lifetimeEarnings, split);
   const actual: JarSplit = {

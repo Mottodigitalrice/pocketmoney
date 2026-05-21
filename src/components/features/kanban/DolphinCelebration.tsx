@@ -19,14 +19,18 @@ interface Coin {
   duration: number;
 }
 
-export function DolphinCelebration({ yenAmount, childId, onClose }: DolphinCelebrationProps) {
+export function DolphinCelebration({
+  yenAmount,
+  childId,
+  onClose,
+}: DolphinCelebrationProps) {
   const [coins] = useState<Coin[]>(() =>
     Array.from({ length: 20 }, (_, i) => ({
       id: i,
       left: 10 + Math.random() * 80,
       delay: Math.random() * 1,
       duration: 1.5 + Math.random() * 1.5,
-    }))
+    })),
   );
   const [showText, setShowText] = useState(false);
   const { t } = useTranslation();
@@ -78,14 +82,19 @@ export function DolphinCelebration({ yenAmount, childId, onClose }: DolphinCeleb
       ))}
 
       {/* Jumping creature */}
-      <div className="animate-dolphin-jump absolute" aria-hidden="true" style={{ bottom: "30%" }}>
-        <span className="text-8xl">
-          {iconConfig?.emoji ?? "🐟"}
-        </span>
+      <div
+        className="animate-dolphin-jump absolute"
+        aria-hidden="true"
+        style={{ bottom: "30%" }}
+      >
+        <span className="text-8xl">{iconConfig?.emoji ?? "🐟"}</span>
       </div>
 
       {/* Splash effect */}
-      <div className="absolute animate-splash" style={{ bottom: "25%", left: "50%", transform: "translateX(-50%)" }}>
+      <div
+        className="absolute animate-splash"
+        style={{ bottom: "25%", left: "50%", transform: "translateX(-50%)" }}
+      >
         <div className="h-16 w-16 rounded-full bg-blue-300/60" />
       </div>
 
@@ -96,7 +105,8 @@ export function DolphinCelebration({ yenAmount, childId, onClose }: DolphinCeleb
             {t("celebration_great_job")}
           </p>
           <p className="mt-4 text-4xl font-bold text-amber-300 drop-shadow sm:text-5xl">
-            {CURRENCY}{yenAmount}
+            {CURRENCY}
+            {yenAmount}
           </p>
           <p className="mt-2 text-lg text-white/80">
             {t("celebration_waiting")}

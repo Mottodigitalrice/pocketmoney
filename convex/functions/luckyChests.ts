@@ -23,21 +23,21 @@ async function getMustDoProgress(
     userId: Id<"users">;
     childId: Id<"children">;
     weekDates: string[];
-  }
+  },
 ) {
   const scheduled = [];
   for (const date of args.weekDates) {
     const entries = await ctx.db
       .query("scheduledJobs")
       .withIndex("by_child_date", (q) =>
-        q.eq("childId", args.childId).eq("date", date)
+        q.eq("childId", args.childId).eq("date", date),
       )
       .collect();
     scheduled.push(...entries);
   }
 
   const mustDo = scheduled.filter(
-    (entry) => entry.userId === args.userId && entry.priority === "mustDo"
+    (entry) => entry.userId === args.userId && entry.priority === "mustDo",
   );
   let approved = 0;
 
@@ -49,7 +49,7 @@ async function getMustDoProgress(
     if (
       instances.some(
         (instance) =>
-          instance.userId === args.userId && instance.status === "approved"
+          instance.userId === args.userId && instance.status === "approved",
       )
     ) {
       approved += 1;
@@ -66,12 +66,12 @@ async function getMustDoProgress(
 async function getOpenedChest(
   ctx: QueryCtx | MutationCtx,
   childId: Id<"children">,
-  weekStart: string
+  weekStart: string,
 ) {
   return await ctx.db
     .query("luckyChests")
     .withIndex("by_child_week", (q) =>
-      q.eq("childId", childId).eq("weekStart", weekStart)
+      q.eq("childId", childId).eq("weekStart", weekStart),
     )
     .unique();
 }
@@ -90,7 +90,7 @@ export const getStatusForFamily = query({
       maxAmount: v.number(),
       mustDoTotal: v.number(),
       mustDoApproved: v.number(),
-    })
+    }),
   ),
   handler: async (ctx, args) => {
     if (args.weekDates.length !== 7) {
@@ -126,7 +126,7 @@ export const getStatusForFamily = query({
           mustDoTotal: progress.total,
           mustDoApproved: progress.approved,
         };
-      })
+      }),
     );
   },
 });

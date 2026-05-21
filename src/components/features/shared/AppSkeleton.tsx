@@ -21,7 +21,11 @@ import { useTranslation } from "@/hooks/use-translation";
  * the `convexUser === undefined` provisioning race reads as intentional
  * loading copy rather than a blank shell.
  */
-export function AppSkeleton({ variant = "home" }: { variant?: "home" | "kid" | "parent" }) {
+export function AppSkeleton({
+  variant = "home",
+}: {
+  variant?: "home" | "kid" | "parent";
+}) {
   return (
     <div
       role="status"
@@ -93,7 +97,10 @@ function KidSkeletonBody() {
       <div className="px-4 sm:px-8">
         <div className="grid gap-4 md:grid-cols-3">
           {[0, 1, 2].map((col) => (
-            <div key={col} className="space-y-3 rounded-2xl border border-amber-900/30 p-3">
+            <div
+              key={col}
+              className="space-y-3 rounded-2xl border border-amber-900/30 p-3"
+            >
               <Skeleton className="h-6 w-24 rounded bg-amber-900/40" />
               <Skeleton className="h-20 w-full rounded-xl bg-amber-900/30" />
               <Skeleton className="h-20 w-full rounded-xl bg-amber-900/30" />
@@ -118,7 +125,10 @@ function ParentSkeletonBody() {
       {/* Tab bar */}
       <div className="mx-4 flex gap-2 overflow-x-auto sm:mx-8">
         {[0, 1, 2, 3, 4].map((i) => (
-          <Skeleton key={i} className="h-10 w-24 shrink-0 rounded-xl bg-amber-900/40" />
+          <Skeleton
+            key={i}
+            className="h-10 w-24 shrink-0 rounded-xl bg-amber-900/40"
+          />
         ))}
       </div>
 

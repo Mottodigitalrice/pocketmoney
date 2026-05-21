@@ -43,7 +43,9 @@ describe("GoalWishlist", () => {
       },
     );
     // F11 empty state — title + hint copy.
-    expect(container).toHaveTextContent(/no goal yet|set your first goal|goal/i);
+    expect(container).toHaveTextContent(
+      /no goal yet|set your first goal|goal/i,
+    );
     // No emoji-tile + name should render for a non-existent goal.
     expect(container.querySelector("h3")).toBeNull();
   });
@@ -101,7 +103,9 @@ describe("GoalWishlist", () => {
     // "Ready!" copy replaces "¥X to go" once funded.
     expect(container).toHaveTextContent(/ready/i);
     // No big-dream hint when fully funded.
-    expect(container.querySelector("[data-testid='goal-big-dream-hint']")).toBeNull();
+    expect(
+      container.querySelector("[data-testid='goal-big-dream-hint']"),
+    ).toBeNull();
   });
 
   it("renders the skeleton variant while context is hydrating", () => {

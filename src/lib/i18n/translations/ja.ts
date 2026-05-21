@@ -93,11 +93,14 @@ const ja = {
   approval_reject_note_prompt: "もう一回やる前に、何を直してほしいですか?",
   // S6 (R4) — F10 5.17: styled reject-note dialog replaces window.prompt.
   approval_reject_dialog_title: "もう一回やってもらおう",
-  approval_reject_dialog_subtitle: "何を直してほしいか、やさしくつたえてあげてください。",
-  approval_reject_dialog_placeholder: "例: ベッドのまくらの下にまだくつしたがあるよ!",
+  approval_reject_dialog_subtitle:
+    "何を直してほしいか、やさしくつたえてあげてください。",
+  approval_reject_dialog_placeholder:
+    "例: ベッドのまくらの下にまだくつしたがあるよ!",
   approval_reject_dialog_cancel: "キャンセル",
   approval_reject_dialog_submit: "もどす",
-  approval_reject_dialog_empty_error: "もどす前に、すこしメモを入れてくださいね。",
+  approval_reject_dialog_empty_error:
+    "もどす前に、すこしメモを入れてくださいね。",
   approval_photo_proof: "写真のしょうこ",
   approval_photo_proof_alt: "お仕事完了の写真",
   // F20 — tap-to-enlarge + close labels for the proof preview modal.
@@ -118,7 +121,8 @@ const ja = {
   job_manager_choose_child: "だれに",
   job_manager_photo_proof: "写真のしょうこが必要",
   // S2 (R4) — F10 5.10: disabled-state aria-label when no kids exist.
-  job_manager_quick_assign_no_kids_aria: "先にクルーを追加してから、おしごとをわりあててね",
+  job_manager_quick_assign_no_kids_aria:
+    "先にクルーを追加してから、おしごとをわりあててね",
 
   // Job form
   job_form_edit_title: "お仕事を編集",
@@ -129,7 +133,8 @@ const ja = {
   job_form_yen_label: "金額 (¥)",
   job_form_recurrence_label: "くりかえし",
   job_form_photo_proof_label: "写真のしょうこを必要にする",
-  job_form_photo_proof_hint: "子どもは承認待ちにする前に写真をアップロードします。",
+  job_form_photo_proof_hint:
+    "子どもは承認待ちにする前に写真をアップロードします。",
   job_form_cancel: "キャンセル",
   job_form_save: "保存",
   job_form_add: "追加",
@@ -186,12 +191,14 @@ const ja = {
 
   // Quick add today
   quick_add_title: "今日すぐ追加",
-  quick_add_subtitle: "おしごとをタップして、だれにするかえらぶだけ。すぐ今日のリストに追加できます。",
+  quick_add_subtitle:
+    "おしごとをタップして、だれにするかえらぶだけ。すぐ今日のリストに追加できます。",
   quick_add_empty_jobs: "まずおしごとライブラリにおしごとを追加してね。",
   quick_add_empty_children: "まずクルーを追加してからおしごとをわりあててね。",
   quick_add_choose_who: "だれにする?",
   quick_add_preapprove: "すぐ承認しておこづかいにする",
-  quick_add_preapprove_hint: "子どものリストと承認待ちをスキップして、すぐにたからものへ追加します。",
+  quick_add_preapprove_hint:
+    "子どものリストと承認待ちをスキップして、すぐにたからものへ追加します。",
   quick_add_confirm: "追加する",
   quick_add_assigning: "追加中...",
 
@@ -253,7 +260,8 @@ const ja = {
   bonus_amount: "金額",
   bonus_note: "理由",
   bonus_note_placeholder: "何をよくできた?",
-  bonus_split_hint: "ボーナスは、つかう / ためる / あげるに 70 / 20 / 10 で分けます。",
+  bonus_split_hint:
+    "ボーナスは、つかう / ためる / あげるに 70 / 20 / 10 で分けます。",
   bonus_submit: "ボーナスをあげる",
   bonus_saving: "追加中...",
   bonus_error_amount: "¥0より大きい金額を入れてください。",
@@ -265,15 +273,18 @@ const ja = {
   lucky_chest_sleeping_title: "こんしゅうはたからばこ おやすみ",
   // F18 — Replace katakana loanword "マストドゥ" with native "ぜったいのおしごと"
   // (matches kanban/planner vocab). Kid audience can't parse mastodu.
-  lucky_chest_sleeping_hint: "ぜったいのおしごとがついかされると、つぎのしゅうおきるよ!",
+  lucky_chest_sleeping_hint:
+    "ぜったいのおしごとがついかされると、つぎのしゅうおきるよ!",
   // F18: 「承認済み」is 小5–6 kanji + keigo register — replace with kid-readable
   // 「OKがでた」which matches the approval button vocabulary the kid already sees.
-  lucky_chest_locked: "こんしゅうのぜったいおしごと {{total}}このうち{{done}}こ OKがでたよ。",
+  lucky_chest_locked:
+    "こんしゅうのぜったいおしごと {{total}}このうち{{done}}こ OKがでたよ。",
   // F18 — Soften gambling-adjacent language: 当たる ("win/hit") → もらえる ("receive")
   // reframes the chest as a reward for finishing the week's must-do work, not a
   // lottery roll. Matches the EN "Open it for up to ¥X" phrasing.
   lucky_chest_unlocked: "あいたよ! さいだい¥{{amount}}までもらえるよ。",
-  lucky_chest_opened: "こんしゅうのほうび: ¥{{amount}}をたからものに ついかしたよ。",
+  lucky_chest_opened:
+    "こんしゅうのほうび: ¥{{amount}}をたからものに ついかしたよ。",
   lucky_chest_open: "あける",
   lucky_chest_opening: "あけている...",
   // F18: keigo-leaning でした → plain よ-ending for kid surface.
@@ -282,11 +293,13 @@ const ja = {
   // F18 — Reframe as "weekly reward" (ぼうけんのほうび) rather than chance-based.
   // Lewis's PRD principle #2: no fear, no gambling vibes — chest is a thank-you
   // for finishing the must-do work, not a roll of the dice.
-  lucky_chest_parent_subtitle: "今週のぜったいおしごとが全部おわると、しゅう1回ほうびのチェストをひらけます。",
+  lucky_chest_parent_subtitle:
+    "今週のぜったいおしごとが全部おわると、しゅう1回ほうびのチェストをひらけます。",
   lucky_chest_max_label: "最高 ¥",
   lucky_chest_save: "保存",
   // S2 (R4) — F10 5.19: surface the Monday-roll schedule + amount range.
-  lucky_chest_schedule_explainer: "毎週月曜日、ぜったいおしごとを全部おえたクルーは ¥10〜¥{{max}} のあいだでチェストをひらきます。",
+  lucky_chest_schedule_explainer:
+    "毎週月曜日、ぜったいおしごとを全部おえたクルーは ¥10〜¥{{max}} のあいだでチェストをひらきます。",
 
   // Goals
   goal_title: "ためるゴール",
@@ -305,8 +318,10 @@ const ja = {
   goal_error_title: "まずゴールの名前を入れてね。",
   goal_error_amount: "¥0より大きいゴール金額を入れてね。",
   goal_error_generic: "ゴールを保存できませんでした。",
-  goal_swap_reassurance: "¥{{amount}}はなくならないよ。これからは{{name}}のためにたまるよ。",
-  goal_big_dream_hint: "おおきなゆめだね! まいしゅう ためていくと、もっとちかづくよ!",
+  goal_swap_reassurance:
+    "¥{{amount}}はなくならないよ。これからは{{name}}のためにたまるよ。",
+  goal_big_dream_hint:
+    "おおきなゆめだね! まいしゅう ためていくと、もっとちかづくよ!",
 
   // Ranks
   rank_board_title: "クルーランク",
@@ -351,10 +366,12 @@ const ja = {
 
   // Onboarding
   onboarding_welcome: "Pirate Moneyへようこそ!",
-  onboarding_welcome_subtitle: "船長さん、こんにちは! たからものいっぱいの冒険に出かけよう! クルーをあつめて、円をかせごう!",
+  onboarding_welcome_subtitle:
+    "船長さん、こんにちは! たからものいっぱいの冒険に出かけよう! クルーをあつめて、円をかせごう!",
   onboarding_get_started: "はじめよう",
   onboarding_add_crew: "クルーはだれ?",
-  onboarding_add_crew_subtitle: "おこさまを追加してください。最大6人まで追加できます。",
+  onboarding_add_crew_subtitle:
+    "おこさまを追加してください。最大6人まで追加できます。",
   onboarding_child_name: "クルーの名前",
   onboarding_choose_icon: "うみの生き物をえらぼう",
   onboarding_add_another: "+ クルーを追加",
@@ -371,29 +388,36 @@ const ja = {
 
   // Onboarding - Jobs step
   onboarding_add_jobs: "おしごとをつくろう",
-  onboarding_add_jobs_subtitle: "クルーがたからものをかせぐおしごとは? 自分で追加してもいいし、スキップすれば最初から20個のおしごとを用意します。",
+  onboarding_add_jobs_subtitle:
+    "クルーがたからものをかせぐおしごとは? 自分で追加してもいいし、スキップすれば最初から20個のおしごとを用意します。",
   onboarding_job_name: "おしごとの名前",
   onboarding_job_name_placeholder: "れい: おもちゃをかたづける",
   onboarding_job_yen: "金額 (¥)",
   onboarding_add_job: "+ おしごとを追加",
   onboarding_remove_job: "はずす",
   // H3 — skip-jobs path: empty custom list is fine, defaults always seed.
-  onboarding_use_defaults_only: "スキップすると、20個の最初のおしごとを用意します",
+  onboarding_use_defaults_only:
+    "スキップすると、20個の最初のおしごとを用意します",
 
   // H3 — onboarding save error UX
-  onboarding_save_failed_title: "嵐にあいました — クルーをほぞんできませんでした",
+  onboarding_save_failed_title:
+    "嵐にあいました — クルーをほぞんできませんでした",
   onboarding_save_retry: "もう一度ためす",
 
   // S1 (R4) — Onboarding copy refinements (F10 3.1 / 3.3 / 3.4 / 3.5 / 3.8)
-  onboarding_child_name_hint: "ここで決めた名前が、お子さまのダッシュボードに表示されます。",
+  onboarding_child_name_hint:
+    "ここで決めた名前が、お子さまのダッシュボードに表示されます。",
   onboarding_job_yen_tip: "ヒント: ちいさいクルーは ¥50〜¥300 がめやすです。",
   onboarding_add_sibling: "+ きょうだいを追加",
-  onboarding_sibling_unlock_hint: "2人以上ふやすと、きょうだいランキングがひらきます。",
-  auth_env_missing_subtitle: "アカウントの読み込みでつまずいています。少しまってからもう一度ためすか、船長に設定を確認してもらってください。",
+  onboarding_sibling_unlock_hint:
+    "2人以上ふやすと、きょうだいランキングがひらきます。",
+  auth_env_missing_subtitle:
+    "アカウントの読み込みでつまずいています。少しまってからもう一度ためすか、船長に設定を確認してもらってください。",
 
   // S3 (R4) — Kid dashboard polish (F10 6.3 / 6.5)
   kanban_empty_today_action: "🦜 もっとやりたいときは、おとなにつたえよう!",
-  weekly_tracker_zero_hint: "おしごとをやって、たからばこを いっぱいにしよう! 🪙",
+  weekly_tracker_zero_hint:
+    "おしごとをやって、たからばこを いっぱいにしよう! 🪙",
 
   // S5 (R4) — GoalWishlist collapse toggle (F10 6.6).
   goal_new_toggle_open: "+ ほかのもほしい!",
@@ -441,51 +465,65 @@ const ja = {
   job_library_empty_title: "おしごとライブラリはまだからっぽです",
   // F18 (resolves F11 CMO-review): 「見えません」reads as a flat negative; reframe as
   // a positive sequencing message — child can start once the library has content.
-  job_library_empty_hint: "「+ 新しいお仕事」をタップして最初のおしごとを追加すると、子どものリストに出てきます。",
+  job_library_empty_hint:
+    "「+ 新しいお仕事」をタップして最初のおしごとを追加すると、子どものリストに出てきます。",
   job_library_empty_cta: "+ 最初のおしごとを追加",
   // F18 (resolves F11 CMO-review): parent surface — keep the celebratory tone but
   // pair it with parent-actionable framing rather than 「みんなえらい」kid-voice alone.
   approvals_empty_title: "全部おわっています! 船長、おつかれさま。",
-  approvals_empty_hint: "子どもがおしごとをおわらせると、ここにしょうにん待ちで出てきます。",
+  approvals_empty_hint:
+    "子どもがおしごとをおわらせると、ここにしょうにん待ちで出てきます。",
   quick_add_empty_title: "今日のクイック追加はありません",
-  quick_add_empty_hint: "上のおしごとをタップして今日に追加するか、よていタブで一週間ぶんを計画してください。",
+  quick_add_empty_hint:
+    "上のおしごとをタップして今日に追加するか、よていタブで一週間ぶんを計画してください。",
   quick_add_empty_jobs_title: "おしごとライブラリはまだからっぽです",
   child_manager_no_kids: "まだクルーがいません",
   child_manager_no_kids_hint: "最初のおこさまを追加して、冒険をはじめよう。",
   planner_empty_title: "計画するクルーがいません",
-  planner_empty_hint: "クルータブで子どもを1人以上追加してから、ここに戻ってきてください。",
+  planner_empty_hint:
+    "クルータブで子どもを1人以上追加してから、ここに戻ってきてください。",
   planner_no_jobs_title: "おしごとライブラリがからっぽ",
   // F18 (resolves F11 CMO-review): drop the「チョア」loanword — おしごと is the
   // canonical app term and matches every other planner/kanban string.
-  planner_no_jobs_hint: "おしごとタブでおしごとを追加すると、ここにドラッグできるようになります。",
-  planner_week_empty_banner: "今週のよていはまだありません — おしごとを曜日にドラッグするか、「月曜をテンプレートにする」をタップしてください。",
+  planner_no_jobs_hint:
+    "おしごとタブでおしごとを追加すると、ここにドラッグできるようになります。",
+  planner_week_empty_banner:
+    "今週のよていはまだありません — おしごとを曜日にドラッグするか、「月曜をテンプレートにする」をタップしてください。",
 
   // F11 — Empty states (kid dashboard) — kid-readable hiragana
   kanban_empty_today_title: "きょうのおしごとなし!",
-  kanban_empty_today_hint: "あしたまたみてみよう。もっとやりたいときは船長にきいてね。",
+  kanban_empty_today_hint:
+    "あしたまたみてみよう。もっとやりたいときは船長にきいてね。",
   goals_empty_title: "ゴールはまだないよ",
   goals_empty_hint: "なにかほしいものをえらんでね!",
   history_empty_title: "たからものれきしはまだからっぽ",
-  history_empty_hint: "おしごとをひとつおわらせるとここにでてくるよ — がんばれ!",
+  history_empty_hint:
+    "おしごとをひとつおわらせるとここにでてくるよ — がんばれ!",
   // S3 (R4) — F10 6.9: warmer tone — passive "your captain hasn't planned
   // yet" rather than active "go nag them".
   upcoming_empty_title: "まだよていなし",
-  upcoming_empty_hint: "船長は まだのこりのしゅうを きめてないみたい — ちょっとまっててね!",
+  upcoming_empty_hint:
+    "船長は まだのこりのしゅうを きめてないみたい — ちょっとまっててね!",
   sibling_rank_solo_title: "いまはきみだけ!",
-  sibling_rank_solo_hint: "もうひとりクルーがふえると、だれがいちばんかみえるよ。",
+  sibling_rank_solo_hint:
+    "もうひとりクルーがふえると、だれがいちばんかみえるよ。",
 
   // F12 — Mapped error messages (mapConvexError)
   // F18 (resolves F12 CMO-review): parent surface needs slightly tighter register
   // without going into 敬語 — drop 「ちゃった」filler and use plain 「が切れました」
   // which is informative without being cold.
   error_auth_lost: "ログインが切れました。もう一度ログインしてください。",
-  error_network: "船とつながらないよ。インターネットをかくにんしてもう一度ためしてね。",
+  error_network:
+    "船とつながらないよ。インターネットをかくにんしてもう一度ためしてね。",
   error_overdraft: "そのつぼには、引き出すぶんのたからものがたりません。",
-  error_lucky_chest_locked: "今週はもうラッキーチェストをあけたよ。月曜にまたためしてね!",
+  error_lucky_chest_locked:
+    "今週はもうラッキーチェストをあけたよ。月曜にまたためしてね!",
   error_child_deleted: "そのクルーはもう乗っていません。ページを更新します。",
-  error_already_approved: "このおしごとはもう承認ずみです。取り消しはいりません。",
+  error_already_approved:
+    "このおしごとはもう承認ずみです。取り消しはいりません。",
   error_ownership: "それはあなたのクルーのものではありません。",
-  error_validation: "入力内容にきになるところがあります。確認してもう一度送ってね。",
+  error_validation:
+    "入力内容にきになるところがあります。確認してもう一度送ってね。",
   error_unknown: "なにかつまずいたみたい。もう一度ためしてね。",
 
   // F12 — Error / not-found pages (pirate-toned bilingual)
@@ -493,10 +531,12 @@ const ja = {
   // Parents may find it juvenile in a serious error context — a native L2-fluent
   // reader should sanity-check whether it lands warm or annoying.
   error_page_title: "あれ、ちずをみうしなった!",
-  error_page_subtitle: "だいじょうぶ、たからものはぶじだよ。下のボタンでもう一度ためしてね。",
+  error_page_subtitle:
+    "だいじょうぶ、たからものはぶじだよ。下のボタンでもう一度ためしてね。",
   error_page_cta: "もう一度",
   not_found_page_title: "この地図にはなにもないよ!",
-  not_found_page_subtitle: "そのページが見つかりませんでした。安全なところに戻りましょう。",
+  not_found_page_subtitle:
+    "そのページが見つかりませんでした。安全なところに戻りましょう。",
   not_found_page_cta: "ホームへもどる",
 
   // F12 — Photo upload retry
@@ -504,13 +544,15 @@ const ja = {
 
   // F12 — Destructive confirmation dialogs (child)
   child_delete_confirm_title: "{{name}}を削除しますか?",
-  child_delete_confirm_body: "つぼ・れきし・よていされたおしごとがすべて消えます。元にはもどせません。",
+  child_delete_confirm_body:
+    "つぼ・れきし・よていされたおしごとがすべて消えます。元にはもどせません。",
   child_delete_confirm_cta: "はい、クルーを削除する",
   child_delete_confirm_cancel: "そのままにする",
 
   // F12 — Destructive confirmation dialogs (job)
   job_delete_confirm_title: "このおしごとを削除しますか?",
-  job_delete_confirm_body: "よていされたインスタンスは削除されます。承認ずみのれきしは残ります。元にはもどせません。",
+  job_delete_confirm_body:
+    "よていされたインスタンスは削除されます。承認ずみのれきしは残ります。元にはもどせません。",
   job_delete_confirm_cta: "はい、削除する",
   job_delete_confirm_cancel: "そのままにする",
 
@@ -519,7 +561,8 @@ const ja = {
   child_manager_header: "クルーメンバー ({{count}})",
   child_manager_add_btn: "+ クルーを追加",
   child_manager_empty_title: "まだクルーがいません!",
-  child_manager_empty_subtitle: "最初のちいさな海賊を追加して、冒険をはじめよう。",
+  child_manager_empty_subtitle:
+    "最初のちいさな海賊を追加して、冒険をはじめよう。",
   child_manager_empty_cta: "+ クルーを追加",
   child_icon_fallback_label: "サカナ",
   child_manager_delete_aria: "{{name}}を削除",

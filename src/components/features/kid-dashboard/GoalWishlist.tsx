@@ -77,7 +77,7 @@ export function GoalWishlist({ childId }: GoalWishlistProps) {
         .filter((goal) => goal.status === "active")
         .sort((a, b) => b.updatedAt - a.updatedAt)
         .slice(0, 3),
-    [goals]
+    [goals],
   );
 
   // G2: skeleton while context hydrates. Placed after hooks so order stays stable.
@@ -86,7 +86,8 @@ export function GoalWishlist({ childId }: GoalWishlistProps) {
   const saveBalance = getWalletBalance(childId, "save");
   const activeGoal = getActiveGoalForChild(childId);
   const target = activeGoal?.targetAmount ?? 0;
-  const progress = target > 0 ? Math.min(100, Math.round((saveBalance / target) * 100)) : 0;
+  const progress =
+    target > 0 ? Math.min(100, Math.round((saveBalance / target) * 100)) : 0;
   const remaining = Math.max(0, target - saveBalance);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -204,9 +205,7 @@ export function GoalWishlist({ childId }: GoalWishlistProps) {
           <p className="text-lg font-bold text-sky-100">
             {t("goals_empty_title")}
           </p>
-          <p className="text-sm text-sky-100/70">
-            {t("goals_empty_hint")}
-          </p>
+          <p className="text-sm text-sky-100/70">{t("goals_empty_hint")}</p>
         </div>
       )}
 

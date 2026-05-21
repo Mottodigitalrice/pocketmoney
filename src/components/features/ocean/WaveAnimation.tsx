@@ -1,6 +1,10 @@
 "use client";
 
-export function WaveAnimation({ position = "top" }: { position?: "top" | "bottom" }) {
+export function WaveAnimation({
+  position = "top",
+}: {
+  position?: "top" | "bottom";
+}) {
   const isTop = position === "top";
 
   return (

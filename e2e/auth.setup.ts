@@ -41,7 +41,7 @@ setup("authenticate as parent", async ({ page }) => {
   // not set in the dev process. Surface this as an actionable error rather
   // than a vague locator timeout.
   const clerkMissingMessage = page.getByText(
-    /Clerk environment variables are required/i
+    /Clerk environment variables are required/i,
   );
   if (await clerkMissingMessage.isVisible().catch(() => false)) {
     throw new Error(
@@ -49,14 +49,14 @@ setup("authenticate as parent", async ({ page }) => {
         "required' fallback. The dev server (`npm run dev`) does not have " +
         "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY / CLERK_SECRET_KEY set. Add them " +
         "to `.env.local` (from Clerk Dashboard → API Keys), then re-run " +
-        "`npx playwright test --project=setup`."
+        "`npx playwright test --project=setup`.",
     );
   }
 
   // Clerk's <SignUp /> renders an iframe-free form. The email input has
   // name="emailAddress" in the embedded component.
   const emailField = page.locator(
-    'input[name="emailAddress"], input[type="email"]'
+    'input[name="emailAddress"], input[type="email"]',
   );
   await expect(emailField.first()).toBeVisible({ timeout: 20_000 });
 
@@ -65,9 +65,9 @@ setup("authenticate as parent", async ({ page }) => {
   // Password field — Clerk's default password sign-up renders it on the same
   // step.
   const passwordField = page.locator(
-    'input[name="password"], input[type="password"]'
+    'input[name="password"], input[type="password"]',
   );
-  if (await passwordField.count() > 0) {
+  if ((await passwordField.count()) > 0) {
     await passwordField.first().fill(TEST_PASSWORD);
   }
 
@@ -107,14 +107,14 @@ setup("authenticate as parent", async ({ page }) => {
           "enabled on this dev instance, so +clerk_test@ emails do not auto-" +
           "verify. Enable Test mode in Clerk Dashboard → User & Authentication → " +
           "Restrictions, OR set PLAYWRIGHT_TEST_EMAIL/PASSWORD to a pre-created " +
-          "test user."
+          "test user.",
       );
     }
 
     // Try sign-in fallback.
     await page.goto("/sign-in");
     const siEmail = page.locator(
-      'input[name="identifier"], input[name="emailAddress"], input[type="email"]'
+      'input[name="identifier"], input[name="emailAddress"], input[type="email"]',
     );
     await expect(siEmail.first()).toBeVisible({ timeout: 20_000 });
     await siEmail.first().fill(TEST_EMAIL);
@@ -124,9 +124,14 @@ setup("authenticate as parent", async ({ page }) => {
       .click();
 
     const siPassword = page.locator(
-      'input[name="password"], input[type="password"]'
+      'input[name="password"], input[type="password"]',
     );
-    if (await siPassword.first().isVisible({ timeout: 10_000 }).catch(() => false)) {
+    if (
+      await siPassword
+        .first()
+        .isVisible({ timeout: 10_000 })
+        .catch(() => false)
+    ) {
       await siPassword.first().fill(TEST_PASSWORD);
       await page
         .getByRole("button", { name: /continue|sign\s*in/i })
@@ -151,10 +156,7 @@ setup("authenticate as parent", async ({ page }) => {
   // -------------------------------------------------------------------------
   if (page.url().includes("/onboarding")) {
     // Step 0: Welcome → "Get started"
-    await page
-      .getByRole("button")
-      .first()
-      .click();
+    await page.getByRole("button").first().click();
 
     // Step 1: Add child. Look for the first text input + first icon button.
     const childNameInput = page.locator('input[type="text"]').first();

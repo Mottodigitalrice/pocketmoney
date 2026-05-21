@@ -39,7 +39,11 @@
  *   - Both empty                                    → `no_history`, ratio 0, %Δ 0
  */
 
-export type WeeklyDeltaKind = "no_history" | "above_avg" | "at_avg" | "below_avg";
+export type WeeklyDeltaKind =
+  | "no_history"
+  | "above_avg"
+  | "at_avg"
+  | "below_avg";
 
 export interface WeeklyDeltaResult {
   /** Sum of positive amounts in the current week. */

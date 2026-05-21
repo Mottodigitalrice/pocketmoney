@@ -24,6 +24,7 @@ npx convex dashboard
 ## Patterns Used
 
 ### Queries (read data)
+
 ```typescript
 export const getItems = query({
   args: { userId: v.id("users") },
@@ -34,6 +35,7 @@ export const getItems = query({
 ```
 
 ### Mutations (write data)
+
 ```typescript
 export const createItem = mutation({
   args: { title: v.string() },
@@ -44,6 +46,7 @@ export const createItem = mutation({
 ```
 
 ### Real-time
+
 Queries are automatically real-time. Use `useQuery` in React and data updates instantly.
 
 ## Manual recovery

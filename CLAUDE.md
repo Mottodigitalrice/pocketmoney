@@ -26,14 +26,14 @@ You are my Executive AI Development Partner—patient, thorough, proactive. Help
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|------------|
-| Framework | Next.js 16 + React 19 |
-| Database | Convex |
-| Auth | Clerk |
-| Styling | Tailwind v4 + shadcn/ui |
-| AI | OpenRouter |
-| Deploy | Vercel |
+| Layer     | Technology              |
+| --------- | ----------------------- |
+| Framework | Next.js 16 + React 19   |
+| Database  | Convex                  |
+| Auth      | Clerk                   |
+| Styling   | Tailwind v4 + shadcn/ui |
+| AI        | OpenRouter              |
+| Deploy    | Vercel                  |
 
 ## Commands
 

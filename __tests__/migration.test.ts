@@ -99,8 +99,8 @@ describe("computeMigrationDelta — partially-migrated child (partial-run recove
     const result = computeMigrationDelta({
       lifetimeEarnings: lifetime,
       actualSpend: expected.spend, // 700 — done
-      actualSave: 0,                // 200 — pending
-      actualGive: 0,                // 100 — pending
+      actualSave: 0, // 200 — pending
+      actualGive: 0, // 100 — pending
     });
     expect(result.delta).toEqual({
       spend: 0,
@@ -182,7 +182,7 @@ describe("computeMigrationDelta — custom split percentages", () => {
         actualSave: 0,
         actualGive: 0,
       },
-      customSplit
+      customSplit,
     );
     expect(result.expected).toEqual({ spend: 500, save: 300, give: 200 });
     expect(result.delta).toEqual({ spend: 500, save: 300, give: 200 });

@@ -22,11 +22,17 @@ function UpcomingWeekPreviewSkeleton() {
       </div>
       <div className="space-y-3">
         {[0, 1, 2].map((day) => (
-          <div key={day} className="rounded-xl border border-white/10 bg-white/5 p-3 space-y-2">
+          <div
+            key={day}
+            className="rounded-xl border border-white/10 bg-white/5 p-3 space-y-2"
+          >
             <Skeleton className="h-4 w-24 rounded bg-cyan-900/40" />
             <div className="flex flex-wrap gap-2">
               {[0, 1, 2].map((j) => (
-                <Skeleton key={j} className="h-8 w-28 rounded-full bg-cyan-900/30" />
+                <Skeleton
+                  key={j}
+                  className="h-8 w-28 rounded-full bg-cyan-900/30"
+                />
               ))}
             </div>
           </div>
@@ -42,7 +48,8 @@ interface UpcomingWeekPreviewProps {
 
 export function UpcomingWeekPreview({ childId }: UpcomingWeekPreviewProps) {
   const { t, locale } = useTranslation();
-  const { isLoading, getScheduledJobsForWeek, getLocalDateString } = usePocketMoney();
+  const { isLoading, getScheduledJobsForWeek, getLocalDateString } =
+    usePocketMoney();
 
   const today = getLocalDateString();
   const upcomingJobs = useMemo(
@@ -50,7 +57,7 @@ export function UpcomingWeekPreview({ childId }: UpcomingWeekPreviewProps) {
       getScheduledJobsForWeek(childId)
         .filter((entry) => entry.date > today)
         .sort((a, b) => a.date.localeCompare(b.date)),
-    [childId, getScheduledJobsForWeek, today]
+    [childId, getScheduledJobsForWeek, today],
   );
 
   const grouped = useMemo(() => {
@@ -72,7 +79,9 @@ export function UpcomingWeekPreview({ childId }: UpcomingWeekPreviewProps) {
     <div className="mx-4 rounded-2xl border border-cyan-300/20 bg-cyan-950/20 p-4 backdrop-blur-sm sm:mx-8">
       <div className="mb-3 flex items-center gap-2">
         <span className="text-2xl">🗓️</span>
-        <h2 className="text-lg font-bold text-white">{t("kid_upcoming_title")}</h2>
+        <h2 className="text-lg font-bold text-white">
+          {t("kid_upcoming_title")}
+        </h2>
       </div>
 
       {grouped.length === 0 ? (
@@ -81,9 +90,7 @@ export function UpcomingWeekPreview({ childId }: UpcomingWeekPreviewProps) {
           <p className="text-base font-bold text-cyan-100">
             {t("upcoming_empty_title")}
           </p>
-          <p className="text-sm text-white/70">
-            {t("upcoming_empty_hint")}
-          </p>
+          <p className="text-sm text-white/70">{t("upcoming_empty_hint")}</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -99,7 +106,7 @@ export function UpcomingWeekPreview({ childId }: UpcomingWeekPreviewProps) {
                     weekday: "short",
                     month: "short",
                     day: "numeric",
-                  }
+                  },
                 )}
               </p>
               <div className="mt-2 flex flex-wrap gap-2">

@@ -129,7 +129,14 @@ export function LuckyChest({ childId }: LuckyChestProps) {
                       total: status.mustDoTotal,
                     })}
             </p>
-            {error && <p className="mt-2 text-sm text-red-200" data-testid="lucky-chest-error">{error}</p>}
+            {error && (
+              <p
+                className="mt-2 text-sm text-red-200"
+                data-testid="lucky-chest-error"
+              >
+                {error}
+              </p>
+            )}
           </div>
         </div>
 

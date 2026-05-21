@@ -37,12 +37,19 @@ export const DEFAULT_SPLIT: JarSplit = { spend: 70, save: 20, give: 10 };
  * @throws if `split` percentages don't sum to exactly 100.
  * @throws if any split percentage is negative.
  */
-export function splitEarning(amount: number, split: JarSplit = DEFAULT_SPLIT): JarSplit {
+export function splitEarning(
+  amount: number,
+  split: JarSplit = DEFAULT_SPLIT,
+): JarSplit {
   if (!Number.isFinite(amount)) {
-    throw new Error(`splitEarning: amount must be a finite number, got ${amount}`);
+    throw new Error(
+      `splitEarning: amount must be a finite number, got ${amount}`,
+    );
   }
   if (!Number.isInteger(amount)) {
-    throw new Error(`splitEarning: amount must be an integer (yen has no fractional cents), got ${amount}`);
+    throw new Error(
+      `splitEarning: amount must be an integer (yen has no fractional cents), got ${amount}`,
+    );
   }
   if (amount < 0) {
     throw new Error(`splitEarning: amount must be non-negative, got ${amount}`);
@@ -50,13 +57,13 @@ export function splitEarning(amount: number, split: JarSplit = DEFAULT_SPLIT): J
 
   if (split.spend < 0 || split.save < 0 || split.give < 0) {
     throw new Error(
-      `splitEarning: split percentages must be non-negative, got ${JSON.stringify(split)}`
+      `splitEarning: split percentages must be non-negative, got ${JSON.stringify(split)}`,
     );
   }
   const total = split.spend + split.save + split.give;
   if (total !== 100) {
     throw new Error(
-      `splitEarning: split percentages must sum to 100, got ${total} (${JSON.stringify(split)})`
+      `splitEarning: split percentages must sum to 100, got ${total} (${JSON.stringify(split)})`,
     );
   }
 

@@ -26,49 +26,49 @@ const REF_MONDAY_MS = REF_MONDAY.getTime();
 describe("weekStartUTC — snap to Monday 00:00 UTC", () => {
   it("Monday morning stays put", () => {
     expect(weekStartUTC(REF_MONDAY).toISOString()).toBe(
-      "2026-05-11T00:00:00.000Z"
+      "2026-05-11T00:00:00.000Z",
     );
   });
 
   it("Monday afternoon snaps back to 00:00", () => {
-    expect(weekStartUTC(new Date("2026-05-11T14:30:00.000Z")).toISOString()).toBe(
-      "2026-05-11T00:00:00.000Z"
-    );
+    expect(
+      weekStartUTC(new Date("2026-05-11T14:30:00.000Z")).toISOString(),
+    ).toBe("2026-05-11T00:00:00.000Z");
   });
 
   it("mid-week (Wednesday) snaps to the same week's Monday", () => {
-    expect(weekStartUTC(new Date("2026-05-13T08:00:00.000Z")).toISOString()).toBe(
-      "2026-05-11T00:00:00.000Z"
-    );
+    expect(
+      weekStartUTC(new Date("2026-05-13T08:00:00.000Z")).toISOString(),
+    ).toBe("2026-05-11T00:00:00.000Z");
   });
 
   it("Friday snaps to the same week's Monday", () => {
-    expect(weekStartUTC(new Date("2026-05-15T23:59:59.999Z")).toISOString()).toBe(
-      "2026-05-11T00:00:00.000Z"
-    );
+    expect(
+      weekStartUTC(new Date("2026-05-15T23:59:59.999Z")).toISOString(),
+    ).toBe("2026-05-11T00:00:00.000Z");
   });
 
   it("Sunday 23:59 snaps to the SAME week's Monday (not the next)", () => {
-    expect(weekStartUTC(new Date("2026-05-17T23:59:00.000Z")).toISOString()).toBe(
-      "2026-05-11T00:00:00.000Z"
-    );
+    expect(
+      weekStartUTC(new Date("2026-05-17T23:59:00.000Z")).toISOString(),
+    ).toBe("2026-05-11T00:00:00.000Z");
   });
 
   it("Sunday 00:01 still in this week's Monday", () => {
-    expect(weekStartUTC(new Date("2026-05-17T00:01:00.000Z")).toISOString()).toBe(
-      "2026-05-11T00:00:00.000Z"
-    );
+    expect(
+      weekStartUTC(new Date("2026-05-17T00:01:00.000Z")).toISOString(),
+    ).toBe("2026-05-11T00:00:00.000Z");
   });
 
   it("the Monday AFTER snaps to itself", () => {
-    expect(weekStartUTC(new Date("2026-05-18T00:00:00.000Z")).toISOString()).toBe(
-      "2026-05-18T00:00:00.000Z"
-    );
+    expect(
+      weekStartUTC(new Date("2026-05-18T00:00:00.000Z")).toISOString(),
+    ).toBe("2026-05-18T00:00:00.000Z");
   });
 
   it("accepts millisecond epoch as input", () => {
     expect(weekStartUTC(REF_MONDAY_MS).toISOString()).toBe(
-      "2026-05-11T00:00:00.000Z"
+      "2026-05-11T00:00:00.000Z",
     );
   });
 });
@@ -201,7 +201,7 @@ describe("hasTransactionInWeek — idempotency predicate", () => {
 
   it("returns true when an interest tx sits one ms before week-end", () => {
     expect(hasTransactionInWeek([interestSecondBeforeEnd], weekStartMs)).toBe(
-      true
+      true,
     );
   });
 
@@ -222,8 +222,8 @@ describe("hasTransactionInWeek — idempotency predicate", () => {
     expect(
       hasTransactionInWeek(
         [earningMidWeek, interestPrevWeek, interestMidWeek],
-        weekStartMs
-      )
+        weekStartMs,
+      ),
     ).toBe(true);
   });
 
@@ -231,8 +231,8 @@ describe("hasTransactionInWeek — idempotency predicate", () => {
     expect(
       hasTransactionInWeek(
         [earningMidWeek, interestPrevWeek, interestAtWeekEnd],
-        weekStartMs
-      )
+        weekStartMs,
+      ),
     ).toBe(false);
   });
 
@@ -242,10 +242,10 @@ describe("hasTransactionInWeek — idempotency predicate", () => {
       createdAt: weekStartMs + MS_PER_DAY,
     };
     expect(hasTransactionInWeek([bonusMidWeek], weekStartMs, "bonus")).toBe(
-      true
+      true,
     );
     expect(hasTransactionInWeek([bonusMidWeek], weekStartMs, "interest")).toBe(
-      false
+      false,
     );
   });
 
@@ -300,7 +300,7 @@ describe("idempotency proof — re-running the predicate after a credit is a no-
 
   it("4-week backfill scenario: 3 missed weeks, then cron fires — each missed week credited exactly once", () => {
     const weeks = weeksToBackfill(REF_MONDAY, 4).map((iso) =>
-      new Date(iso).getTime()
+      new Date(iso).getTime(),
     );
     // Start with NO interest transactions (3 weeks of outage + current).
     const transactions: TxLike[] = [];
@@ -331,7 +331,7 @@ describe("idempotency proof — re-running the predicate after a credit is a no-
 
   it("partial backfill scenario: only 2 weeks missed → exactly 2 credits", () => {
     const weeks = weeksToBackfill(REF_MONDAY, 4).map((iso) =>
-      new Date(iso).getTime()
+      new Date(iso).getTime(),
     );
     // Two oldest weeks were already credited at the time the outage started.
     const transactions: TxLike[] = [
@@ -354,19 +354,19 @@ describe("idempotency proof — re-running the predicate after a credit is a no-
 describe("assertIsWeekStartISO — manual recovery input gate", () => {
   it("accepts a valid Monday 00:00 UTC ISO string", () => {
     expect(assertIsWeekStartISO("2026-05-11T00:00:00.000Z").toISOString()).toBe(
-      "2026-05-11T00:00:00.000Z"
+      "2026-05-11T00:00:00.000Z",
     );
   });
 
   it("rejects a Wednesday", () => {
     expect(() => assertIsWeekStartISO("2026-05-13T00:00:00.000Z")).toThrow(
-      /not a Monday 00:00 UTC/
+      /not a Monday 00:00 UTC/,
     );
   });
 
   it("rejects a Monday with a non-zero time component", () => {
     expect(() => assertIsWeekStartISO("2026-05-11T10:00:00.000Z")).toThrow(
-      /not a Monday 00:00 UTC/
+      /not a Monday 00:00 UTC/,
     );
   });
 
@@ -376,7 +376,7 @@ describe("assertIsWeekStartISO — manual recovery input gate", () => {
 
   it("error message includes the expected snapped value (helps the parent)", () => {
     expect(() => assertIsWeekStartISO("2026-05-13T00:00:00.000Z")).toThrow(
-      /2026-05-11T00:00:00\.000Z/
+      /2026-05-11T00:00:00\.000Z/,
     );
   });
 });

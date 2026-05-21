@@ -119,7 +119,9 @@ export function WithdrawalDialogBody({
       });
       handleOpenChange(false);
     } catch (err) {
-      setError(err instanceof Error ? err.message : t("withdraw_error_generic"));
+      setError(
+        err instanceof Error ? err.message : t("withdraw_error_generic"),
+      );
       setIsSaving(false);
     }
   };
@@ -182,7 +184,9 @@ export function WithdrawalDialogBody({
                       className="text-amber-200/70"
                       data-testid="withdraw-max-helper"
                     >
-                      {t("withdraw_max_helper", { max: balance.toLocaleString() })}
+                      {t("withdraw_max_helper", {
+                        max: balance.toLocaleString(),
+                      })}
                     </span>
                     <button
                       type="button"

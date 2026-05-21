@@ -67,9 +67,7 @@ export function ChildOverview({ childId }: ChildOverviewProps) {
             <p className="text-xs font-semibold uppercase tracking-wide text-amber-300/70">
               {t("rank_current")}
             </p>
-            <p className="text-xl font-extrabold text-amber-100">
-              {rank.rank}
-            </p>
+            <p className="text-xl font-extrabold text-amber-100">{rank.rank}</p>
           </div>
           <p className="text-sm font-semibold text-amber-200/80">
             {t("rank_score", { score: rank.score.toLocaleString() })}
@@ -120,9 +118,7 @@ export function ChildOverview({ childId }: ChildOverviewProps) {
           <p className="text-2xl font-extrabold text-green-300">
             {approved.length}
           </p>
-          <p className="text-xs text-amber-300/60">
-            {t("overview_completed")}
-          </p>
+          <p className="text-xs text-amber-300/60">{t("overview_completed")}</p>
         </div>
       </div>
 

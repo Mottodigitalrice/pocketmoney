@@ -50,10 +50,16 @@ export interface MappedError {
   raw: string;
 }
 
-type TFn = (key: TranslationKey, params?: Record<string, string | number>) => string;
+type TFn = (
+  key: TranslationKey,
+  params?: Record<string, string | number>,
+) => string;
 
 /** Map each ErrorCode → translation key + severity. */
-const CODE_META: Record<ErrorCode, { key: TranslationKey; severity: ErrorSeverity }> = {
+const CODE_META: Record<
+  ErrorCode,
+  { key: TranslationKey; severity: ErrorSeverity }
+> = {
   AUTH_LOST: { key: "error_auth_lost", severity: "auth" },
   NETWORK: { key: "error_network", severity: "network" },
   OVERDRAFT: { key: "error_overdraft", severity: "validation" },
@@ -78,7 +84,11 @@ const CODE_META: Record<ErrorCode, { key: TranslationKey; severity: ErrorSeverit
 function extractRaw(err: unknown): string {
   if (typeof err === "string") return err;
   if (err && typeof err === "object") {
-    const maybeError = err as { message?: unknown; data?: unknown; toString?: () => string };
+    const maybeError = err as {
+      message?: unknown;
+      data?: unknown;
+      toString?: () => string;
+    };
     if (typeof maybeError.message === "string") return maybeError.message;
     if (typeof maybeError.data === "string") return maybeError.data;
     if (
@@ -103,7 +113,9 @@ function classify(raw: string): ErrorCode {
   if (!raw) return "UNKNOWN";
 
   // Convex auth — exact match plus loose pattern.
-  if (/not authenticated|unauthenticated|auth.*expired|invalid token/i.test(raw)) {
+  if (
+    /not authenticated|unauthenticated|auth.*expired|invalid token/i.test(raw)
+  ) {
     return "AUTH_LOST";
   }
 
@@ -161,7 +173,10 @@ export function mapConvexError(err: unknown, t: TFn): MappedError {
  * at render time but not at the moment of error catch (e.g. throw-and-catch
  * across an async boundary that returns a code).
  */
-export function classifyConvexError(err: unknown): { code: ErrorCode; raw: string } {
+export function classifyConvexError(err: unknown): {
+  code: ErrorCode;
+  raw: string;
+} {
   const raw = extractRaw(err);
   return { code: classify(raw), raw };
 }

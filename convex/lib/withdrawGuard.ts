@@ -10,7 +10,7 @@
  */
 export function overdraftErrorOrNull(
   balance: number,
-  amount: number
+  amount: number,
 ): string | null {
   if (balance < amount) {
     return `OVERDRAFT: balance ¥${balance} cannot cover withdrawal ¥${amount}`;

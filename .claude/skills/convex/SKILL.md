@@ -6,12 +6,15 @@ description: Use this skill when working with Convex database—schema definitio
 # Convex Database Skill
 
 ## Overview
+
 This project uses Convex as the database layer. Convex provides real-time, reactive data with TypeScript-first development.
 
 ## Key Concepts
 
 ### Schema (`convex/schema.ts`)
+
 Define tables and their types:
+
 ```typescript
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
@@ -26,6 +29,7 @@ export default defineSchema({
 ```
 
 ### Queries (read data - reactive)
+
 ```typescript
 import { query } from "./_generated/server";
 import { v } from "convex/values";
@@ -42,6 +46,7 @@ export const get = query({
 ```
 
 ### Mutations (write data)
+
 ```typescript
 import { mutation } from "./_generated/server";
 import { v } from "convex/values";
@@ -59,6 +64,7 @@ export const create = mutation({
 ```
 
 ### React Usage
+
 ```typescript
 "use client";
 import { useQuery, useMutation } from "convex/react";
@@ -81,6 +87,7 @@ function TaskList({ userId }) {
 ```
 
 ## Convex Value Types
+
 - `v.string()` - String
 - `v.number()` - Number
 - `v.boolean()` - Boolean
@@ -91,6 +98,7 @@ function TaskList({ userId }) {
 - `v.union(v.literal("a"), v.literal("b"))` - Enum
 
 ## Project Structure
+
 ```
 convex/
 ├── schema.ts           # Database schema
@@ -101,6 +109,7 @@ convex/
 ```
 
 ## Commands
+
 ```bash
 npx convex dev      # Start dev server
 npx convex deploy   # Deploy to production
@@ -108,4 +117,5 @@ npx convex dashboard # Open web dashboard
 ```
 
 ## Migration Note
+
 When moving to production (Supabase), see `/docs/MIGRATION-GUIDE.md`.

@@ -101,8 +101,8 @@ export const findOrphanedProofs = query({
     const orphanIds = new Set(
       findOrphansInList(
         allStorage.map((s) => s._id as unknown as string),
-        referencedIds as unknown as string[]
-      )
+        referencedIds as unknown as string[],
+      ),
     );
 
     return allStorage
@@ -170,7 +170,7 @@ export const deleteOrphanedProofs = mutation({
       myInstances
         .map((inst) => inst.proofStorageId)
         .filter((id): id is Id<"_storage"> => id !== undefined)
-        .map((id) => id as unknown as string)
+        .map((id) => id as unknown as string),
     );
 
     const deletedIds: Id<"_storage">[] = [];

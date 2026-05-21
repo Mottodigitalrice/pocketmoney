@@ -30,11 +30,7 @@ export default function ParentError({
   const { t } = useTranslation();
 
   useEffect(() => {
-    console.error(
-      "[parent/error.tsx]",
-      error.digest ?? "(no digest)",
-      error,
-    );
+    console.error("[parent/error.tsx]", error.digest ?? "(no digest)", error);
   }, [error]);
 
   return (

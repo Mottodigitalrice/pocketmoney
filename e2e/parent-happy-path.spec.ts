@@ -47,7 +47,7 @@ test("parent: full happy-path (create child → job → schedule → approve →
     await expect(page).toHaveURL(/\/parent/);
     // Tab bar should be visible — proves auth + onboarding complete.
     await expect(
-      page.getByRole("button", { name: /Crew|👥|crew/i }).first()
+      page.getByRole("button", { name: /Crew|👥|crew/i }).first(),
     ).toBeVisible({ timeout: 15_000 });
   });
 
@@ -85,7 +85,7 @@ test("parent: full happy-path (create child → job → schedule → approve →
 
     // Assert Zoe row appears.
     const zoeRow = page.locator(
-      `[data-testid="child-row"][data-child-name="${childName}"]`
+      `[data-testid="child-row"][data-child-name="${childName}"]`,
     );
     await expect(zoeRow).toBeVisible({ timeout: 10_000 });
     zoeId = (await zoeRow.getAttribute("data-child-id")) ?? "";
@@ -100,9 +100,7 @@ test("parent: full happy-path (create child → job → schedule → approve →
     await page.getByRole("button", { name: /\+\s*New Job/i }).click();
 
     // Fill job name.
-    const titleField = page
-      .locator('input[type="text"]')
-      .first();
+    const titleField = page.locator('input[type="text"]').first();
     await expect(titleField).toBeVisible({ timeout: 5_000 });
     await titleField.fill(jobName);
 
@@ -111,23 +109,26 @@ test("parent: full happy-path (create child → job → schedule → approve →
     await yenField.fill("100");
 
     // Submit — button label is from t('job_form_add') = "Add Job" in en.
-    await page
-      .getByRole("button", { name: /^(Add Job|Save Job)$/i })
-      .click();
+    await page.getByRole("button", { name: /^(Add Job|Save Job)$/i }).click();
 
     // Assert job appears in the list (title text "Make bed").
-    await expect(page.getByText(jobName, { exact: false }).first()).toBeVisible({
-      timeout: 10_000,
-    });
+    await expect(page.getByText(jobName, { exact: false }).first()).toBeVisible(
+      {
+        timeout: 10_000,
+      },
+    );
   });
 
   await test.step("4. Assign Make bed to Zoe today as mustDo via WeekPlanner", async () => {
     // Switch to Planner tab.
-    await page.getByRole("button", { name: /Planner/i }).first().click();
+    await page
+      .getByRole("button", { name: /Planner/i })
+      .first()
+      .click();
 
     // Wait for planner grid to render — look for any planner cell.
     await expect(
-      page.locator('[data-testid="planner-cell"]').first()
+      page.locator('[data-testid="planner-cell"]').first(),
     ).toBeVisible({ timeout: 10_000 });
 
     // Select the "Make bed" job in the bulk-job picker.
@@ -137,27 +138,28 @@ test("parent: full happy-path (create child → job → schedule → approve →
       .click();
 
     // Set priority to "Must do".
-    await page.getByRole("button", { name: /Must do/i }).first().click();
+    await page
+      .getByRole("button", { name: /Must do/i })
+      .first()
+      .click();
 
     // Today's date as YYYY-MM-DD (matches getLocalDateString format).
     const today = new Date();
     const todayStr = `${today.getFullYear()}-${String(
-      today.getMonth() + 1
+      today.getMonth() + 1,
     ).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
 
     // Click the "Add selected" button for today's column.
     await page
-      .locator(
-        `[data-testid="planner-add-selected"][data-date="${todayStr}"]`
-      )
+      .locator(`[data-testid="planner-add-selected"][data-date="${todayStr}"]`)
       .click();
 
     // Assert: Zoe's row × today's column contains "Make bed".
     const zoeTodayCell = page.locator(
-      `[data-testid="planner-cell"][data-child-id="${zoeId}"][data-date="${todayStr}"]`
+      `[data-testid="planner-cell"][data-child-id="${zoeId}"][data-date="${todayStr}"]`,
     );
     await expect(zoeTodayCell.getByText(jobName, { exact: false })).toBeVisible(
-      { timeout: 5_000 }
+      { timeout: 5_000 },
     );
   });
 
@@ -230,11 +232,11 @@ test("parent: full happy-path (create child → job → schedule → approve →
         });
         if (!res.ok) {
           throw new Error(
-            `setJobInstanceCompleted failed: ${res.status} ${await res.text()}`
+            `setJobInstanceCompleted failed: ${res.status} ${await res.text()}`,
           );
         }
       },
-      { instanceId: jobInstanceId, convexUrl: CONVEX_URL }
+      { instanceId: jobInstanceId, convexUrl: CONVEX_URL },
     );
 
     // The kid dashboard subscribes via Convex reactivity — wait for the
@@ -243,8 +245,8 @@ test("parent: full happy-path (create child → job → schedule → approve →
     // approval queue).
     await expect(
       page.locator(
-        `[data-testid="job-card"][data-status="in_progress"][data-instance-id="${jobInstanceId}"]`
-      )
+        `[data-testid="job-card"][data-status="in_progress"][data-instance-id="${jobInstanceId}"]`,
+      ),
     ).toHaveCount(0, { timeout: 10_000 });
   });
 
@@ -254,7 +256,7 @@ test("parent: full happy-path (create child → job → schedule → approve →
 
     // Find Zoe's "Make bed" approval card and click Approve.
     const card = page.locator(
-      `[data-testid="approval-card"][data-instance-id="${jobInstanceId}"]`
+      `[data-testid="approval-card"][data-instance-id="${jobInstanceId}"]`,
     );
     await expect(card).toBeVisible({ timeout: 10_000 });
     await card.getByRole("button", { name: /Approve/i }).click();
@@ -269,19 +271,19 @@ test("parent: full happy-path (create child → job → schedule → approve →
     await page.goto("/parent#overview");
 
     const zoeOverview = page.locator(
-      `[data-testid="child-overview"][data-child-id="${zoeId}"]`
+      `[data-testid="child-overview"][data-child-id="${zoeId}"]`,
     );
     await expect(zoeOverview).toBeVisible({ timeout: 10_000 });
 
     // Read balance from each jar's data-balance attr.
     const spend = zoeOverview.locator(
-      '[data-testid="wallet-jar"][data-jar="spend"]'
+      '[data-testid="wallet-jar"][data-jar="spend"]',
     );
     const save = zoeOverview.locator(
-      '[data-testid="wallet-jar"][data-jar="save"]'
+      '[data-testid="wallet-jar"][data-jar="save"]',
     );
     const give = zoeOverview.locator(
-      '[data-testid="wallet-jar"][data-jar="give"]'
+      '[data-testid="wallet-jar"][data-jar="give"]',
     );
     await expect(spend).toHaveAttribute("data-balance", "70", {
       timeout: 10_000,
@@ -292,7 +294,7 @@ test("parent: full happy-path (create child → job → schedule → approve →
 
   await test.step("8. Withdraw ¥30 from Spend (cashOut)", async () => {
     const zoeOverview = page.locator(
-      `[data-testid="child-overview"][data-child-id="${zoeId}"]`
+      `[data-testid="child-overview"][data-child-id="${zoeId}"]`,
     );
     // WithdrawalDialog renders a "Withdraw" trigger button.
     await zoeOverview.getByRole("button", { name: /Withdraw/i }).click();
@@ -305,13 +307,11 @@ test("parent: full happy-path (create child → job → schedule → approve →
     // Reason "cashOut" is default. Leave note empty.
 
     // Submit — button label "Record Withdrawal".
-    await page
-      .getByRole("button", { name: /Record Withdrawal/i })
-      .click();
+    await page.getByRole("button", { name: /Record Withdrawal/i }).click();
 
     // Assert spend balance drops to 40.
     const spend = zoeOverview.locator(
-      '[data-testid="wallet-jar"][data-jar="spend"]'
+      '[data-testid="wallet-jar"][data-jar="spend"]',
     );
     await expect(spend).toHaveAttribute("data-balance", "40", {
       timeout: 10_000,
@@ -320,7 +320,7 @@ test("parent: full happy-path (create child → job → schedule → approve →
 
   await test.step("9. Bonus ¥50 (note: kept room clean)", async () => {
     const zoeOverview = page.locator(
-      `[data-testid="child-overview"][data-child-id="${zoeId}"]`
+      `[data-testid="child-overview"][data-child-id="${zoeId}"]`,
     );
     // BonusDialog trigger.
     await zoeOverview.getByRole("button", { name: /Bonus/i }).click();
@@ -331,7 +331,7 @@ test("parent: full happy-path (create child → job → schedule → approve →
     await amountField.fill("50");
 
     // Optional note. Use the textarea via placeholder lookup.
-    const noteField = page.locator('textarea').first();
+    const noteField = page.locator("textarea").first();
     await noteField.fill("kept room clean");
 
     // Submit — button label is "Award Bonus".
@@ -349,13 +349,13 @@ test("parent: full happy-path (create child → job → schedule → approve →
       timeout: 10_000,
     });
     await expect(
-      zoeOverview.locator('[data-testid="wallet-jar"][data-jar="spend"]')
+      zoeOverview.locator('[data-testid="wallet-jar"][data-jar="spend"]'),
     ).toHaveAttribute("data-balance", "75");
     await expect(
-      zoeOverview.locator('[data-testid="wallet-jar"][data-jar="save"]')
+      zoeOverview.locator('[data-testid="wallet-jar"][data-jar="save"]'),
     ).toHaveAttribute("data-balance", "30");
     await expect(
-      zoeOverview.locator('[data-testid="wallet-jar"][data-jar="give"]')
+      zoeOverview.locator('[data-testid="wallet-jar"][data-jar="give"]'),
     ).toHaveAttribute("data-balance", "15");
   });
 
@@ -364,7 +364,7 @@ test("parent: full happy-path (create child → job → schedule → approve →
     await page.goto("/parent#children");
 
     const zoeRow = page.locator(
-      `[data-testid="child-row"][data-child-id="${zoeId}"]`
+      `[data-testid="child-row"][data-child-id="${zoeId}"]`,
     );
     await expect(zoeRow).toBeVisible({ timeout: 10_000 });
 

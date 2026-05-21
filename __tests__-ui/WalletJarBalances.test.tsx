@@ -63,7 +63,9 @@ describe("WalletJarBalances", () => {
     // Each balance line carries an sr-only "<label>:" prefix.
     const srOnlyLabels = container.querySelectorAll(".sr-only");
     expect(srOnlyLabels.length).toBeGreaterThanOrEqual(3);
-    const text = Array.from(srOnlyLabels).map((el) => el.textContent).join(" ");
+    const text = Array.from(srOnlyLabels)
+      .map((el) => el.textContent)
+      .join(" ");
     expect(text).toMatch(/Spend/);
     expect(text).toMatch(/Save/);
     expect(text).toMatch(/Give/);
@@ -93,8 +95,8 @@ describe("WalletJarBalances", () => {
       expect(jar).toHaveTextContent("¥0");
     }
     // Total row also reads "¥0", never blank.
-    expect(container.querySelector("[data-testid='wallet-total']")).toHaveTextContent(
-      "¥0",
-    );
+    expect(
+      container.querySelector("[data-testid='wallet-total']"),
+    ).toHaveTextContent("¥0");
   });
 });

@@ -23,8 +23,26 @@ interface OneOffTaskFormProps {
 }
 
 const ICONS = [
-  "👕", "🧸", "🛏️", "🍽️", "🌱", "👟", "🐾", "📚", "🧹", "🧺",
-  "🏠", "🛋️", "🪥", "🎒", "🛒", "🪟", "♻️", "👨‍🍳", "🧽", "🪣",
+  "👕",
+  "🧸",
+  "🛏️",
+  "🍽️",
+  "🌱",
+  "👟",
+  "🐾",
+  "📚",
+  "🧹",
+  "🧺",
+  "🏠",
+  "🛋️",
+  "🪥",
+  "🎒",
+  "🛒",
+  "🪟",
+  "♻️",
+  "👨‍🍳",
+  "🧽",
+  "🪣",
 ];
 
 export function OneOffTaskForm({ open, onClose }: OneOffTaskFormProps) {
@@ -124,9 +142,7 @@ export function OneOffTaskForm({ open, onClose }: OneOffTaskFormProps) {
             </div>
 
             <div>
-              <Label className="text-amber-200">
-                {t("oneoff_assign_to")}
-              </Label>
+              <Label className="text-amber-200">{t("oneoff_assign_to")}</Label>
               <div className="mt-1 flex flex-wrap gap-2">
                 {familyChildren.map((child) => {
                   const iconConfig = CHILD_ICON_CONFIG[child.icon as ChildIcon];

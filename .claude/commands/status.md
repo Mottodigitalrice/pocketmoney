@@ -12,6 +12,7 @@ Show current design system state.
 **If `.interface-design/system.md` exists:**
 
 Display:
+
 ```
 Design System: [Project Name]
 

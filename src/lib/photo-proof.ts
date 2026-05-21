@@ -26,7 +26,12 @@ function getOutputType(file: File) {
 }
 
 function getOutputName(file: File, outputType: string) {
-  const extension = outputType === "image/png" ? "png" : outputType === "image/webp" ? "webp" : "jpg";
+  const extension =
+    outputType === "image/png"
+      ? "png"
+      : outputType === "image/webp"
+        ? "webp"
+        : "jpg";
   const baseName = file.name.replace(/\.[^.]+$/, "") || "photo-proof";
   return `${baseName}.${extension}`;
 }
@@ -38,7 +43,8 @@ export async function resizeImageForProof(file: File) {
 
   const image = await loadImage(file);
   const longestSide = Math.max(image.naturalWidth, image.naturalHeight);
-  const scale = longestSide > MAX_PROOF_DIMENSION ? MAX_PROOF_DIMENSION / longestSide : 1;
+  const scale =
+    longestSide > MAX_PROOF_DIMENSION ? MAX_PROOF_DIMENSION / longestSide : 1;
   const width = Math.max(1, Math.round(image.naturalWidth * scale));
   const height = Math.max(1, Math.round(image.naturalHeight * scale));
 
@@ -60,7 +66,7 @@ export async function resizeImageForProof(file: File) {
         else reject(new Error("Could not prepare image"));
       },
       outputType,
-      outputType === "image/jpeg" ? JPEG_QUALITY : undefined
+      outputType === "image/jpeg" ? JPEG_QUALITY : undefined,
     );
   });
 
@@ -91,7 +97,11 @@ export class RetryablePhotoUploadError extends Error {
 export function isAbortError(err: unknown): boolean {
   if (!err) return false;
   if (err instanceof DOMException && err.name === "AbortError") return true;
-  if (typeof err === "object" && "name" in err && (err as { name?: unknown }).name === "AbortError") {
+  if (
+    typeof err === "object" &&
+    "name" in err &&
+    (err as { name?: unknown }).name === "AbortError"
+  ) {
     return true;
   }
   return false;
@@ -137,7 +147,7 @@ interface UploadProofOpts {
  */
 export async function uploadProofWithRetry(
   file: File,
-  opts: UploadProofOpts
+  opts: UploadProofOpts,
 ): Promise<UploadResult> {
   const existing = inFlightUploads.get(opts.dedupeKey);
   if (existing) return existing;
@@ -163,7 +173,7 @@ export async function uploadProofWithRetry(
       // Network-layer failure (no DNS / offline / TLS) — surface as retryable.
       throw new RetryablePhotoUploadError(
         err instanceof Error ? err.message : "network failure",
-        0
+        0,
       );
     }
 
@@ -175,7 +185,7 @@ export async function uploadProofWithRetry(
       if (response.status >= 500) {
         throw new RetryablePhotoUploadError(
           `Upload failed (${response.status})`,
-          response.status
+          response.status,
         );
       }
       throw new Error(`Photo proof upload rejected (${response.status})`);

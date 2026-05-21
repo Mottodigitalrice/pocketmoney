@@ -18,7 +18,7 @@ const WithdrawalDialogBody = dynamic(
     import("./WithdrawalDialogBody").then((m) => ({
       default: m.WithdrawalDialogBody,
     })),
-  { ssr: false }
+  { ssr: false },
 );
 
 interface WithdrawalDialogProps {

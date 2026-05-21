@@ -6,7 +6,7 @@ import { assertOwnedBy } from "../lib/auth";
 const goalStatusValidator = v.union(
   v.literal("active"),
   v.literal("completed"),
-  v.literal("archived")
+  v.literal("archived"),
 );
 
 const goalDocValidator = v.object({

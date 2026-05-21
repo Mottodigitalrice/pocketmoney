@@ -36,7 +36,7 @@ test("kid: photo-proof happy-path → approval → lucky chest unlock", async ({
     // Today as YYYY-MM-DD.
     const today = new Date();
     const todayStr = `${today.getFullYear()}-${String(
-      today.getMonth() + 1
+      today.getMonth() + 1,
     ).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
 
     // Land on /parent so a) auth is established b) Clerk JS is loaded c)
@@ -79,7 +79,7 @@ test("kid: photo-proof happy-path → approval → lucky chest unlock", async ({
         });
         if (!res.ok) {
           throw new Error(
-            `seedKidScenario failed: ${res.status} ${await res.text()}`
+            `seedKidScenario failed: ${res.status} ${await res.text()}`,
           );
         }
         const json = (await res.json()) as {
@@ -92,7 +92,7 @@ test("kid: photo-proof happy-path → approval → lucky chest unlock", async ({
         };
         return json.value;
       },
-      { date: todayStr, convexUrl: CONVEX_URL }
+      { date: todayStr, convexUrl: CONVEX_URL },
     );
     bobbyId = result.childId;
     tidyDeskJobId = result.jobId;
@@ -104,7 +104,7 @@ test("kid: photo-proof happy-path → approval → lucky chest unlock", async ({
     await page.goto(`/kid/${bobbyId}`);
     // Wait for the kanban board to render with the available job.
     await expect(
-      page.locator('[data-testid="job-card"][data-status="available"]')
+      page.locator('[data-testid="job-card"][data-status="available"]'),
     ).toBeVisible({ timeout: 15_000 });
   });
 
@@ -118,7 +118,7 @@ test("kid: photo-proof happy-path → approval → lucky chest unlock", async ({
 
     // Card should now appear in in_progress.
     await expect(
-      page.locator('[data-testid="job-card"][data-status="in_progress"]')
+      page.locator('[data-testid="job-card"][data-status="in_progress"]'),
     ).toBeVisible({ timeout: 10_000 });
   });
 
@@ -160,7 +160,7 @@ test("kid: photo-proof happy-path → approval → lucky chest unlock", async ({
     // the kid kanban shows in the "Done!" column with "Waiting for
     // Mummy or Daddy" label — see JobCard `status === "completed"` branch).
     await expect(
-      page.locator('[data-testid="job-card"][data-status="completed"]')
+      page.locator('[data-testid="job-card"][data-status="completed"]'),
     ).toBeVisible({ timeout: 10_000 });
   });
 
@@ -170,14 +170,14 @@ test("kid: photo-proof happy-path → approval → lucky chest unlock", async ({
 
     // Find Bobby's approval card by job-id.
     const card = page.locator(
-      `[data-testid="approval-card"][data-job-id="${tidyDeskJobId}"]`
+      `[data-testid="approval-card"][data-job-id="${tidyDeskJobId}"]`,
     );
     await expect(card).toBeVisible({ timeout: 10_000 });
 
     // Proof image renders with alt text from t('approval_photo_proof_alt').
     // Asserting via partial alt match makes this resilient to copy changes.
     await expect(
-      card.locator('img[alt*="proof" i], img[alt*="Photo proof" i]').first()
+      card.locator('img[alt*="proof" i], img[alt*="Photo proof" i]').first(),
     ).toBeVisible({ timeout: 10_000 });
 
     // Approve.
@@ -197,17 +197,17 @@ test("kid: photo-proof happy-path → approval → lucky chest unlock", async ({
     // shared WalletJarBalances component is mounted in a stable layout.
     await page.goto("/parent#overview");
     const bobbyOverview = page.locator(
-      `[data-testid="child-overview"][data-child-id="${bobbyId}"]`
+      `[data-testid="child-overview"][data-child-id="${bobbyId}"]`,
     );
     await expect(bobbyOverview).toBeVisible({ timeout: 10_000 });
     await expect(
-      bobbyOverview.locator('[data-testid="wallet-jar"][data-jar="spend"]')
+      bobbyOverview.locator('[data-testid="wallet-jar"][data-jar="spend"]'),
     ).toHaveAttribute("data-balance", "140", { timeout: 10_000 });
     await expect(
-      bobbyOverview.locator('[data-testid="wallet-jar"][data-jar="save"]')
+      bobbyOverview.locator('[data-testid="wallet-jar"][data-jar="save"]'),
     ).toHaveAttribute("data-balance", "40");
     await expect(
-      bobbyOverview.locator('[data-testid="wallet-jar"][data-jar="give"]')
+      bobbyOverview.locator('[data-testid="wallet-jar"][data-jar="give"]'),
     ).toHaveAttribute("data-balance", "20");
   });
 
@@ -262,8 +262,8 @@ test("kid: photo-proof happy-path → approval → lucky chest unlock", async ({
           d.setDate(monday.getDate() + i);
           week.push(
             `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(
-              d.getDate()
-            ).padStart(2, "0")}`
+              d.getDate(),
+            ).padStart(2, "0")}`,
           );
         }
         const res = await fetch(convexUrl + "/api/mutation", {
@@ -281,7 +281,7 @@ test("kid: photo-proof happy-path → approval → lucky chest unlock", async ({
         const json = await res.json();
         return JSON.stringify(json);
       },
-      { convexUrl: CONVEX_URL, childId: bobbyId }
+      { convexUrl: CONVEX_URL, childId: bobbyId },
     );
 
     // Backend throws "LUCKY_CHEST_ALREADY_OPENED_THIS_WEEK". The Convex

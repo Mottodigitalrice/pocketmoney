@@ -55,15 +55,12 @@ describe("QuickAddToday — H4 empty-state copy & CTA", () => {
   });
 
   it("renders the zero-children empty state without a CTA when no navigator prop is supplied", () => {
-    const { container, queryByText } = renderWithProviders(
-      <QuickAddToday />,
-      {
-        contextValue: {
-          familyChildren: [],
-          jobs: [JOB_TIDY],
-        },
+    const { container, queryByText } = renderWithProviders(<QuickAddToday />, {
+      contextValue: {
+        familyChildren: [],
+        jobs: [JOB_TIDY],
       },
-    );
+    });
 
     // Empty-state copy still renders.
     expect(container).toHaveTextContent(/No crew aboard/i);

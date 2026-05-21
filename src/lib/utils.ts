@@ -1,8 +1,8 @@
-import { clsx, type ClassValue } from "clsx"
-import { twMerge } from "tailwind-merge"
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(inputs));
 }
 
 /**
@@ -12,7 +12,7 @@ export function cn(...inputs: ClassValue[]) {
  * Use this when adapting Convex doc shapes to our domain types.
  */
 export function stripUndefined<T extends Record<string, unknown>>(
-  obj: T
+  obj: T,
 ): { [K in keyof T]: Exclude<T[K], undefined> } {
   const out: Record<string, unknown> = {};
   for (const k in obj) {

@@ -21,7 +21,10 @@ test("authenticated parent can reach /parent without redirect", async ({
   // Use a flexible matcher so this is resilient to copy changes.
   const anyParentTab = page
     .getByRole("button")
-    .filter({ hasText: /quick|approv|plan|job|overview|child|追加|承認|計画|仕事|概要|子供/i });
+    .filter({
+      hasText:
+        /quick|approv|plan|job|overview|child|追加|承認|計画|仕事|概要|子供/i,
+    });
 
   await expect(anyParentTab.first()).toBeVisible({ timeout: 15_000 });
 });

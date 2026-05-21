@@ -76,8 +76,7 @@ const DEFAULT_CTX_HELPERS = {
     const d = String(date.getUTCDate()).padStart(2, "0");
     return `${y}-${m}-${d}`;
   },
-  getJobById: (id: string) =>
-    [JOB_TIDY, JOB_DISHES].find((j) => j._id === id),
+  getJobById: (id: string) => [JOB_TIDY, JOB_DISHES].find((j) => j._id === id),
 };
 
 describe("TreasureHistoryCalendar", () => {

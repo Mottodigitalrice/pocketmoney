@@ -36,7 +36,7 @@ export function weekStartUTC(at: Date | number): Date {
   const d = new Date(ms);
   const dayMonIndexed = (d.getUTCDay() + 6) % 7; // 0=Mon..6=Sun
   const monday = new Date(
-    Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate())
+    Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()),
   );
   monday.setUTCDate(monday.getUTCDate() - dayMonIndexed);
   return monday;
@@ -63,11 +63,11 @@ export function weekStartUTC(at: Date | number): Date {
  */
 export function weeksToBackfill(
   now: Date | number,
-  lookback: number = 4
+  lookback: number = 4,
 ): string[] {
   if (!Number.isInteger(lookback) || lookback < 1) {
     throw new Error(
-      `weeksToBackfill: lookback must be a positive integer, got ${lookback}`
+      `weeksToBackfill: lookback must be a positive integer, got ${lookback}`,
     );
   }
   const start = weekStartUTC(now);
@@ -104,7 +104,7 @@ export interface TxLike {
 export function hasTransactionInWeek(
   transactions: ReadonlyArray<TxLike>,
   weekStart: Date | number,
-  type: string = "interest"
+  type: string = "interest",
 ): boolean {
   const start = typeof weekStart === "number" ? weekStart : weekStart.getTime();
   const end = start + MS_PER_WEEK;
@@ -128,7 +128,7 @@ export function assertIsWeekStartISO(iso: string): Date {
   const snapped = weekStartUTC(d);
   if (snapped.getTime() !== d.getTime()) {
     throw new Error(
-      `assertIsWeekStartISO: ${iso} is not a Monday 00:00 UTC week-start (expected ${snapped.toISOString()})`
+      `assertIsWeekStartISO: ${iso} is not a Monday 00:00 UTC week-start (expected ${snapped.toISOString()})`,
     );
   }
   return d;

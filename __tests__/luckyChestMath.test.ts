@@ -32,7 +32,7 @@ describe("pickLuckyChestAmount — range invariant", () => {
   it("maxAmount=10 over 1000 draws covers every value in [1,10]", () => {
     const rng = makeCycleRng();
     const draws = Array.from({ length: 1000 }, () =>
-      pickLuckyChestAmount(10, rng)
+      pickLuckyChestAmount(10, rng),
     );
     const unique = new Set(draws);
     expect(unique.size).toBe(10);
@@ -61,14 +61,14 @@ describe("pickLuckyChestAmount — validation", () => {
   });
 
   it("throws on undefined (typeof !== number branch)", () => {
-    expect(() =>
-      pickLuckyChestAmount(undefined as unknown as number)
-    ).toThrow(/must be an integer/);
+    expect(() => pickLuckyChestAmount(undefined as unknown as number)).toThrow(
+      /must be an integer/,
+    );
   });
 
   it(`throws on maxAmount=${__testing__.MAX_LUCKY_CHEST_CAP + 1} (over cap)`, () => {
     expect(() =>
-      pickLuckyChestAmount(__testing__.MAX_LUCKY_CHEST_CAP + 1)
+      pickLuckyChestAmount(__testing__.MAX_LUCKY_CHEST_CAP + 1),
     ).toThrow(/must be <= 10000/);
   });
 });

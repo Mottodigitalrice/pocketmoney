@@ -19,18 +19,21 @@ Extract design patterns from existing code to create a system.
 **Scan UI files (tsx, jsx, vue, svelte) for:**
 
 1. **Repeated spacing values**
+
    ```
    Found: 4px (12x), 8px (23x), 12px (18x), 16px (31x), 24px (8x)
    → Suggests: Base 4px, Scale: 4, 8, 12, 16, 24
    ```
 
 2. **Repeated radius values**
+
    ```
    Found: 6px (28x), 8px (5x)
    → Suggests: Radius scale: 6px, 8px
    ```
 
 3. **Button patterns**
+
    ```
    Found 8 buttons:
    - Height: 36px (7/8), 40px (1/8)
@@ -39,6 +42,7 @@ Extract design patterns from existing code to create a system.
    ```
 
 4. **Card patterns**
+
    ```
    Found 12 cards:
    - Border: 1px solid (10/12), none (2/12)
@@ -54,6 +58,7 @@ Extract design patterns from existing code to create a system.
    ```
 
 **Then prompt:**
+
 ```
 Extracted patterns:
 

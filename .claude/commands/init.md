@@ -57,6 +57,7 @@ Be invisible. Don't announce modes or narrate process.
 ## Suggest + Ask
 
 Lead with your exploration and recommendation, then confirm:
+
 ```
 "Domain: [concepts from this product's world]
 Color world: [colors that exist in this domain]

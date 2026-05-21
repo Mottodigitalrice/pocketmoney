@@ -44,7 +44,10 @@ export interface RecurrenceRule {
  * The week is treated as a 7-day window beginning at `weekStartISO` — the
  * caller decides whether that's a Monday-start or Sunday-start week.
  */
-export function materializeRecurrence(rule: RecurrenceRule, weekStartISO: string): string[] {
+export function materializeRecurrence(
+  rule: RecurrenceRule,
+  weekStartISO: string,
+): string[] {
   if (!rule || rule.type === "none") return [];
 
   const weekDates = buildWeek(weekStartISO);
@@ -75,7 +78,7 @@ export function materializeRecurrence(rule: RecurrenceRule, weekStartISO: string
  */
 export function materializeRecurrenceFromMonIndexed(
   rule: { type: RecurrenceType; daysOfWeek?: number[] } | undefined | null,
-  weekDates: string[]
+  weekDates: string[],
 ): string[] {
   if (!rule || rule.type === "none") return [];
 
@@ -101,7 +104,7 @@ export function materializeRecurrenceFromMonIndexed(
  */
 export function recurrenceMatchesDateMonIndexed(
   rule: { type: RecurrenceType; daysOfWeek?: number[] } | undefined | null,
-  date: string
+  date: string,
 ): boolean {
   if (!rule || rule.type === "none") return false;
   const monDow = getMondayIndexedDow(date);

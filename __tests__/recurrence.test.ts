@@ -72,7 +72,11 @@ describe("materializeRecurrence — type=weekdays", () => {
   it("returns 5 dates (Mon–Fri)", () => {
     const rule: RecurrenceRule = { type: "weekdays" };
     expect(materializeRecurrence(rule, MONDAY_WEEK_START)).toEqual([
-      MON, TUE, WED, THU, FRI,
+      MON,
+      TUE,
+      WED,
+      THU,
+      FRI,
     ]);
   });
 
@@ -93,8 +97,15 @@ describe("materializeRecurrence — type=specificDays (Sunday-indexed)", () => {
   });
 
   it("specificDays: [1,3,5] (Mon/Wed/Fri) → 3 dates", () => {
-    const rule: RecurrenceRule = { type: "specificDays", daysOfWeek: [1, 3, 5] };
-    expect(materializeRecurrence(rule, MONDAY_WEEK_START)).toEqual([MON, WED, FRI]);
+    const rule: RecurrenceRule = {
+      type: "specificDays",
+      daysOfWeek: [1, 3, 5],
+    };
+    expect(materializeRecurrence(rule, MONDAY_WEEK_START)).toEqual([
+      MON,
+      WED,
+      FRI,
+    ]);
   });
 
   it("specificDays: [0,6] (weekend: Sun + Sat) → 2 dates", () => {
@@ -124,25 +135,29 @@ describe("materializeRecurrence — type=specificDays (Sunday-indexed)", () => {
 
 describe("materializeRecurrenceFromMonIndexed (legacy schema, 0=Mon..6=Sun)", () => {
   it("type=none → []", () => {
-    expect(materializeRecurrenceFromMonIndexed({ type: "none" }, FULL_WEEK)).toEqual([]);
+    expect(
+      materializeRecurrenceFromMonIndexed({ type: "none" }, FULL_WEEK),
+    ).toEqual([]);
   });
 
   it("type=daily → all 7", () => {
-    expect(materializeRecurrenceFromMonIndexed({ type: "daily" }, FULL_WEEK)).toEqual(FULL_WEEK);
+    expect(
+      materializeRecurrenceFromMonIndexed({ type: "daily" }, FULL_WEEK),
+    ).toEqual(FULL_WEEK);
   });
 
   it("type=weekdays → Mon–Fri", () => {
-    expect(materializeRecurrenceFromMonIndexed({ type: "weekdays" }, FULL_WEEK)).toEqual([
-      MON, TUE, WED, THU, FRI,
-    ]);
+    expect(
+      materializeRecurrenceFromMonIndexed({ type: "weekdays" }, FULL_WEEK),
+    ).toEqual([MON, TUE, WED, THU, FRI]);
   });
 
   it("specificDays [0] (Mon-indexed = Monday) → MON only", () => {
     expect(
       materializeRecurrenceFromMonIndexed(
         { type: "specificDays", daysOfWeek: [0] },
-        FULL_WEEK
-      )
+        FULL_WEEK,
+      ),
     ).toEqual([MON]);
   });
 
@@ -150,8 +165,8 @@ describe("materializeRecurrenceFromMonIndexed (legacy schema, 0=Mon..6=Sun)", ()
     expect(
       materializeRecurrenceFromMonIndexed(
         { type: "specificDays", daysOfWeek: [6] },
-        FULL_WEEK
-      )
+        FULL_WEEK,
+      ),
     ).toEqual([SUN]);
   });
 
@@ -160,7 +175,9 @@ describe("materializeRecurrenceFromMonIndexed (legacy schema, 0=Mon..6=Sun)", ()
   });
 
   it("undefined rule → []", () => {
-    expect(materializeRecurrenceFromMonIndexed(undefined, FULL_WEEK)).toEqual([]);
+    expect(materializeRecurrenceFromMonIndexed(undefined, FULL_WEEK)).toEqual(
+      [],
+    );
   });
 });
 
@@ -173,7 +190,9 @@ describe("recurrenceMatchesDateMonIndexed (legacy predicate)", () => {
 
   it("daily → true for any date", () => {
     for (const date of FULL_WEEK) {
-      expect(recurrenceMatchesDateMonIndexed({ type: "daily" }, date)).toBe(true);
+      expect(recurrenceMatchesDateMonIndexed({ type: "daily" }, date)).toBe(
+        true,
+      );
     }
   });
 
@@ -195,22 +214,22 @@ describe("recurrenceMatchesDateMonIndexed (legacy predicate)", () => {
   });
 
   it("specificDays with no daysOfWeek → false", () => {
-    expect(
-      recurrenceMatchesDateMonIndexed({ type: "specificDays" }, MON)
-    ).toBe(false);
+    expect(recurrenceMatchesDateMonIndexed({ type: "specificDays" }, MON)).toBe(
+      false,
+    );
   });
 });
 
 describe("materializeRecurrence — input validation", () => {
   it("throws on malformed weekStartISO", () => {
-    expect(() => materializeRecurrence({ type: "daily" }, "not-a-date")).toThrow(
-      /YYYY-MM-DD/
-    );
-    expect(() => materializeRecurrence({ type: "daily" }, "2026/05/11")).toThrow(
-      /YYYY-MM-DD/
-    );
+    expect(() =>
+      materializeRecurrence({ type: "daily" }, "not-a-date"),
+    ).toThrow(/YYYY-MM-DD/);
+    expect(() =>
+      materializeRecurrence({ type: "daily" }, "2026/05/11"),
+    ).toThrow(/YYYY-MM-DD/);
     expect(() => materializeRecurrence({ type: "daily" }, "")).toThrow(
-      /YYYY-MM-DD/
+      /YYYY-MM-DD/,
     );
   });
 });

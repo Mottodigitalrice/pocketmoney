@@ -6,11 +6,13 @@ description: Clerk authentication patterns — sign-in/up flows, middleware prot
 # Clerk Authentication Patterns
 
 ## Overview
+
 Clerk provides pre-built authentication UI and works with both Convex (Demo template) and Supabase (MVP template). The integration patterns differ by database.
 
 ## Provider Setup
 
 Already configured in `src/app/layout.tsx`:
+
 ```typescript
 import { ClerkProvider } from "@clerk/nextjs";
 import { ConvexClientProvider } from "@/components/providers/convex-client-provider";
@@ -111,6 +113,7 @@ import { SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
 ## User Sync Strategies
 
 ### Strategy 1: Client-Side Sync (Convex / Demo Template)
+
 User data synced to Convex via `useEffect` on the client:
 
 ```typescript
@@ -142,6 +145,7 @@ export function UserSync() {
 Place `<UserSync />` inside an authenticated layout.
 
 ### Strategy 2: Webhook Sync (Supabase / MVP Template)
+
 User data synced via Clerk webhook → Supabase:
 
 1. Clerk sends POST to `/api/webhooks/clerk` on user events
@@ -151,6 +155,7 @@ User data synced via Clerk webhook → Supabase:
 See `supabase-patterns.md` for the full webhook handler.
 
 **Webhook setup:**
+
 1. Clerk Dashboard → Webhooks → Create endpoint
 2. URL: `https://your-domain.com/api/webhooks/clerk`
 3. Events: `user.created`, `user.updated`, `user.deleted`
@@ -159,15 +164,19 @@ See `supabase-patterns.md` for the full webhook handler.
 ## Vercel Preview Deploys
 
 ### Deployment Protection
+
 Vercel enables **Deployment Protection** on preview deploys by default, returning HTTP 401 for unauthenticated requests. This blocks Clerk's auth flow.
 
 **Options:**
+
 1. **Deploy to production** instead of preview for testing
 2. **Disable Deployment Protection** in Vercel → Settings → Deployment Protection → Standard Protection → Off
 3. **Whitelist Clerk domains** in Vercel's protection bypass
 
 ### Preview Webhook URLs
+
 Preview URLs change with each deploy. For Clerk webhooks on previews:
+
 - Use a stable URL (e.g., ngrok tunnel or production webhook endpoint)
 - Or test webhook flows only on production deploys
 
@@ -187,6 +196,7 @@ CLERK_WEBHOOK_SECRET=whsec_...
 ```
 
 ## Get Keys
+
 1. Go to https://dashboard.clerk.com
 2. Create or select project
 3. Copy keys from "API Keys" section

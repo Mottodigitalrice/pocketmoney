@@ -36,6 +36,7 @@ Check existing code against your design system.
    - Find cards not matching Card pattern
 
 **Report format:**
+
 ```
 Audit Results: src/components/
 

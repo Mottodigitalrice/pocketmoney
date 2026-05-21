@@ -31,7 +31,7 @@ crons.weekly(
     hourUTC: 10,
     minuteUTC: 0,
   },
-  internal.functions.wallets.creditWeeklySaveInterest
+  internal.functions.wallets.creditWeeklySaveInterest,
 );
 
 crons.weekly(
@@ -41,7 +41,7 @@ crons.weekly(
     hourUTC: 10,
     minuteUTC: 15,
   },
-  internal.functions.jobInstances.cleanupApprovedPhotoProofs
+  internal.functions.jobInstances.cleanupApprovedPhotoProofs,
 );
 
 export default crons;

@@ -26,25 +26,30 @@ import { LanguageProvider } from "@/components/providers/LanguageProvider";
 // (mockReturnValueOnce would silently expire after the first render and
 // downstream calls would return `undefined`, which manifests as
 // `createChild is not a function` at the call site.)
-const { useQueryMock, useMutationMock, mutationSpies, routerPushSpy } = vi.hoisted(() => {
-  const spies = {
-    createChild: vi.fn(),
-    createJob: vi.fn(),
-    seedDefaults: vi.fn(),
-  };
-  let callIdx = 0;
-  const order: Array<keyof typeof spies> = ["createChild", "createJob", "seedDefaults"];
-  return {
-    useQueryMock: vi.fn(),
-    mutationSpies: spies,
-    useMutationMock: vi.fn().mockImplementation(() => {
-      const spy = spies[order[callIdx % 3]!];
-      callIdx += 1;
-      return spy;
-    }),
-    routerPushSpy: vi.fn(),
-  };
-});
+const { useQueryMock, useMutationMock, mutationSpies, routerPushSpy } =
+  vi.hoisted(() => {
+    const spies = {
+      createChild: vi.fn(),
+      createJob: vi.fn(),
+      seedDefaults: vi.fn(),
+    };
+    let callIdx = 0;
+    const order: Array<keyof typeof spies> = [
+      "createChild",
+      "createJob",
+      "seedDefaults",
+    ];
+    return {
+      useQueryMock: vi.fn(),
+      mutationSpies: spies,
+      useMutationMock: vi.fn().mockImplementation(() => {
+        const spy = spies[order[callIdx % 3]!];
+        callIdx += 1;
+        return spy;
+      }),
+      routerPushSpy: vi.fn(),
+    };
+  });
 
 vi.mock("@/lib/env", () => ({
   hasAppDataEnv: true,
@@ -58,8 +63,16 @@ vi.mock("convex/react", () => ({
 }));
 
 vi.mock("@clerk/nextjs", () => ({
-  useUser: () => ({ user: { id: "clerk-user-123" }, isLoaded: true, isSignedIn: true }),
-  useAuth: () => ({ isLoaded: true, isSignedIn: true, userId: "clerk-user-123" }),
+  useUser: () => ({
+    user: { id: "clerk-user-123" },
+    isLoaded: true,
+    isSignedIn: true,
+  }),
+  useAuth: () => ({
+    isLoaded: true,
+    isSignedIn: true,
+    userId: "clerk-user-123",
+  }),
 }));
 
 vi.mock("next/navigation", () => ({
@@ -83,7 +96,9 @@ function renderOnboarding(locale: "en" | "ja" = "en") {
 /** Fill out the children step minimally so we can advance to jobs / done. */
 function fillFirstChild() {
   // First name input — there's only one on StepAddChildren initially.
-  const nameInput = screen.getByPlaceholderText(/Crew member's name|クルーの名前/);
+  const nameInput = screen.getByPlaceholderText(
+    /Crew member's name|クルーの名前/,
+  );
   fireEvent.change(nameInput, { target: { value: "Jayden" } });
   // First icon button (shark/dolphin/etc.) — pick the first non-disabled one.
   const iconButtons = screen
@@ -97,7 +112,10 @@ beforeEach(() => {
   useQueryMock.mockReset();
   // Default: convexUser is provisioned and we have an _id so handleComplete
   // can proceed.
-  useQueryMock.mockReturnValue({ _id: "convex-user-id", captainCodeEnabled: false });
+  useQueryMock.mockReturnValue({
+    _id: "convex-user-id",
+    captainCodeEnabled: false,
+  });
 
   // Reset the mutation spies — but NOT useMutationMock itself, since that
   // would clear the `mockImplementation` that maps call order → spy.
@@ -116,7 +134,11 @@ describe("OnboardingPage — H3 fixes", () => {
   // 3.2 — skip-jobs path: empty custom jobs list still advances + saves.
   it("3.2 — allows advancing past StepAddJobs with zero custom jobs (skip path clears the list)", async () => {
     // mutationSpies (resolved defaults from beforeEach) cover all three.
-    const { createChild: createChildSpy, createJob: createJobSpy, seedDefaults: seedDefaultsSpy } = mutationSpies;
+    const {
+      createChild: createChildSpy,
+      createJob: createJobSpy,
+      seedDefaults: seedDefaultsSpy,
+    } = mutationSpies;
 
     renderOnboarding();
 
@@ -188,7 +210,9 @@ describe("OnboardingPage — H3 fixes", () => {
     const createChildSpy = mutationSpies.createChild;
 
     // Silence console.error for this test — the catch logs intentionally.
-    const consoleErrSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const consoleErrSpy = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
 
     renderOnboarding();
 

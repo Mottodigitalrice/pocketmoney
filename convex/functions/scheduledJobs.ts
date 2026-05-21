@@ -57,7 +57,7 @@ export const getByChildDate = query({
     return await ctx.db
       .query("scheduledJobs")
       .withIndex("by_child_date", (q) =>
-        q.eq("childId", args.childId).eq("date", args.date)
+        q.eq("childId", args.childId).eq("date", args.date),
       )
       .collect();
   },
@@ -101,7 +101,7 @@ export const createBatch = mutation({
         childId: v.id("children"),
         date: v.string(),
         priority: v.optional(priorityValidator),
-      })
+      }),
     ),
   },
   returns: v.array(v.id("scheduledJobs")),
@@ -149,11 +149,7 @@ export const applyRecurringForWeek = mutation({
     let offset = 0;
 
     for (const entry of args.entries) {
-      const job = assertOwnedBy(
-        await ctx.db.get(entry.jobId),
-        user._id,
-        "job"
-      );
+      const job = assertOwnedBy(await ctx.db.get(entry.jobId), user._id, "job");
       if (!job.recurrence || job.recurrence.type === "none") continue;
 
       for (const childId of entry.childIds) {
@@ -165,11 +161,13 @@ export const applyRecurringForWeek = mutation({
           const existingEntries = await ctx.db
             .query("scheduledJobs")
             .withIndex("by_child_date", (q) =>
-              q.eq("childId", childId).eq("date", date)
+              q.eq("childId", childId).eq("date", date),
             )
             .collect();
 
-          if (existingEntries.some((scheduled) => scheduled.jobId === entry.jobId)) {
+          if (
+            existingEntries.some((scheduled) => scheduled.jobId === entry.jobId)
+          ) {
             continue;
           }
 
@@ -204,14 +202,13 @@ export const quickAddForToday = mutation({
   returns: v.array(v.union(v.id("scheduledJobs"), v.id("jobInstances"))),
   handler: async (ctx, args) => {
     const user = await getCurrentUser(ctx);
-    const job = assertOwnedBy(
-      await ctx.db.get(args.jobId),
-      user._id,
-      "job"
-    );
+    const job = assertOwnedBy(await ctx.db.get(args.jobId), user._id, "job");
 
     const now = Date.now();
-    const ids: Array<import("../_generated/dataModel").Id<"scheduledJobs"> | import("../_generated/dataModel").Id<"jobInstances">> = [];
+    const ids: Array<
+      | import("../_generated/dataModel").Id<"scheduledJobs">
+      | import("../_generated/dataModel").Id<"jobInstances">
+    > = [];
 
     for (let i = 0; i < args.childIds.length; i++) {
       const childId = args.childIds[i]!; // safe: i bounded by args.childIds.length
@@ -243,11 +240,13 @@ export const quickAddForToday = mutation({
       const existingEntries = await ctx.db
         .query("scheduledJobs")
         .withIndex("by_child_date", (q) =>
-          q.eq("childId", childId).eq("date", args.date)
+          q.eq("childId", childId).eq("date", args.date),
         )
         .collect();
 
-      const duplicate = existingEntries.find((entry) => entry.jobId === args.jobId);
+      const duplicate = existingEntries.find(
+        (entry) => entry.jobId === args.jobId,
+      );
       if (duplicate) {
         ids.push(duplicate._id);
         continue;
@@ -277,7 +276,7 @@ export const remove = mutation({
     const sj = assertOwnedByOrNull(
       await ctx.db.get(args.scheduledJobId),
       user._id,
-      "scheduled job"
+      "scheduled job",
     );
     if (!sj) return null;
 
@@ -285,7 +284,7 @@ export const remove = mutation({
     const instances = await ctx.db
       .query("jobInstances")
       .withIndex("by_scheduled_job", (q) =>
-        q.eq("scheduledJobId", args.scheduledJobId)
+        q.eq("scheduledJobId", args.scheduledJobId),
       )
       .collect();
 
@@ -311,14 +310,14 @@ export const clearDay = mutation({
     const child = assertOwnedByOrNull(
       await ctx.db.get(args.childId),
       user._id,
-      "child"
+      "child",
     );
     if (!child) return null;
 
     const entries = await ctx.db
       .query("scheduledJobs")
       .withIndex("by_child_date", (q) =>
-        q.eq("childId", args.childId).eq("date", args.date)
+        q.eq("childId", args.childId).eq("date", args.date),
       )
       .collect();
 
@@ -326,9 +325,7 @@ export const clearDay = mutation({
       // Delete linked instances
       const instances = await ctx.db
         .query("jobInstances")
-        .withIndex("by_scheduled_job", (q) =>
-          q.eq("scheduledJobId", entry._id)
-        )
+        .withIndex("by_scheduled_job", (q) => q.eq("scheduledJobId", entry._id))
         .collect();
 
       for (const instance of instances) {

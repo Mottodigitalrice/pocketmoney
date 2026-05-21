@@ -52,7 +52,9 @@ export default function KidPage({ params }: KidPageProps) {
 
   return (
     <div className="min-h-screen pb-8">
-      {currentRank && <RankUpToast childId={childId} currentRank={currentRank} />}
+      {currentRank && (
+        <RankUpToast childId={childId} currentRank={currentRank} />
+      )}
       <KidHeader childId={childId} />
       <div className="mt-4 space-y-6">
         <WeeklyTracker childId={childId} />

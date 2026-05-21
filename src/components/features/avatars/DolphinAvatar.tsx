@@ -5,7 +5,10 @@
 export function DolphinAvatar({
   className = "",
   label = "Dolphin avatar",
-}: { className?: string; label?: string }) {
+}: {
+  className?: string;
+  label?: string;
+}) {
   return (
     <svg
       viewBox="0 0 120 120"
@@ -34,7 +37,13 @@ export function DolphinAvatar({
       <circle cx="81" cy="50" r="7" fill="#0D47A1" />
       <circle cx="83" cy="47" r="3" fill="white" />
       {/* Happy smile */}
-      <path d="M45,75 Q60,86 75,75" stroke="#0D47A1" strokeWidth="2.5" fill="none" strokeLinecap="round" />
+      <path
+        d="M45,75 Q60,86 75,75"
+        stroke="#0D47A1"
+        strokeWidth="2.5"
+        fill="none"
+        strokeLinecap="round"
+      />
       {/* Rosy cheeks */}
       <circle cx="35" cy="65" r="5" fill="#F48FB1" opacity="0.35" />
       <circle cx="85" cy="65" r="5" fill="#F48FB1" opacity="0.35" />

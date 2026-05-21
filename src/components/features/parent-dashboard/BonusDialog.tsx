@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button";
 const BonusDialogBody = dynamic(
   () =>
     import("./BonusDialogBody").then((m) => ({ default: m.BonusDialogBody })),
-  { ssr: false }
+  { ssr: false },
 );
 
 interface BonusDialogProps {

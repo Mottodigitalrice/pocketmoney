@@ -25,11 +25,16 @@ interface ChildFormProps {
 
 const iconKeys = Object.keys(CHILD_ICON_CONFIG) as ChildIcon[];
 
-export function ChildForm({ open, onClose, onSave, editingChild }: ChildFormProps) {
+export function ChildForm({
+  open,
+  onClose,
+  onSave,
+  editingChild,
+}: ChildFormProps) {
   const { t, locale } = useTranslation();
   const [name, setName] = useState(() => editingChild?.name ?? "");
   const [selectedIcon, setSelectedIcon] = useState<ChildIcon>(
-    () => (editingChild?.icon as ChildIcon | undefined) ?? "shark"
+    () => (editingChild?.icon as ChildIcon | undefined) ?? "shark",
   );
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -48,7 +53,9 @@ export function ChildForm({ open, onClose, onSave, editingChild }: ChildFormProp
         <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
           <DialogHeader>
             <DialogTitle className="text-amber-100">
-              {isEditing ? t("child_form_edit_title") : t("child_form_add_title")}
+              {isEditing
+                ? t("child_form_edit_title")
+                : t("child_form_add_title")}
             </DialogTitle>
           </DialogHeader>
 
@@ -86,7 +93,8 @@ export function ChildForm({ open, onClose, onSave, editingChild }: ChildFormProp
                   const isSelected = selectedIcon === key;
                   // F12: locale-aware sea creature labels — `labelJa` is in
                   // CHILD_ICON_CONFIG and was previously ignored on this form.
-                  const iconLabel = locale === "ja" ? config.labelJa : config.label;
+                  const iconLabel =
+                    locale === "ja" ? config.labelJa : config.label;
                   return (
                     <button
                       type="button"
@@ -103,7 +111,9 @@ export function ChildForm({ open, onClose, onSave, editingChild }: ChildFormProp
                           : "bg-amber-800/40 hover:bg-amber-800/60"
                       }`}
                     >
-                      <span className="text-2xl" aria-hidden="true">{config.emoji}</span>
+                      <span className="text-2xl" aria-hidden="true">
+                        {config.emoji}
+                      </span>
                       <span className="text-xs font-medium text-amber-200">
                         {iconLabel}
                       </span>

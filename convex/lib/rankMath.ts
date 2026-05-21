@@ -58,19 +58,22 @@ export interface RankCalculation {
  */
 export function calculateRank(
   lifetimeEarnings: number,
-  rankMultiplier: number
+  rankMultiplier: number,
 ): RankCalculation {
   // Defensive: provider had `child?.rankMultiplier ?? 1` — preserve that default
   // here too, plus guard against NaN/null leaking in.
   const multiplier =
     Number.isFinite(rankMultiplier) && rankMultiplier > 0 ? rankMultiplier : 1;
-  const lifetime = Number.isFinite(lifetimeEarnings) ? Math.max(0, lifetimeEarnings) : 0;
+  const lifetime = Number.isFinite(lifetimeEarnings)
+    ? Math.max(0, lifetimeEarnings)
+    : 0;
 
   const score = Math.floor(lifetime * multiplier);
 
   const currentIndex = RANK_THRESHOLDS.reduce(
-    (bestIndex, threshold, index) => (score >= threshold.score ? index : bestIndex),
-    0
+    (bestIndex, threshold, index) =>
+      score >= threshold.score ? index : bestIndex,
+    0,
   );
   // safe: currentIndex always points to a valid entry since RANK_THRESHOLDS
   // has at least one element and the reduce starts at index 0.
@@ -82,7 +85,9 @@ export function calculateRank(
   const progressToNext = nextScore
     ? Math.min(
         100,
-        Math.round(((score - previousScore) / (nextScore - previousScore)) * 100)
+        Math.round(
+          ((score - previousScore) / (nextScore - previousScore)) * 100,
+        ),
       )
     : 100;
 

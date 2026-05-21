@@ -23,9 +23,7 @@ describe("JobForm", () => {
   it("does not call onSave when the title is empty (whitespace only)", () => {
     const onSave = vi.fn();
     const onClose = vi.fn();
-    renderWithProviders(
-      <JobForm open onClose={onClose} onSave={onSave} />,
-    );
+    renderWithProviders(<JobForm open onClose={onClose} onSave={onSave} />);
     // Title default is "" for add-new. Submit immediately.
     const form = screen.getByLabelText(/Job Name/i).closest("form");
     expect(form).not.toBeNull();
@@ -38,9 +36,7 @@ describe("JobForm", () => {
   it("calls onSave with the form values when title + yen are valid", async () => {
     const onSave = vi.fn();
     const onClose = vi.fn();
-    renderWithProviders(
-      <JobForm open onClose={onClose} onSave={onSave} />,
-    );
+    renderWithProviders(<JobForm open onClose={onClose} onSave={onSave} />);
 
     const titleInput = screen.getByLabelText(/Job Name/i) as HTMLInputElement;
     fireEvent.change(titleInput, { target: { value: "Walk the dog" } });
@@ -71,9 +67,7 @@ describe("JobForm", () => {
 
   it("submits with requiresPhotoProof=true when the photo-proof Switch is toggled on", async () => {
     const onSave = vi.fn();
-    renderWithProviders(
-      <JobForm open onClose={vi.fn()} onSave={onSave} />,
-    );
+    renderWithProviders(<JobForm open onClose={vi.fn()} onSave={onSave} />);
 
     const titleInput = screen.getByLabelText(/Job Name/i) as HTMLInputElement;
     fireEvent.change(titleInput, { target: { value: "Make bed" } });
@@ -92,9 +86,7 @@ describe("JobForm", () => {
 
   it("submits the yen value the user typed (controlled number input)", async () => {
     const onSave = vi.fn();
-    renderWithProviders(
-      <JobForm open onClose={vi.fn()} onSave={onSave} />,
-    );
+    renderWithProviders(<JobForm open onClose={vi.fn()} onSave={onSave} />);
 
     const titleInput = screen.getByLabelText(/Job Name/i) as HTMLInputElement;
     fireEvent.change(titleInput, { target: { value: "Tidy" } });
@@ -114,9 +106,7 @@ describe("JobForm", () => {
   it("calls onClose (and NOT onSave) when the Cancel button is clicked", () => {
     const onSave = vi.fn();
     const onClose = vi.fn();
-    renderWithProviders(
-      <JobForm open onClose={onClose} onSave={onSave} />,
-    );
+    renderWithProviders(<JobForm open onClose={onClose} onSave={onSave} />);
 
     // `job_form_cancel` → "Cancel".
     const cancelBtn = screen.getByRole("button", { name: /Cancel/i });

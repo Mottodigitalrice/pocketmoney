@@ -18,7 +18,11 @@ import { Skeleton } from "@/components/ui/skeleton";
  */
 export function ChildManagerSkeleton() {
   return (
-    <div aria-hidden="true" data-testid="child-manager-skeleton" className="space-y-4">
+    <div
+      aria-hidden="true"
+      data-testid="child-manager-skeleton"
+      className="space-y-4"
+    >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Skeleton className="size-7 rounded bg-amber-900/40" />
@@ -152,9 +156,7 @@ export function ChildManager({
                     iconConfig?.bgColor ?? "bg-amber-800/80"
                   } border-2 ${iconConfig?.borderColor ?? "border-amber-400"}`}
                 >
-                  <span className="text-2xl">
-                    {iconConfig?.emoji ?? "🐟"}
-                  </span>
+                  <span className="text-2xl">{iconConfig?.emoji ?? "🐟"}</span>
                 </div>
 
                 {/* Name and label */}
@@ -173,7 +175,9 @@ export function ChildManager({
                     variant="ghost"
                     size="icon"
                     onClick={() => handleEdit(child)}
-                    aria-label={t("child_manager_edit_aria", { name: child.name })}
+                    aria-label={t("child_manager_edit_aria", {
+                      name: child.name,
+                    })}
                     className="min-h-11 min-w-11 text-base text-amber-300 hover:bg-amber-800/40 hover:text-amber-100"
                   >
                     ✏️
@@ -188,7 +192,9 @@ export function ChildManager({
                       setDeletingChild({ id: child._id, name: child.name })
                     }
                     data-testid="child-row-delete"
-                    aria-label={t("child_manager_delete_aria", { name: child.name })}
+                    aria-label={t("child_manager_delete_aria", {
+                      name: child.name,
+                    })}
                     className="min-h-11 min-w-11 text-base text-red-400 hover:bg-red-900/40 hover:text-red-300"
                   >
                     🗑️
@@ -216,7 +222,9 @@ export function ChildManager({
         onConfirm={() => {
           if (deletingChild) onDelete(deletingChild.id);
         }}
-        title={t("child_delete_confirm_title", { name: deletingChild?.name ?? "" })}
+        title={t("child_delete_confirm_title", {
+          name: deletingChild?.name ?? "",
+        })}
         body={<BudouXText>{t("child_delete_confirm_body")}</BudouXText>}
         confirmLabel={t("child_delete_confirm_cta")}
         cancelLabel={t("child_delete_confirm_cancel")}

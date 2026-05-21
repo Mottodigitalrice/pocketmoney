@@ -202,10 +202,9 @@ describe("WeekPlanner", () => {
     const clearScheduledDay = vi.fn();
     // Inject one scheduled entry on Tuesday for child A.
     const scheduledEntries = new Map<string, ScheduledJobWithJob[]>();
-    scheduledEntries.set(
-      `${CHILD_A._id}|2026-05-12`,
-      [scheduled("s1", JOB_TIDY, CHILD_A._id, "2026-05-12")],
-    );
+    scheduledEntries.set(`${CHILD_A._id}|2026-05-12`, [
+      scheduled("s1", JOB_TIDY, CHILD_A._id, "2026-05-12"),
+    ]);
 
     renderWithProviders(<WeekPlanner />, {
       contextValue: makeContext({

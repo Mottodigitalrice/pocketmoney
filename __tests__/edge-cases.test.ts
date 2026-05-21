@@ -124,10 +124,10 @@ describe("(c) withdraw overdraft guard", () => {
 
   it("error format is exact (frontend pattern-matches)", () => {
     expect(overdraftErrorOrNull(0, 1)).toBe(
-      "OVERDRAFT: balance ¥0 cannot cover withdrawal ¥1"
+      "OVERDRAFT: balance ¥0 cannot cover withdrawal ¥1",
     );
     expect(overdraftErrorOrNull(50, 100)).toBe(
-      "OVERDRAFT: balance ¥50 cannot cover withdrawal ¥100"
+      "OVERDRAFT: balance ¥50 cannot cover withdrawal ¥100",
     );
   });
 
@@ -213,8 +213,13 @@ describe("(f) daysOfWeek Mon-indexed call-site audit", () => {
   const MON = "2026-05-11";
   const SUN = "2026-05-17";
   const FULL_WEEK = [
-    MON, "2026-05-12", "2026-05-13", "2026-05-14", "2026-05-15",
-    "2026-05-16", SUN,
+    MON,
+    "2026-05-12",
+    "2026-05-13",
+    "2026-05-14",
+    "2026-05-15",
+    "2026-05-16",
+    SUN,
   ];
 
   it("Mon-indexed specificDays: [0] resolves to Monday, not Sunday", () => {
@@ -224,7 +229,7 @@ describe("(f) daysOfWeek Mon-indexed call-site audit", () => {
     // into the Mon-indexed function.
     const result = materializeRecurrenceFromMonIndexed(
       { type: "specificDays", daysOfWeek: [0] },
-      FULL_WEEK
+      FULL_WEEK,
     );
     expect(result).toEqual([MON]);
     expect(result).not.toEqual([SUN]);
@@ -233,7 +238,7 @@ describe("(f) daysOfWeek Mon-indexed call-site audit", () => {
   it("Mon-indexed specificDays: [6] resolves to Sunday", () => {
     const result = materializeRecurrenceFromMonIndexed(
       { type: "specificDays", daysOfWeek: [6] },
-      FULL_WEEK
+      FULL_WEEK,
     );
     expect(result).toEqual([SUN]);
   });

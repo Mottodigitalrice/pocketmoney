@@ -14,7 +14,7 @@ const TreasureChestAnimation = dynamic(
     import("./TreasureChestAnimation").then((m) => ({
       default: m.TreasureChestAnimation,
     })),
-  { ssr: false }
+  { ssr: false },
 );
 
 interface WeeklyTrackerProps {

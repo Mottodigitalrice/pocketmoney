@@ -64,14 +64,14 @@ describe("assertOwnedBy — wrong owner throws 'Not your {resource}'", () => {
 describe("assertOwnedBy — missing doc throws '{Resource} not found'", () => {
   it("throws NOT_FOUND-style error when doc is null", () => {
     expect(() => assertOwnedBy(null, userA, "child")).toThrow(
-      /Child not found/
+      /Child not found/,
     );
   });
 
   it("capitalizes the resource label in the error message", () => {
     // The capitalize() helper lives in auth.ts. Confirm: "wallet" → "Wallet".
     expect(() => assertOwnedBy(null, userA, "wallet")).toThrow(
-      /Wallet not found/
+      /Wallet not found/,
     );
   });
 });
@@ -86,7 +86,7 @@ describe("assertOwnedByOrNull — wrong owner still throws (cross-tenant)", () =
     // OK (idempotent delete pattern); cross-tenant is never OK.
     const doc: OwnedTestDoc = { _id: "child_1", userId: userB };
     expect(() => assertOwnedByOrNull(doc, userA, "child")).toThrow(
-      /Not your child/
+      /Not your child/,
     );
   });
 });
@@ -120,7 +120,7 @@ describe("getOwnedById — happy path fetches + asserts in one call", () => {
       ctx as any,
       "child_1" as unknown as Id<"children">,
       userA,
-      "child"
+      "child",
     );
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expect(result as any).toBe(doc);
@@ -141,8 +141,8 @@ describe("getOwnedById — wrong owner throws (via assertOwnedBy)", () => {
         ctx as any,
         "child_1" as unknown as Id<"children">,
         userA,
-        "child"
-      )
+        "child",
+      ),
     ).rejects.toThrow(/Not your child/);
   });
 
@@ -158,8 +158,8 @@ describe("getOwnedById — wrong owner throws (via assertOwnedBy)", () => {
         ctx as any,
         "missing_id" as unknown as Id<"children">,
         userA,
-        "child"
-      )
+        "child",
+      ),
     ).rejects.toThrow(/Child not found/);
   });
 });

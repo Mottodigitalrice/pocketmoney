@@ -9,17 +9,21 @@ const BubbleEffect = dynamic(
     import("@/components/features/ocean/BubbleEffect").then((m) => ({
       default: m.BubbleEffect,
     })),
-  { ssr: false }
+  { ssr: false },
 );
 const WaveAnimation = dynamic(
   () =>
     import("@/components/features/ocean/WaveAnimation").then((m) => ({
       default: m.WaveAnimation,
     })),
-  { ssr: false }
+  { ssr: false },
 );
 
-export default function ParentLayout({ children }: { children: React.ReactNode }) {
+export default function ParentLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <div className="pirate-gradient relative min-h-screen overflow-hidden">
       <WaveAnimation position="top" />

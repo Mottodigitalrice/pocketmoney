@@ -73,11 +73,7 @@ export interface ScheduledJobWithJob extends ScheduledJob {
   rejectionCount?: number;
 }
 
-export type JobStatus =
-  | "in_progress"
-  | "completed"
-  | "approved"
-  | "rejected";
+export type JobStatus = "in_progress" | "completed" | "approved" | "rejected";
 export type JobPriority = "mustDo" | "optional";
 
 export type PirateRank = "Noob" | "Normal" | "Pro" | "Master" | "Hacker";

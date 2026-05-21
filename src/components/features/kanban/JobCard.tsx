@@ -84,8 +84,8 @@ export function JobCard({
         status === "available"
           ? "border-blue-300"
           : status === "in_progress"
-          ? "border-amber-400"
-          : "border-green-400"
+            ? "border-amber-400"
+            : "border-green-400"
       }`}
       style={{ animationDuration: `${animationDuration}s` }}
     >

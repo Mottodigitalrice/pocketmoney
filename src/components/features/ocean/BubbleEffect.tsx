@@ -17,7 +17,7 @@ export function BubbleEffect({ count = 15 }: { count?: number }) {
         isBig,
         wobbleX: [0, wobbleAmount, -wobbleAmount * 0.7, wobbleAmount * 0.4, 0],
       };
-    })
+    }),
   );
 
   return (

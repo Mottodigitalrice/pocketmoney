@@ -19,7 +19,7 @@ function useInView(threshold = 0.15) {
           obs.disconnect();
         }
       },
-      { threshold }
+      { threshold },
     );
     obs.observe(el);
     return () => obs.disconnect();
@@ -102,11 +102,46 @@ function PhoneFrame({ children }: { children: ReactNode }) {
 function FloatingCoins() {
   const coins = [
     { emoji: "🪙", cls: "text-4xl", x: "8%", y: "18%", delay: "0s", dur: "4s" },
-    { emoji: "💴", cls: "text-3xl", x: "82%", y: "12%", delay: "1.2s", dur: "5s" },
-    { emoji: "🪙", cls: "text-2xl", x: "72%", y: "62%", delay: "2s", dur: "3.5s" },
-    { emoji: "💰", cls: "text-3xl", x: "15%", y: "68%", delay: "0.6s", dur: "4.5s" },
-    { emoji: "🪙", cls: "text-xl", x: "50%", y: "25%", delay: "1.5s", dur: "3s" },
-    { emoji: "💴", cls: "text-2xl", x: "35%", y: "75%", delay: "0.3s", dur: "5.5s" },
+    {
+      emoji: "💴",
+      cls: "text-3xl",
+      x: "82%",
+      y: "12%",
+      delay: "1.2s",
+      dur: "5s",
+    },
+    {
+      emoji: "🪙",
+      cls: "text-2xl",
+      x: "72%",
+      y: "62%",
+      delay: "2s",
+      dur: "3.5s",
+    },
+    {
+      emoji: "💰",
+      cls: "text-3xl",
+      x: "15%",
+      y: "68%",
+      delay: "0.6s",
+      dur: "4.5s",
+    },
+    {
+      emoji: "🪙",
+      cls: "text-xl",
+      x: "50%",
+      y: "25%",
+      delay: "1.5s",
+      dur: "3s",
+    },
+    {
+      emoji: "💴",
+      cls: "text-2xl",
+      x: "35%",
+      y: "75%",
+      delay: "0.3s",
+      dur: "5.5s",
+    },
   ];
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden">
@@ -210,22 +245,16 @@ function HeroSection() {
           float-up entrance) so the H1 is the LCP element at first paint
           rather than being delayed by the 0.6s opacity:0→1 keyframe. */}
       <div className="relative z-10">
-        <div className="mb-4 text-5xl">
-          🏴‍☠️
-        </div>
+        <div className="mb-4 text-5xl">🏴‍☠️</div>
 
-        <h1
-          className="mx-auto max-w-4xl text-5xl font-black leading-tight tracking-tight text-white drop-shadow-lg sm:text-6xl lg:text-7xl"
-        >
+        <h1 className="mx-auto max-w-4xl text-5xl font-black leading-tight tracking-tight text-white drop-shadow-lg sm:text-6xl lg:text-7xl">
           Turn Chores Into{" "}
           <span className="bg-gradient-to-r from-amber-300 to-yellow-200 bg-clip-text text-transparent">
             Treasure
           </span>
         </h1>
 
-        <p
-          className="mx-auto mt-6 max-w-2xl text-lg text-white/80 sm:text-xl"
-        >
+        <p className="mx-auto mt-6 max-w-2xl text-lg text-white/80 sm:text-xl">
           Kids earn real pocket money by completing household jobs.
           <br className="hidden sm:block" /> Fun for kids, easy for parents,
           great for the whole family.
@@ -278,10 +307,7 @@ function HeroSection() {
       </div>
 
       {/* Wave transition to white */}
-      <Wave
-        fill="#ffffff"
-        className="absolute bottom-0 left-0 right-0 z-10"
-      />
+      <Wave fill="#ffffff" className="absolute bottom-0 left-0 right-0 z-10" />
     </section>
   );
 }
@@ -377,9 +403,7 @@ function HowItWorks() {
         {/* Connection arrows (desktop) */}
         <div className="mt-4 hidden items-center justify-center gap-2 text-gray-300 sm:flex">
           <div className="h-px flex-1 bg-gray-200" />
-          <span className="text-xs font-bold text-gray-400">
-            → → →
-          </span>
+          <span className="text-xs font-bold text-gray-400">→ → →</span>
           <div className="h-px flex-1 bg-gray-200" />
         </div>
       </div>
@@ -395,7 +419,9 @@ function ParentScreenMockup() {
     <div className="min-h-[420px] bg-gradient-to-b from-amber-900 to-amber-950 p-4">
       {/* Header */}
       <div className="mb-3 text-center">
-        <p className="text-xs font-bold text-amber-300">🏴‍☠️ Captain&apos;s Deck</p>
+        <p className="text-xs font-bold text-amber-300">
+          🏴‍☠️ Captain&apos;s Deck
+        </p>
         <p className="text-sm font-bold text-white">Week Planner</p>
       </div>
 
@@ -425,7 +451,9 @@ function ParentScreenMockup() {
           ))}
         </div>
         <div className="mt-2 flex items-center justify-between">
-          <span className="text-[10px] text-amber-200">🦈 Bobby&apos;s Week</span>
+          <span className="text-[10px] text-amber-200">
+            🦈 Bobby&apos;s Week
+          </span>
           <span className="text-xs font-bold text-amber-300">¥850</span>
         </div>
       </div>
@@ -477,8 +505,8 @@ function ParentShowcase() {
           </h2>
           <p className="mb-8 text-lg text-slate-300">
             Assign chores to each child, set yen amounts, and schedule the
-            entire week. When kids finish their jobs, review and approve
-            with a single tap.
+            entire week. When kids finish their jobs, review and approve with a
+            single tap.
           </p>
           <ul className="space-y-3">
             {[
@@ -487,10 +515,7 @@ function ParentShowcase() {
               "✅ Approve or send back for redo",
               "🔒 Math challenge keeps kids out",
             ].map((item, i) => (
-              <li
-                key={i}
-                className="flex items-center gap-3 text-slate-200"
-              >
+              <li key={i} className="flex items-center gap-3 text-slate-200">
                 <span>{item}</span>
               </li>
             ))}
@@ -566,9 +591,7 @@ function KidScreenMockup() {
           </p>
           <div className="mb-1 rounded-lg border border-amber-400/50 bg-amber-400/30 p-1.5 text-center">
             <span className="block text-lg">🌱</span>
-            <span className="text-[9px] font-bold text-amber-300">
-              ¥100
-            </span>
+            <span className="text-[9px] font-bold text-amber-300">¥100</span>
           </div>
         </div>
 
@@ -626,8 +649,8 @@ function KidShowcase() {
             Your own mission board
           </h2>
           <p className="mb-8 text-lg text-gray-600">
-            See today&apos;s jobs, drag them to &quot;Doing&quot;, and mark them done.
-            Watch your earnings grow all week. Complete everything for a
+            See today&apos;s jobs, drag them to &quot;Doing&quot;, and mark them
+            done. Watch your earnings grow all week. Complete everything for a
             dolphin celebration!
           </p>
           <ul className="space-y-3">
@@ -637,10 +660,7 @@ function KidShowcase() {
               "🐬 Celebration animations",
               "🦈 Choose your own sea creature avatar",
             ].map((item, i) => (
-              <li
-                key={i}
-                className="flex items-center gap-3 text-gray-700"
-              >
+              <li key={i} className="flex items-center gap-3 text-gray-700">
                 <span>{item}</span>
               </li>
             ))}
@@ -778,9 +798,7 @@ function ChorePreview() {
                   <p className="truncate text-sm font-medium text-gray-800">
                     {c.title}
                   </p>
-                  <p className="text-xs font-bold text-amber-600">
-                    ¥{c.yen}
-                  </p>
+                  <p className="text-xs font-bold text-amber-600">¥{c.yen}</p>
                 </div>
               </div>
             ))}
@@ -861,9 +879,7 @@ function Footer() {
               Sign Up
             </Link>
           </div>
-          <span className="text-xs text-slate-600">
-            Made by Mottodigital
-          </span>
+          <span className="text-xs text-slate-600">Made by Mottodigital</span>
         </div>
       </div>
     </footer>

@@ -24,7 +24,9 @@ describe("RANK_THRESHOLDS table", () => {
   });
   it("scores are monotonically increasing", () => {
     for (let i = 1; i < RANK_THRESHOLDS.length; i++) {
-      expect(RANK_THRESHOLDS[i]!.score).toBeGreaterThan(RANK_THRESHOLDS[i - 1]!.score);
+      expect(RANK_THRESHOLDS[i]!.score).toBeGreaterThan(
+        RANK_THRESHOLDS[i - 1]!.score,
+      );
     }
   });
 });
@@ -197,7 +199,9 @@ describe("calculateRank — progress percentage", () => {
   });
 
   it("progress is clamped to [0, 100]", () => {
-    for (const lifetime of [0, 100, 499, 500, 1000, 1999, 2000, 5000, 9999, 10000, 99999]) {
+    for (const lifetime of [
+      0, 100, 499, 500, 1000, 1999, 2000, 5000, 9999, 10000, 99999,
+    ]) {
       const r = calculateRank(lifetime, 1);
       expect(r.progressToNext).toBeGreaterThanOrEqual(0);
       expect(r.progressToNext).toBeLessThanOrEqual(100);

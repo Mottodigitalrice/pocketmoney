@@ -4,14 +4,14 @@ A production-ready template for building AI-powered web applications with Claude
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|------------|
-| Framework | Next.js 16 (App Router) + React 19 |
-| Database | Convex (real-time) |
-| Auth | Clerk |
-| Styling | Tailwind CSS v4 + shadcn/ui |
-| AI | OpenRouter |
-| Deployment | Vercel |
+| Layer      | Technology                         |
+| ---------- | ---------------------------------- |
+| Framework  | Next.js 16 (App Router) + React 19 |
+| Database   | Convex (real-time)                 |
+| Auth       | Clerk                              |
+| Styling    | Tailwind CSS v4 + shadcn/ui        |
+| AI         | OpenRouter                         |
+| Deployment | Vercel                             |
 
 ## Getting Started
 
@@ -24,6 +24,7 @@ A production-ready template for building AI-powered web applications with Claude
 ### Setup
 
 1. **Clone and install:**
+
    ```bash
    git clone [repo-url] my-project
    cd my-project
@@ -32,12 +33,15 @@ A production-ready template for building AI-powered web applications with Claude
    ```
 
 2. **Configure environment:**
+
    ```bash
    cp .env.example .env.local
    ```
+
    Fill in your API keys from Convex, Clerk, and OpenRouter dashboards.
 
 3. **Start development:**
+
    ```bash
    npm run dev:all
    ```

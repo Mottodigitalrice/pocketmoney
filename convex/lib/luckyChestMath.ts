@@ -33,21 +33,21 @@ const MAX_LUCKY_CHEST_CAP = 10_000;
  */
 export function pickLuckyChestAmount(
   maxAmount: number,
-  rng: () => number = Math.random
+  rng: () => number = Math.random,
 ): number {
   if (typeof maxAmount !== "number" || !Number.isInteger(maxAmount)) {
     throw new Error(
-      `pickLuckyChestAmount: maxAmount must be an integer, got ${String(maxAmount)}`
+      `pickLuckyChestAmount: maxAmount must be an integer, got ${String(maxAmount)}`,
     );
   }
   if (maxAmount < 1) {
     throw new Error(
-      `pickLuckyChestAmount: maxAmount must be >= 1, got ${maxAmount}`
+      `pickLuckyChestAmount: maxAmount must be >= 1, got ${maxAmount}`,
     );
   }
   if (maxAmount > MAX_LUCKY_CHEST_CAP) {
     throw new Error(
-      `pickLuckyChestAmount: maxAmount must be <= ${MAX_LUCKY_CHEST_CAP}, got ${maxAmount}`
+      `pickLuckyChestAmount: maxAmount must be <= ${MAX_LUCKY_CHEST_CAP}, got ${maxAmount}`,
     );
   }
   return Math.floor(rng() * maxAmount) + 1;

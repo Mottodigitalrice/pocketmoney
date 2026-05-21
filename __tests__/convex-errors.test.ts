@@ -44,7 +44,7 @@ describe("mapConvexError — classify", () => {
   it("classifies OVERDRAFT: prefix as OVERDRAFT", () => {
     const r = mapConvexError(
       new Error("OVERDRAFT: balance ¥10 cannot cover withdrawal ¥50"),
-      tStub
+      tStub,
     );
     expect(r.code).toBe("OVERDRAFT");
     expect(r.message).toBe("error_overdraft");
@@ -54,7 +54,7 @@ describe("mapConvexError — classify", () => {
   it("classifies LUCKY_CHEST_ALREADY_OPENED_THIS_WEEK", () => {
     const r = mapConvexError(
       new Error("LUCKY_CHEST_ALREADY_OPENED_THIS_WEEK"),
-      tStub
+      tStub,
     );
     expect(r.code).toBe("LUCKY_CHEST_ALREADY_OPENED_THIS_WEEK");
     expect(r.message).toBe("error_lucky_chest_locked");
@@ -63,7 +63,7 @@ describe("mapConvexError — classify", () => {
   it("classifies CHILD_DELETED_AFTER_COMPLETION", () => {
     const r = mapConvexError(
       new Error("CHILD_DELETED_AFTER_COMPLETION"),
-      tStub
+      tStub,
     );
     expect(r.code).toBe("CHILD_DELETED_AFTER_COMPLETION");
     expect(r.message).toBe("error_child_deleted");
@@ -72,7 +72,7 @@ describe("mapConvexError — classify", () => {
   it("classifies CANNOT_REJECT_APPROVED_INSTANCE", () => {
     const r = mapConvexError(
       new Error("CANNOT_REJECT_APPROVED_INSTANCE"),
-      tStub
+      tStub,
     );
     expect(r.code).toBe("CANNOT_REJECT_APPROVED_INSTANCE");
     expect(r.message).toBe("error_already_approved");
@@ -89,7 +89,7 @@ describe("mapConvexError — classify", () => {
   it("classifies ArgumentValidationError as VALIDATION", () => {
     const r = mapConvexError(
       new Error("ArgumentValidationError: bad arg"),
-      tStub
+      tStub,
     );
     expect(r.code).toBe("VALIDATION");
   });
@@ -130,12 +130,15 @@ describe("errorCodeToTranslationKey", () => {
     expect(errorCodeToTranslationKey("AUTH_LOST")).toBe("error_auth_lost");
     expect(errorCodeToTranslationKey("NETWORK")).toBe("error_network");
     expect(errorCodeToTranslationKey("OVERDRAFT")).toBe("error_overdraft");
-    expect(errorCodeToTranslationKey("LUCKY_CHEST_ALREADY_OPENED_THIS_WEEK"))
-      .toBe("error_lucky_chest_locked");
-    expect(errorCodeToTranslationKey("CHILD_DELETED_AFTER_COMPLETION"))
-      .toBe("error_child_deleted");
-    expect(errorCodeToTranslationKey("CANNOT_REJECT_APPROVED_INSTANCE"))
-      .toBe("error_already_approved");
+    expect(
+      errorCodeToTranslationKey("LUCKY_CHEST_ALREADY_OPENED_THIS_WEEK"),
+    ).toBe("error_lucky_chest_locked");
+    expect(errorCodeToTranslationKey("CHILD_DELETED_AFTER_COMPLETION")).toBe(
+      "error_child_deleted",
+    );
+    expect(errorCodeToTranslationKey("CANNOT_REJECT_APPROVED_INSTANCE")).toBe(
+      "error_already_approved",
+    );
     expect(errorCodeToTranslationKey("OWNERSHIP")).toBe("error_ownership");
     expect(errorCodeToTranslationKey("VALIDATION")).toBe("error_validation");
     expect(errorCodeToTranslationKey("UNKNOWN")).toBe("error_unknown");

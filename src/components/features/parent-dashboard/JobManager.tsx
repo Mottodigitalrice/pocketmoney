@@ -17,7 +17,11 @@ import type { ChildIcon, JobPriority, RecurrenceType } from "@/types";
  */
 function JobManagerSkeleton() {
   return (
-    <div aria-hidden="true" data-testid="job-manager-skeleton" className="space-y-4">
+    <div
+      aria-hidden="true"
+      data-testid="job-manager-skeleton"
+      className="space-y-4"
+    >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Skeleton className="size-7 rounded bg-amber-900/40" />
@@ -63,8 +67,15 @@ import { BudouXText } from "@/components/shared/BudouXText";
 
 export function JobManager() {
   const { t, locale } = useTranslation();
-  const { isLoading, jobs, addJob, editJob, deleteJob, familyChildren, quickAssign } =
-    usePocketMoney();
+  const {
+    isLoading,
+    jobs,
+    addJob,
+    editJob,
+    deleteJob,
+    familyChildren,
+    quickAssign,
+  } = usePocketMoney();
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<Job | undefined>();
   const [oneOffOpen, setOneOffOpen] = useState(false);
@@ -167,88 +178,90 @@ export function JobManager() {
       )}
 
       <div className="space-y-2">
-        {jobs.filter((job) => !job.isOneOff).map((job) => (
-          <div
-            key={job._id}
-            className="flex items-center gap-3 rounded-xl border border-amber-700/20 bg-amber-900/30 p-3 backdrop-blur-sm"
-          >
-            <span className="text-2xl">{job.icon}</span>
-            <div className="min-w-0 flex-1">
-              <h3 className="truncate font-semibold text-amber-100">
-                {job.titleKey
-                  ? t(job.titleKey as TranslationKey)
-                  : locale === "ja" && job.titleJa
-                    ? job.titleJa
-                    : job.title}
-              </h3>
-              {getRecurrenceLabel(job) && (
-                <p className="mt-1 truncate text-xs font-semibold text-amber-300/70">
-                  {getRecurrenceLabel(job)}
-                </p>
-              )}
-              {job.requiresPhotoProof && (
-                <p className="mt-1 text-xs font-semibold text-sky-200">
-                  {t("job_manager_photo_proof")}
-                </p>
-              )}
-            </div>
-            <span className="rounded-full bg-amber-400/20 px-3 py-1 text-sm font-bold text-amber-300">
-              {CURRENCY}
-              {job.yenAmount}
-            </span>
-            {/* F20: bumped emoji icon buttons from size="sm" (h-8) to
+        {jobs
+          .filter((job) => !job.isOneOff)
+          .map((job) => (
+            <div
+              key={job._id}
+              className="flex items-center gap-3 rounded-xl border border-amber-700/20 bg-amber-900/30 p-3 backdrop-blur-sm"
+            >
+              <span className="text-2xl">{job.icon}</span>
+              <div className="min-w-0 flex-1">
+                <h3 className="truncate font-semibold text-amber-100">
+                  {job.titleKey
+                    ? t(job.titleKey as TranslationKey)
+                    : locale === "ja" && job.titleJa
+                      ? job.titleJa
+                      : job.title}
+                </h3>
+                {getRecurrenceLabel(job) && (
+                  <p className="mt-1 truncate text-xs font-semibold text-amber-300/70">
+                    {getRecurrenceLabel(job)}
+                  </p>
+                )}
+                {job.requiresPhotoProof && (
+                  <p className="mt-1 text-xs font-semibold text-sky-200">
+                    {t("job_manager_photo_proof")}
+                  </p>
+                )}
+              </div>
+              <span className="rounded-full bg-amber-400/20 px-3 py-1 text-sm font-bold text-amber-300">
+                {CURRENCY}
+                {job.yenAmount}
+              </span>
+              {/* F20: bumped emoji icon buttons from size="sm" (h-8) to
                 size="icon" (h-9 w-9) + min-h-11/min-w-11 floors so each
                 hits the 44px Apple HIG. aria-label promoted from title so
                 screen readers + AT announce the action, not the emoji. */}
-            <div className="flex gap-1">
-              {/* S2 (R4) — F10 5.10: disable quick-assign when no crew exists.
+              <div className="flex gap-1">
+                {/* S2 (R4) — F10 5.10: disable quick-assign when no crew exists.
                   Without kids, the picker dialog has nothing to pick — silently
                   opening it would dead-end the parent. Also marks aria-disabled
                   for assistive tech. */}
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setAssigningJobId(job._id)}
-                disabled={familyChildren.length === 0}
-                aria-disabled={familyChildren.length === 0}
-                className="min-h-11 min-w-11 text-base text-green-400 hover:bg-green-900/40 hover:text-green-300 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
-                aria-label={
-                  familyChildren.length === 0
-                    ? t("job_manager_quick_assign_no_kids_aria")
-                    : t("job_manager_quick_assign")
-                }
-                title={
-                  familyChildren.length === 0
-                    ? t("job_manager_quick_assign_no_kids_aria")
-                    : t("job_manager_quick_assign")
-                }
-              >
-                📅
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => handleEdit(job)}
-                aria-label={t("job_manager_edit_aria")}
-                className="min-h-11 min-w-11 text-base text-amber-300 hover:bg-amber-800/40 hover:text-amber-100"
-              >
-                ✏️
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                // F12: route delete through confirm dialog. Single-tap
-                // destructive delete is forbidden (F10 gap 5.9).
-                onClick={() => setDeletingJobId(job._id)}
-                data-testid="job-row-delete"
-                aria-label={t("job_manager_delete_aria")}
-                className="min-h-11 min-w-11 text-base text-red-400 hover:bg-red-900/40 hover:text-red-300"
-              >
-                🗑️
-              </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setAssigningJobId(job._id)}
+                  disabled={familyChildren.length === 0}
+                  aria-disabled={familyChildren.length === 0}
+                  className="min-h-11 min-w-11 text-base text-green-400 hover:bg-green-900/40 hover:text-green-300 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
+                  aria-label={
+                    familyChildren.length === 0
+                      ? t("job_manager_quick_assign_no_kids_aria")
+                      : t("job_manager_quick_assign")
+                  }
+                  title={
+                    familyChildren.length === 0
+                      ? t("job_manager_quick_assign_no_kids_aria")
+                      : t("job_manager_quick_assign")
+                  }
+                >
+                  📅
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => handleEdit(job)}
+                  aria-label={t("job_manager_edit_aria")}
+                  className="min-h-11 min-w-11 text-base text-amber-300 hover:bg-amber-800/40 hover:text-amber-100"
+                >
+                  ✏️
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  // F12: route delete through confirm dialog. Single-tap
+                  // destructive delete is forbidden (F10 gap 5.9).
+                  onClick={() => setDeletingJobId(job._id)}
+                  data-testid="job-row-delete"
+                  aria-label={t("job_manager_delete_aria")}
+                  className="min-h-11 min-w-11 text-base text-red-400 hover:bg-red-900/40 hover:text-red-300"
+                >
+                  🗑️
+                </Button>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
       </div>
 
       <JobForm
@@ -258,10 +271,7 @@ export function JobManager() {
         {...(editing !== undefined ? { editingJob: editing } : {})}
       />
 
-      <OneOffTaskForm
-        open={oneOffOpen}
-        onClose={() => setOneOffOpen(false)}
-      />
+      <OneOffTaskForm open={oneOffOpen} onClose={() => setOneOffOpen(false)} />
 
       {/* F12 — Delete-job confirmation dialog */}
       <ConfirmDialog
@@ -295,7 +305,8 @@ export function JobManager() {
                 <button
                   key={child._id}
                   onClick={() =>
-                    assigningJobId && handleQuickAssign(assigningJobId, child._id)
+                    assigningJobId &&
+                    handleQuickAssign(assigningJobId, child._id)
                   }
                   // F20: explicit min-h-[60px] for tap target (p-4 already
                   // hits 44 with 24px text, but explicit floor is safer).

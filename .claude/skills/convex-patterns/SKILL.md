@@ -6,6 +6,7 @@ description: Convex database patterns for Next.js 16 — schema, queries, mutati
 # Convex Database Patterns
 
 ## Overview
+
 Convex provides real-time, reactive data with TypeScript-first development. All data operations are defined in the `convex/` directory and auto-generate type-safe APIs.
 
 ## Schema (`convex/schema.ts`)
@@ -39,19 +40,21 @@ export default defineSchema({
 ```
 
 ### Value Types
-| Type | Usage |
-|------|-------|
-| `v.string()` | String |
-| `v.number()` | Number |
-| `v.boolean()` | Boolean |
-| `v.id("tableName")` | Reference to another table |
-| `v.array(v.string())` | Array of strings |
-| `v.object({ key: v.string() })` | Nested object |
-| `v.optional(v.string())` | Optional field |
-| `v.union(v.literal("a"), v.literal("b"))` | Enum/union type |
-| `v.null()` | Explicit null |
+
+| Type                                      | Usage                      |
+| ----------------------------------------- | -------------------------- |
+| `v.string()`                              | String                     |
+| `v.number()`                              | Number                     |
+| `v.boolean()`                             | Boolean                    |
+| `v.id("tableName")`                       | Reference to another table |
+| `v.array(v.string())`                     | Array of strings           |
+| `v.object({ key: v.string() })`           | Nested object              |
+| `v.optional(v.string())`                  | Optional field             |
+| `v.union(v.literal("a"), v.literal("b"))` | Enum/union type            |
+| `v.null()`                                | Explicit null              |
 
 **Important:** When changing field types (e.g., `v.string()` to `v.array(v.string())`), existing data keeps the old type. Handle both in queries:
+
 ```typescript
 // Backward-compatible array field display
 const value = record.tags;
@@ -147,7 +150,9 @@ import { api } from "./_generated/api";
 export const submitToWebhook = action({
   args: { leadId: v.id("leads") },
   handler: async (ctx, args) => {
-    const lead = await ctx.runQuery(api.functions.leads.getById, { id: args.leadId });
+    const lead = await ctx.runQuery(api.functions.leads.getById, {
+      id: args.leadId,
+    });
     if (!lead) throw new Error("Lead not found");
 
     await fetch("https://n8n.example.com/webhook/xxx", {
@@ -162,11 +167,13 @@ export const submitToWebhook = action({
 ## React Usage
 
 ### CRITICAL: Build-Time Safety
+
 Convex hooks (`useQuery`, `useMutation`, `useAction`) require `ConvexProvider` at runtime. At build time, providers aren't mounted, so any page using these hooks will fail prerendering.
 
 **Always add `force-dynamic` to the parent layout.** See `nextjs16-core.md` for details.
 
 ### useQuery (Real-Time)
+
 ```typescript
 "use client";
 import { useQuery } from "convex/react";
@@ -183,6 +190,7 @@ function TaskList({ userId }) {
 ```
 
 ### useMutation
+
 ```typescript
 "use client";
 import { useMutation } from "convex/react";
@@ -205,6 +213,7 @@ function CreateButton() {
 ```
 
 ### useAction
+
 ```typescript
 const submitWebhook = useAction(api.functions.leads.submitToWebhook);
 await submitWebhook({ leadId });
@@ -225,7 +234,10 @@ export const createPartial = mutation({
       .first();
 
     if (existing) {
-      await ctx.db.patch(existing._id, { currentStep: 1, updatedAt: Date.now() });
+      await ctx.db.patch(existing._id, {
+        currentStep: 1,
+        updatedAt: Date.now(),
+      });
       return existing._id;
     }
 

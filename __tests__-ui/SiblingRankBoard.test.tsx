@@ -80,7 +80,10 @@ function approved(
   };
 }
 
-function rank(score: number, name: RankProgress["rank"] = "Noob"): RankProgress {
+function rank(
+  score: number,
+  name: RankProgress["rank"] = "Noob",
+): RankProgress {
   return {
     rank: name,
     nextRank: "Normal",
@@ -163,15 +166,18 @@ describe("SiblingRankBoard — view rendering", () => {
       approved("i4", CHILD_B._id, JOB_100._id, WEEK_START_MS + 2 * ONE_DAY), // Bea +100 (total 300)
     ];
 
-    const utils = renderWithProviders(<SiblingRankBoard childId={CHILD_B._id} />, {
-      contextValue: {
-        familyChildren: [CHILD_A, CHILD_B],
-        jobs: [JOB_100],
-        jobInstances: instances,
-        getRankForChild: (id) => (id === CHILD_A._id ? rank(900) : rank(200)),
-        getWalletTotal: (id) => (id === CHILD_A._id ? 900 : 200),
+    const utils = renderWithProviders(
+      <SiblingRankBoard childId={CHILD_B._id} />,
+      {
+        contextValue: {
+          familyChildren: [CHILD_A, CHILD_B],
+          jobs: [JOB_100],
+          jobInstances: instances,
+          getRankForChild: (id) => (id === CHILD_A._id ? rank(900) : rank(200)),
+          getWalletTotal: (id) => (id === CHILD_A._id ? 900 : 200),
+        },
       },
-    });
+    );
 
     // Lifetime view default — Alex first (higher rank score).
     const initialRows = utils.container.querySelectorAll(

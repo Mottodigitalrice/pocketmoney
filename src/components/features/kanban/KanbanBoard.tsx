@@ -27,7 +27,10 @@ function KanbanBoardSkeleton() {
         >
           <Skeleton className="h-7 w-24 rounded bg-blue-900/50" />
           {[0, 1, 2].map((row) => (
-            <Skeleton key={row} className="h-20 w-full rounded-xl bg-blue-900/40" />
+            <Skeleton
+              key={row}
+              className="h-20 w-full rounded-xl bg-blue-900/40"
+            />
           ))}
         </div>
       ))}
@@ -39,8 +42,10 @@ function KanbanBoardSkeleton() {
 // until the user actually triggers it.
 const DolphinCelebration = dynamic(
   () =>
-    import("./DolphinCelebration").then((m) => ({ default: m.DolphinCelebration })),
-  { ssr: false }
+    import("./DolphinCelebration").then((m) => ({
+      default: m.DolphinCelebration,
+    })),
+  { ssr: false },
 );
 
 interface KanbanBoardProps {
@@ -80,7 +85,7 @@ export function KanbanBoard({ childId }: KanbanBoardProps) {
     // don't fake-celebrate historical approvals on initial mount.
     if (seenApprovedIdsRef.current === null) {
       seenApprovedIdsRef.current = new Set(
-        childInstances.filter((i) => i.status === "approved").map((i) => i._id)
+        childInstances.filter((i) => i.status === "approved").map((i) => i._id),
       );
       return;
     }
@@ -111,7 +116,11 @@ export function KanbanBoard({ childId }: KanbanBoardProps) {
     startJob(jobId, childId, scheduledJobId);
   };
 
-  const handleComplete = async (instanceId: string, jobId: string, proofFile?: File) => {
+  const handleComplete = async (
+    instanceId: string,
+    jobId: string,
+    proofFile?: File,
+  ) => {
     await completeJob(instanceId, proofFile);
     const job = getJobById(jobId);
     if (job) {
@@ -155,7 +164,8 @@ export function KanbanBoard({ childId }: KanbanBoardProps) {
   }
 
   // Show empty state if no jobs scheduled today at all
-  const hasNoJobsToday = available.length === 0 && inProgress.length === 0 && completed.length === 0;
+  const hasNoJobsToday =
+    available.length === 0 && inProgress.length === 0 && completed.length === 0;
 
   if (hasNoJobsToday) {
     return (
@@ -200,8 +210,12 @@ export function KanbanBoard({ childId }: KanbanBoardProps) {
                 key={sj._id}
                 job={sj.job}
                 status="available"
-                {...(sj.parentNote !== undefined ? { parentNote: sj.parentNote } : {})}
-                {...(sj.priority !== undefined ? { priority: sj.priority } : {})}
+                {...(sj.parentNote !== undefined
+                  ? { parentNote: sj.parentNote }
+                  : {})}
+                {...(sj.priority !== undefined
+                  ? { priority: sj.priority }
+                  : {})}
                 onStart={() => handleStart(sj.jobId, sj._id)}
               />
             ))}

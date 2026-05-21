@@ -1,7 +1,18 @@
 "use client";
 
-import { createContext, useState, useEffect, useCallback, useMemo, type ReactNode } from "react";
-import { type Locale, type TranslationKey, translations } from "@/lib/i18n/translations";
+import {
+  createContext,
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  type ReactNode,
+} from "react";
+import {
+  type Locale,
+  type TranslationKey,
+  translations,
+} from "@/lib/i18n/translations";
 
 interface LanguageContextType {
   locale: Locale;
@@ -45,17 +56,20 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       let text = translations[locale][key] ?? translations["en"][key] ?? key;
       if (params) {
         Object.entries(params).forEach(([paramKey, value]) => {
-          text = text.replace(new RegExp(`\\{\\{${paramKey}\\}\\}`, "g"), String(value));
+          text = text.replace(
+            new RegExp(`\\{\\{${paramKey}\\}\\}`, "g"),
+            String(value),
+          );
         });
       }
       return text;
     },
-    [locale]
+    [locale],
   );
 
   const value = useMemo(
     () => ({ locale, setLocale, toggleLocale, t }),
-    [locale, setLocale, toggleLocale, t]
+    [locale, setLocale, toggleLocale, t],
   );
 
   return (

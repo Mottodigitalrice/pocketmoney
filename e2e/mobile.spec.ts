@@ -57,7 +57,7 @@ test.describe("F20 mobile pass", () => {
 
     expect(
       scrollWidth,
-      `Horizontal scroll detected: scrollWidth=${scrollWidth}, clientWidth=${clientWidth}`
+      `Horizontal scroll detected: scrollWidth=${scrollWidth}, clientWidth=${clientWidth}`,
     ).toBeLessThanOrEqual(clientWidth);
   });
 
@@ -73,7 +73,7 @@ test.describe("F20 mobile pass", () => {
     expect(CONVEX_URL, "NEXT_PUBLIC_CONVEX_URL must be set").toBeTruthy();
     const today = new Date();
     const todayStr = `${today.getFullYear()}-${String(
-      today.getMonth() + 1
+      today.getMonth() + 1,
     ).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
 
     await page.evaluate(
@@ -108,12 +108,15 @@ test.describe("F20 mobile pass", () => {
         });
         if (!res.ok) throw new Error(`seedKidScenario: ${res.status}`);
       },
-      { date: todayStr, convexUrl: CONVEX_URL }
+      { date: todayStr, convexUrl: CONVEX_URL },
     );
 
     // Navigate to the wallet tab where Bonus button lives.
     await page.goto("/parent#children");
-    await page.getByRole("button", { name: /bonus|ボーナス/i }).first().click();
+    await page
+      .getByRole("button", { name: /bonus|ボーナス/i })
+      .first()
+      .click();
 
     // Dialog should be visible.
     const dialog = page.locator('[data-slot="dialog-content"]');
@@ -144,7 +147,7 @@ test.describe("F20 mobile pass", () => {
     if (box) {
       expect(
         box.y + box.height,
-        `submit CTA bottom (${box.y + box.height}) exceeds viewport (508)`
+        `submit CTA bottom (${box.y + box.height}) exceeds viewport (508)`,
       ).toBeLessThanOrEqual(508);
     }
   });
@@ -165,20 +168,18 @@ test.describe("F20 mobile pass", () => {
       .first();
     await expect(
       proofBtn,
-      "test requires a pending approval with proof — seed before running"
+      "test requires a pending approval with proof — seed before running",
     ).toBeVisible({ timeout: 15_000 });
 
     // Preview overlay should NOT exist yet.
     await expect(
-      page.locator('[data-testid="approval-card-proof-preview"]')
+      page.locator('[data-testid="approval-card-proof-preview"]'),
     ).toHaveCount(0);
 
     // Tap to open.
     await proofBtn.click();
 
-    const preview = page.locator(
-      '[data-testid="approval-card-proof-preview"]'
-    );
+    const preview = page.locator('[data-testid="approval-card-proof-preview"]');
     await expect(preview).toBeVisible();
     // role=dialog + aria-modal — minimal a11y contract.
     await expect(preview).toHaveAttribute("role", "dialog");

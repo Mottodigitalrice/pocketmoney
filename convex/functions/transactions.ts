@@ -8,7 +8,7 @@ import { overdraftErrorOrNull } from "../lib/withdrawGuard";
 const jarValidator = v.union(
   v.literal("spend"),
   v.literal("save"),
-  v.literal("give")
+  v.literal("give"),
 );
 
 const transactionTypeValidator = v.union(
@@ -18,14 +18,14 @@ const transactionTypeValidator = v.union(
   v.literal("migration"),
   v.literal("correction"),
   v.literal("bonus"),
-  v.literal("luckyChest")
+  v.literal("luckyChest"),
 );
 
 const reasonValidator = v.union(
   v.literal("cashOut"),
   v.literal("penalty"),
   v.literal("correction"),
-  v.literal("other")
+  v.literal("other"),
 );
 
 const transactionDocValidator = v.object({
@@ -104,7 +104,7 @@ export const withdraw = mutation({
     const wallet = await ctx.db
       .query("wallets")
       .withIndex("by_child_jar", (q) =>
-        q.eq("childId", args.childId).eq("jar", args.jar)
+        q.eq("childId", args.childId).eq("jar", args.jar),
       )
       .unique();
 
@@ -139,4 +139,3 @@ export const withdraw = mutation({
     });
   },
 });
-

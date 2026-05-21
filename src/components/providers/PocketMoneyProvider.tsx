@@ -84,23 +84,41 @@ interface PocketMoneyContextType {
   editJob: (id: string, updates: Partial<Job>) => void;
   deleteJob: (id: string) => void;
   // Scheduling
-  scheduleJob: (jobId: string, childId: string, date: string, priority?: JobPriority) => void;
-  scheduleJobBatch: (entries: { jobId: string; childId: string; date: string; priority?: JobPriority }[]) => void;
+  scheduleJob: (
+    jobId: string,
+    childId: string,
+    date: string,
+    priority?: JobPriority,
+  ) => void;
+  scheduleJobBatch: (
+    entries: {
+      jobId: string;
+      childId: string;
+      date: string;
+      priority?: JobPriority;
+    }[],
+  ) => void;
   removeScheduledJob: (scheduledJobId: string) => void;
   clearScheduledDay: (childId: string, date: string) => void;
   applyRecurringJobsForWeek: (
     weekDates: string[],
-    entries: { jobId: string; childIds: string[] }[]
+    entries: { jobId: string; childIds: string[] }[],
   ) => Promise<void>;
   // Quick assign: schedule a job for today for a child
   quickAssign: (jobId: string, childId: string) => void;
   quickAddForToday: (
     jobId: string,
     childIds: string[],
-    options?: { preApprove?: boolean; priority?: JobPriority }
+    options?: { preApprove?: boolean; priority?: JobPriority },
   ) => Promise<void>;
   // One-off: create a temporary job + schedule it for today
-  createOneOff: (title: string, titleJa: string | undefined, yenAmount: number, icon: string, childId: string) => void;
+  createOneOff: (
+    title: string,
+    titleJa: string | undefined,
+    yenAmount: number,
+    icon: string,
+    childId: string,
+  ) => void;
   // Job instance lifecycle
   startJob: (jobId: string, childId: string, scheduledJobId?: string) => void;
   completeJob: (instanceId: string, proofFile?: File) => Promise<void>;
@@ -127,8 +145,14 @@ interface PocketMoneyContextType {
     emoji: string;
   }) => Promise<void>;
   // Derived data
-  getScheduledJobsForChildDate: (childId: string, date: string) => ScheduledJobWithJob[];
-  getScheduledJobsForWeek: (childId: string, weekStart?: Date) => ScheduledJobWithJob[];
+  getScheduledJobsForChildDate: (
+    childId: string,
+    date: string,
+  ) => ScheduledJobWithJob[];
+  getScheduledJobsForWeek: (
+    childId: string,
+    weekStart?: Date,
+  ) => ScheduledJobWithJob[];
   getTodayAvailableJobs: (childId: string) => ScheduledJobWithJob[];
   getInProgressJobs: (childId: string) => JobInstanceWithJob[];
   getCompletedJobs: (childId: string) => JobInstanceWithJob[];
@@ -156,11 +180,13 @@ interface PocketMoneyContextType {
   getWeekDates: (date?: Date) => string[];
 }
 
-export const PocketMoneyContext = createContext<PocketMoneyContextType | null>(null);
+export const PocketMoneyContext = createContext<PocketMoneyContextType | null>(
+  null,
+);
 
 const hasDataProviders = Boolean(
   process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY &&
-    process.env.NEXT_PUBLIC_CONVEX_URL
+  process.env.NEXT_PUBLIC_CONVEX_URL,
 );
 
 const fallbackContextValue: PocketMoneyContextType = {
@@ -248,7 +274,7 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
   // Get the Convex user record
   const convexUser = useQuery(
     api.functions.users.getCurrent,
-    user?.id ? {} : "skip"
+    user?.id ? {} : "skip",
   );
 
   const userIdForQueries = convexUser?._id;
@@ -259,42 +285,42 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
   // Query family data from Convex
   const rawChildren = useQuery(
     api.functions.children.getByFamily,
-    userIdForQueries ? {} : "skip"
+    userIdForQueries ? {} : "skip",
   );
 
   const rawJobs = useQuery(
     api.functions.jobs.getByFamily,
-    userIdForQueries ? {} : "skip"
+    userIdForQueries ? {} : "skip",
   );
 
   const rawInstances = useQuery(
     api.functions.jobInstances.getByFamily,
-    userIdForQueries ? {} : "skip"
+    userIdForQueries ? {} : "skip",
   );
 
   const rawScheduledJobs = useQuery(
     api.functions.scheduledJobs.getByFamily,
-    userIdForQueries ? {} : "skip"
+    userIdForQueries ? {} : "skip",
   );
 
   const rawWallets = useQuery(
     api.functions.wallets.getByFamily,
-    userIdForQueries ? {} : "skip"
+    userIdForQueries ? {} : "skip",
   );
 
   const rawTransactions = useQuery(
     api.functions.transactions.getByFamily,
-    userIdForQueries ? {} : "skip"
+    userIdForQueries ? {} : "skip",
   );
 
   const rawGoals = useQuery(
     api.functions.goals.getByFamily,
-    userIdForQueries ? {} : "skip"
+    userIdForQueries ? {} : "skip",
   );
 
   const rawLuckyChestStatuses = useQuery(
     api.functions.luckyChests.getStatusForFamily,
-    userIdForQueries ? { weekDates: currentWeekDates } : "skip"
+    userIdForQueries ? { weekDates: currentWeekDates } : "skip",
   );
 
   // Map Convex documents to app types. `stripUndefined` is required because
@@ -317,9 +343,9 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
             requiresPhotoProof: j.requiresPhotoProof,
             recurrence: j.recurrence,
             createdAt: j.createdAt,
-          }) as Job
+          }) as Job,
       ),
-    [rawJobs]
+    [rawJobs],
   );
 
   const jobInstances: JobInstance[] = useMemo(
@@ -347,23 +373,25 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
             proofDeletedAt: i.proofDeletedAt,
             proofUrl: i.proofUrl,
             createdAt: i.createdAt,
-          }) as JobInstance
+          }) as JobInstance,
       ),
-    [rawInstances]
+    [rawInstances],
   );
 
   const scheduledJobs: ScheduledJob[] = useMemo(
     () =>
-      (rawScheduledJobs ?? []).map((s: NonNullable<typeof rawScheduledJobs>[number]) => ({
-        _id: s._id,
-        userId: s.userId,
-        jobId: s.jobId,
-        childId: s.childId,
-        date: s.date,
-        priority: s.priority ?? "optional",
-        createdAt: s.createdAt,
-      })),
-    [rawScheduledJobs]
+      (rawScheduledJobs ?? []).map(
+        (s: NonNullable<typeof rawScheduledJobs>[number]) => ({
+          _id: s._id,
+          userId: s.userId,
+          jobId: s.jobId,
+          childId: s.childId,
+          date: s.date,
+          priority: s.priority ?? "optional",
+          createdAt: s.createdAt,
+        }),
+      ),
+    [rawScheduledJobs],
   );
 
   const mappedChildren: Child[] = useMemo(
@@ -378,9 +406,9 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
             age: c.age,
             rankMultiplier: c.rankMultiplier,
             createdAt: c.createdAt,
-          }) as Child
+          }) as Child,
       ),
-    [rawChildren]
+    [rawChildren],
   );
 
   const wallets: Wallet[] = useMemo(
@@ -394,7 +422,7 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
         createdAt: w.createdAt,
         updatedAt: w.updatedAt,
       })),
-    [rawWallets]
+    [rawWallets],
   );
 
   const transactions: Transaction[] = useMemo(
@@ -413,9 +441,9 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
             note: tx.note,
             jobInstanceId: tx.jobInstanceId,
             createdAt: tx.createdAt,
-          }) as Transaction
+          }) as Transaction,
       ),
-    [rawTransactions]
+    [rawTransactions],
   );
 
   const goals: Goal[] = useMemo(
@@ -431,7 +459,7 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
         createdAt: goal.createdAt,
         updatedAt: goal.updatedAt,
       })),
-    [rawGoals]
+    [rawGoals],
   );
 
   // Mutations
@@ -440,36 +468,55 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
   const removeJobMutation = useMutation(api.functions.jobs.remove);
   const startJobMutation = useMutation(api.functions.jobInstances.start);
   const completeJobMutation = useMutation(api.functions.jobInstances.complete);
-  const generateProofUploadUrlMutation = useMutation(api.functions.jobInstances.generateProofUploadUrl);
+  const generateProofUploadUrlMutation = useMutation(
+    api.functions.jobInstances.generateProofUploadUrl,
+  );
   const approveJobMutation = useMutation(api.functions.jobInstances.approve);
   const rejectJobMutation = useMutation(api.functions.jobInstances.reject);
   const createChildMutation = useMutation(api.functions.children.create);
   const updateChildMutation = useMutation(api.functions.children.update);
   const removeChildMutation = useMutation(api.functions.children.remove);
-  const createScheduledJobMutation = useMutation(api.functions.scheduledJobs.create);
-  const createScheduledJobBatchMutation = useMutation(api.functions.scheduledJobs.createBatch);
-  const applyRecurringForWeekMutation = useMutation(api.functions.scheduledJobs.applyRecurringForWeek);
-  const quickAddForTodayMutation = useMutation(api.functions.scheduledJobs.quickAddForToday);
-  const removeScheduledJobMutation = useMutation(api.functions.scheduledJobs.remove);
-  const clearScheduledDayMutation = useMutation(api.functions.scheduledJobs.clearDay);
-  const setCaptainCodeEnabledMutation = useMutation(api.functions.users.setCaptainCodeEnabled);
-  const setLuckyChestMaxAmountMutation = useMutation(api.functions.users.setLuckyChestMaxAmount);
+  const createScheduledJobMutation = useMutation(
+    api.functions.scheduledJobs.create,
+  );
+  const createScheduledJobBatchMutation = useMutation(
+    api.functions.scheduledJobs.createBatch,
+  );
+  const applyRecurringForWeekMutation = useMutation(
+    api.functions.scheduledJobs.applyRecurringForWeek,
+  );
+  const quickAddForTodayMutation = useMutation(
+    api.functions.scheduledJobs.quickAddForToday,
+  );
+  const removeScheduledJobMutation = useMutation(
+    api.functions.scheduledJobs.remove,
+  );
+  const clearScheduledDayMutation = useMutation(
+    api.functions.scheduledJobs.clearDay,
+  );
+  const setCaptainCodeEnabledMutation = useMutation(
+    api.functions.users.setCaptainCodeEnabled,
+  );
+  const setLuckyChestMaxAmountMutation = useMutation(
+    api.functions.users.setLuckyChestMaxAmount,
+  );
   const withdrawMutation = useMutation(api.functions.transactions.withdraw);
   const awardBonusMutation = useMutation(api.functions.wallets.awardBonus);
   const createGoalMutation = useMutation(api.functions.goals.create);
   const openLuckyChestMutation = useMutation(api.functions.luckyChests.open);
 
-  const isLoading = !clerkLoaded || (!!user && (
-    convexUser === undefined ||
-    rawChildren === undefined ||
-    rawJobs === undefined ||
-    rawInstances === undefined ||
-    rawScheduledJobs === undefined ||
-    rawWallets === undefined ||
-    rawTransactions === undefined ||
-    rawGoals === undefined ||
-    rawLuckyChestStatuses === undefined
-  ));
+  const isLoading =
+    !clerkLoaded ||
+    (!!user &&
+      (convexUser === undefined ||
+        rawChildren === undefined ||
+        rawJobs === undefined ||
+        rawInstances === undefined ||
+        rawScheduledJobs === undefined ||
+        rawWallets === undefined ||
+        rawTransactions === undefined ||
+        rawGoals === undefined ||
+        rawLuckyChestStatuses === undefined));
 
   const setCaptainCodeEnabled = useCallback(
     async (enabled: boolean) => {
@@ -478,7 +525,7 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
         enabled,
       });
     },
-    [userIdForQueries, setCaptainCodeEnabledMutation]
+    [userIdForQueries, setCaptainCodeEnabledMutation],
   );
 
   // Job library mutations
@@ -504,11 +551,11 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
           isOneOff: job.isOneOff,
           requiresPhotoProof: job.requiresPhotoProof,
           recurrence: job.recurrence,
-        })
+        }),
       );
       return id;
     },
-    [userIdForQueries, createJobMutation]
+    [userIdForQueries, createJobMutation],
   );
 
   const editJob = useCallback(
@@ -521,22 +568,27 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
           icon: updates.icon,
           requiresPhotoProof: updates.requiresPhotoProof,
           recurrence: updates.recurrence,
-        })
+        }),
       );
     },
-    [updateJobMutation]
+    [updateJobMutation],
   );
 
   const deleteJob = useCallback(
     (id: string) => {
       removeJobMutation({ jobId: id as Id<"jobs"> });
     },
-    [removeJobMutation]
+    [removeJobMutation],
   );
 
   // Scheduling mutations
   const scheduleJob = useCallback(
-    (jobId: string, childId: string, date: string, priority: JobPriority = "optional") => {
+    (
+      jobId: string,
+      childId: string,
+      date: string,
+      priority: JobPriority = "optional",
+    ) => {
       if (!userIdForQueries) return;
       createScheduledJobMutation({
         jobId: jobId as Id<"jobs">,
@@ -545,11 +597,18 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
         priority,
       });
     },
-    [userIdForQueries, createScheduledJobMutation]
+    [userIdForQueries, createScheduledJobMutation],
   );
 
   const scheduleJobBatch = useCallback(
-    (entries: { jobId: string; childId: string; date: string; priority?: JobPriority }[]) => {
+    (
+      entries: {
+        jobId: string;
+        childId: string;
+        date: string;
+        priority?: JobPriority;
+      }[],
+    ) => {
       if (!userIdForQueries) return;
       createScheduledJobBatchMutation({
         entries: entries.map((e) => ({
@@ -560,14 +619,16 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
         })),
       });
     },
-    [userIdForQueries, createScheduledJobBatchMutation]
+    [userIdForQueries, createScheduledJobBatchMutation],
   );
 
   const removeScheduledJob = useCallback(
     (scheduledJobId: string) => {
-      removeScheduledJobMutation({ scheduledJobId: scheduledJobId as Id<"scheduledJobs"> });
+      removeScheduledJobMutation({
+        scheduledJobId: scheduledJobId as Id<"scheduledJobs">,
+      });
     },
-    [removeScheduledJobMutation]
+    [removeScheduledJobMutation],
   );
 
   const clearScheduledDay = useCallback(
@@ -577,13 +638,13 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
         date,
       });
     },
-    [clearScheduledDayMutation]
+    [clearScheduledDayMutation],
   );
 
   const applyRecurringJobsForWeek = useCallback(
     async (
       weekDates: string[],
-      entries: { jobId: string; childIds: string[] }[]
+      entries: { jobId: string; childIds: string[] }[],
     ) => {
       if (!userIdForQueries || entries.length === 0) return;
       await applyRecurringForWeekMutation({
@@ -594,7 +655,7 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
         })),
       });
     },
-    [userIdForQueries, applyRecurringForWeekMutation]
+    [userIdForQueries, applyRecurringForWeekMutation],
   );
 
   // Quick assign: schedule a library job for today
@@ -602,14 +663,14 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
     (jobId: string, childId: string) => {
       scheduleJob(jobId, childId, getLocalDateString());
     },
-    [scheduleJob]
+    [scheduleJob],
   );
 
   const quickAddForToday = useCallback(
     async (
       jobId: string,
       childIds: string[],
-      options?: { preApprove?: boolean; priority?: JobPriority }
+      options?: { preApprove?: boolean; priority?: JobPriority },
     ) => {
       if (!userIdForQueries || childIds.length === 0) return;
       await quickAddForTodayMutation({
@@ -620,12 +681,18 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
         priority: options?.priority ?? "optional",
       });
     },
-    [userIdForQueries, quickAddForTodayMutation]
+    [userIdForQueries, quickAddForTodayMutation],
   );
 
   // One-off: create a temporary job + schedule for today
   const createOneOff = useCallback(
-    async (title: string, titleJa: string | undefined, yenAmount: number, icon: string, childId: string) => {
+    async (
+      title: string,
+      titleJa: string | undefined,
+      yenAmount: number,
+      icon: string,
+      childId: string,
+    ) => {
       if (!userIdForQueries) return;
       const jobId = await createJobMutation(
         stripUndefined({
@@ -634,7 +701,7 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
           yenAmount,
           icon,
           isOneOff: true,
-        })
+        }),
       );
       if (jobId) {
         createScheduledJobMutation({
@@ -645,7 +712,7 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
         });
       }
     },
-    [userIdForQueries, createJobMutation, createScheduledJobMutation]
+    [userIdForQueries, createJobMutation, createScheduledJobMutation],
   );
 
   // Job instance mutations
@@ -657,16 +724,18 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
           jobId: jobId as Id<"jobs">,
           childId: childId as Id<"children">,
           scheduledJobId: scheduledJobId as Id<"scheduledJobs"> | undefined,
-        })
+        }),
       );
     },
-    [userIdForQueries, startJobMutation]
+    [userIdForQueries, startJobMutation],
   );
 
   const completeJob = useCallback(
     async (instanceId: string, proofFile?: File) => {
       if (!proofFile) {
-        await completeJobMutation({ instanceId: instanceId as Id<"jobInstances"> });
+        await completeJobMutation({
+          instanceId: instanceId as Id<"jobInstances">,
+        });
         return;
       }
 
@@ -675,13 +744,11 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
       // retryable 5xx errors (throws RetryablePhotoUploadError), and surfaces
       // a clean Error on permanent 4xx. Callers (JobCard) catch and either
       // show a Retry button or let the global mapper handle it.
-      const { storageId, fileName, contentType, size } = await uploadProofWithRetry(
-        resizedProof,
-        {
+      const { storageId, fileName, contentType, size } =
+        await uploadProofWithRetry(resizedProof, {
           dedupeKey: instanceId,
           getUploadUrl: () => generateProofUploadUrlMutation(),
-        }
-      );
+        });
 
       await completeJobMutation({
         instanceId: instanceId as Id<"jobInstances">,
@@ -693,14 +760,14 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
         },
       });
     },
-    [completeJobMutation, generateProofUploadUrlMutation]
+    [completeJobMutation, generateProofUploadUrlMutation],
   );
 
   const approveJob = useCallback(
     (instanceId: string) => {
       approveJobMutation({ instanceId: instanceId as Id<"jobInstances"> });
     },
-    [approveJobMutation]
+    [approveJobMutation],
   );
 
   const rejectJob = useCallback(
@@ -710,7 +777,7 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
         parentNote,
       });
     },
-    [rejectJobMutation]
+    [rejectJobMutation],
   );
 
   const withdrawFromWallet = useCallback(
@@ -729,10 +796,10 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
           amount: input.amount,
           reason: input.reason,
           note: input.note,
-        })
+        }),
       );
     },
-    [userIdForQueries, withdrawMutation]
+    [userIdForQueries, withdrawMutation],
   );
 
   const createGoal = useCallback(
@@ -750,7 +817,7 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
         emoji: input.emoji,
       });
     },
-    [userIdForQueries, createGoalMutation]
+    [userIdForQueries, createGoalMutation],
   );
 
   const awardBonus = useCallback(
@@ -761,10 +828,10 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
           childId: input.childId as Id<"children">,
           amount: input.amount,
           note: input.note,
-        })
+        }),
       );
     },
-    [userIdForQueries, awardBonusMutation]
+    [userIdForQueries, awardBonusMutation],
   );
 
   const setLuckyChestMaxAmount = useCallback(
@@ -772,7 +839,7 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
       if (!userIdForQueries) return;
       await setLuckyChestMaxAmountMutation({ amount });
     },
-    [userIdForQueries, setLuckyChestMaxAmountMutation]
+    [userIdForQueries, setLuckyChestMaxAmountMutation],
   );
 
   const openLuckyChest = useCallback(
@@ -783,7 +850,7 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
         weekDates,
       });
     },
-    [userIdForQueries, openLuckyChestMutation, currentWeekDates]
+    [userIdForQueries, openLuckyChestMutation, currentWeekDates],
   );
 
   // Child mutations
@@ -792,7 +859,7 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
       if (!userIdForQueries) return;
       createChildMutation({ name, icon });
     },
-    [userIdForQueries, createChildMutation]
+    [userIdForQueries, createChildMutation],
   );
 
   const editChild = useCallback(
@@ -803,30 +870,30 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
         icon,
       });
     },
-    [updateChildMutation]
+    [updateChildMutation],
   );
 
   const deleteChild = useCallback(
     (childId: string) => {
       removeChildMutation({ childId: childId as Id<"children"> });
     },
-    [removeChildMutation]
+    [removeChildMutation],
   );
 
   // Derived data helpers
   const getJobById = useCallback(
     (id: string) => jobs.find((j) => j._id === id),
-    [jobs]
+    [jobs],
   );
 
   const getChildById = useCallback(
     (id: string) => mappedChildren.find((c) => c._id === id),
-    [mappedChildren]
+    [mappedChildren],
   );
 
   const getInstancesForChild = useCallback(
     (childId: string) => jobInstances.filter((i) => i.childId === childId),
-    [jobInstances]
+    [jobInstances],
   );
 
   // Get scheduled jobs for a child on a specific date, with job details attached
@@ -836,7 +903,7 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
         .filter((s) => s.childId === childId && s.date === date)
         .map((s) => ({ ...s, job: jobs.find((j) => j._id === s.jobId)! }))
         .filter((s) => s.job),
-    [scheduledJobs, jobs]
+    [scheduledJobs, jobs],
   );
 
   // Get all scheduled jobs for a child in a given week
@@ -848,7 +915,7 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
         .map((s) => ({ ...s, job: jobs.find((j) => j._id === s.jobId)! }))
         .filter((s) => s.job);
     },
-    [scheduledJobs, jobs]
+    [scheduledJobs, jobs],
   );
 
   // Get today's scheduled jobs that haven't been started yet
@@ -866,9 +933,9 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
               i.scheduledJobId &&
               (i.status === "in_progress" ||
                 i.status === "completed" ||
-                i.status === "approved")
+                i.status === "approved"),
           )
-          .map((i) => i.scheduledJobId)
+          .map((i) => i.scheduledJobId),
       );
 
       return todayScheduled
@@ -879,7 +946,7 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
               (i) =>
                 i.childId === childId &&
                 i.scheduledJobId === s._id &&
-                i.status === "rejected"
+                i.status === "rejected",
             )
             .sort((a, b) => (b.rejectedAt ?? 0) - (a.rejectedAt ?? 0))[0];
 
@@ -890,7 +957,7 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
           }) as ScheduledJobWithJob;
         });
     },
-    [getScheduledJobsForChildDate, jobInstances]
+    [getScheduledJobsForChildDate, jobInstances],
   );
 
   const getInProgressJobs = useCallback(
@@ -899,7 +966,7 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
         .filter((i) => i.childId === childId && i.status === "in_progress")
         .map((i) => ({ ...i, job: jobs.find((j) => j._id === i.jobId)! }))
         .filter((i) => i.job),
-    [jobInstances, jobs]
+    [jobInstances, jobs],
   );
 
   const getCompletedJobs = useCallback(
@@ -908,7 +975,7 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
         .filter((i) => i.childId === childId && i.status === "completed")
         .map((i) => ({ ...i, job: jobs.find((j) => j._id === i.jobId)! }))
         .filter((i) => i.job),
-    [jobInstances, jobs]
+    [jobInstances, jobs],
   );
 
   const getPendingApprovals = useCallback(
@@ -917,7 +984,7 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
         .filter((i) => i.status === "completed")
         .map((i) => ({ ...i, job: jobs.find((j) => j._id === i.jobId)! }))
         .filter((i) => i.job),
-    [jobInstances, jobs]
+    [jobInstances, jobs],
   );
 
   const getWeeklyEarnings = useCallback(
@@ -929,14 +996,14 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
             i.childId === childId &&
             i.status === "approved" &&
             i.approvedAt &&
-            i.approvedAt > weekAgo
+            i.approvedAt > weekAgo,
         )
         .reduce((sum, i) => {
           const job = jobs.find((j) => j._id === i.jobId);
           return sum + (job?.yenAmount || 0);
         }, 0);
     },
-    [jobInstances, jobs]
+    [jobInstances, jobs],
   );
 
   // Weekly potential = sum of all scheduled jobs for this week
@@ -945,7 +1012,7 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
       const weekScheduled = getScheduledJobsForWeek(childId);
       return weekScheduled.reduce((sum, s) => sum + s.job.yenAmount, 0);
     },
-    [getScheduledJobsForWeek]
+    [getScheduledJobsForWeek],
   );
 
   const getLifetimeEarnings = useCallback(
@@ -957,19 +1024,19 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
           return sum + (job?.yenAmount || 0);
         }, 0);
     },
-    [jobInstances, jobs]
+    [jobInstances, jobs],
   );
 
   const getWalletsForChild = useCallback(
     (childId: string) => wallets.filter((wallet) => wallet.childId === childId),
-    [wallets]
+    [wallets],
   );
 
   const getWalletBalance = useCallback(
     (childId: string, jar: WalletJar) =>
       wallets.find((wallet) => wallet.childId === childId && wallet.jar === jar)
         ?.balance ?? 0,
-    [wallets]
+    [wallets],
   );
 
   const getWalletTotal = useCallback(
@@ -977,7 +1044,7 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
       wallets
         .filter((wallet) => wallet.childId === childId)
         .reduce((sum, wallet) => sum + wallet.balance, 0),
-    [wallets]
+    [wallets],
   );
 
   const getRankForChild = useCallback(
@@ -994,18 +1061,18 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
         multiplier: calc.multiplier,
       }) as RankProgress;
     },
-    [getLifetimeEarnings, mappedChildren]
+    [getLifetimeEarnings, mappedChildren],
   );
 
   const getTransactionsForChild = useCallback(
     (childId: string) =>
       transactions.filter((transaction) => transaction.childId === childId),
-    [transactions]
+    [transactions],
   );
 
   const getGoalsForChild = useCallback(
     (childId: string) => goals.filter((goal) => goal.childId === childId),
-    [goals]
+    [goals],
   );
 
   const getActiveGoalForChild = useCallback(
@@ -1013,13 +1080,15 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
       goals
         .filter((goal) => goal.childId === childId && goal.status === "active")
         .sort((a, b) => b.updatedAt - a.updatedAt)[0],
-    [goals]
+    [goals],
   );
 
   const getLuckyChestStatus = useCallback(
     (childId: string) =>
-      (rawLuckyChestStatuses ?? []).find((status) => status.childId === childId),
-    [rawLuckyChestStatuses]
+      (rawLuckyChestStatuses ?? []).find(
+        (status) => status.childId === childId,
+      ),
+    [rawLuckyChestStatuses],
   );
 
   const value = useMemo(
@@ -1138,7 +1207,7 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
       addChild,
       editChild,
       deleteChild,
-    ]
+    ],
   );
 
   return (

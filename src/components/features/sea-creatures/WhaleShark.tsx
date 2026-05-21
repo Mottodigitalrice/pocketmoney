@@ -14,7 +14,12 @@ export function WhaleShark({ className = "" }: { className?: string }) {
         `}</style>
       </defs>
       {/* Body — gentle breathing */}
-      <g style={{ transformOrigin: "80px 42px", animation: "ws-body 4s ease-in-out infinite" }}>
+      <g
+        style={{
+          transformOrigin: "80px 42px",
+          animation: "ws-body 4s ease-in-out infinite",
+        }}
+      >
         <ellipse cx="80" cy="42" rx="60" ry="28" fill="#37474F" />
         <ellipse cx="80" cy="44" rx="55" ry="22" fill="#455A64" />
         <ellipse cx="85" cy="52" rx="40" ry="12" fill="#CFD8DC" />
@@ -31,33 +36,85 @@ export function WhaleShark({ className = "" }: { className?: string }) {
         <circle cx="55" cy="44" r="1.5" fill="#90A4AE" opacity="0.4" />
       </g>
       {/* Dorsal fin */}
-      <g style={{ transformOrigin: "80px 14px", animation: "ws-dorsal 3s ease-in-out infinite" }}>
+      <g
+        style={{
+          transformOrigin: "80px 14px",
+          animation: "ws-dorsal 3s ease-in-out infinite",
+        }}
+      >
         <path d="M70,14 L80,2 L88,14" fill="#37474F" />
       </g>
       {/* Tail */}
-      <g style={{ transformOrigin: "20px 40px", animation: "ws-tail 1s ease-in-out infinite" }}>
+      <g
+        style={{
+          transformOrigin: "20px 40px",
+          animation: "ws-tail 1s ease-in-out infinite",
+        }}
+      >
         <path d="M20,34 L5,18 L14,40 L5,60 L20,48" fill="#37474F" />
       </g>
       {/* Pectoral fin */}
-      <g style={{ transformOrigin: "100px 52px", animation: "ws-pec 2s ease-in-out infinite" }}>
+      <g
+        style={{
+          transformOrigin: "100px 52px",
+          animation: "ws-pec 2s ease-in-out infinite",
+        }}
+      >
         <path d="M100,52 L115,68 L95,58" fill="#37474F" />
       </g>
       {/* Head */}
       <path d="M130,28 Q150,40 130,55 Q140,42 130,28" fill="#455A64" />
       {/* Eye */}
-      <g style={{ transformOrigin: "126px 32px", animation: "ws-blink 6s ease-in-out infinite" }}>
+      <g
+        style={{
+          transformOrigin: "126px 32px",
+          animation: "ws-blink 6s ease-in-out infinite",
+        }}
+      >
         <circle cx="125" cy="32" r="4" fill="white" />
         <circle cx="126" cy="32" r="2.5" fill="#263238" />
         <circle cx="127" cy="31" r="0.8" fill="white" />
       </g>
       {/* Wide smile */}
-      <g style={{ transformOrigin: "138px 47px", animation: "ws-mouth 3s ease-in-out infinite" }}>
-        <path d="M128,48 Q138,52 148,42" stroke="#263238" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+      <g
+        style={{
+          transformOrigin: "138px 47px",
+          animation: "ws-mouth 3s ease-in-out infinite",
+        }}
+      >
+        <path
+          d="M128,48 Q138,52 148,42"
+          stroke="#263238"
+          strokeWidth="1.5"
+          fill="none"
+          strokeLinecap="round"
+        />
       </g>
       {/* Gills */}
-      <line x1="115" y1="30" x2="115" y2="48" stroke="#37474F" strokeWidth="1.2" />
-      <line x1="112" y1="32" x2="112" y2="46" stroke="#37474F" strokeWidth="1" />
-      <line x1="109" y1="33" x2="109" y2="45" stroke="#37474F" strokeWidth="1" />
+      <line
+        x1="115"
+        y1="30"
+        x2="115"
+        y2="48"
+        stroke="#37474F"
+        strokeWidth="1.2"
+      />
+      <line
+        x1="112"
+        y1="32"
+        x2="112"
+        y2="46"
+        stroke="#37474F"
+        strokeWidth="1"
+      />
+      <line
+        x1="109"
+        y1="33"
+        x2="109"
+        y2="45"
+        stroke="#37474F"
+        strokeWidth="1"
+      />
     </svg>
   );
 }

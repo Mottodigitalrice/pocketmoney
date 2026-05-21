@@ -30,9 +30,7 @@ function makeError(digest?: string): Error & { digest?: string } {
 
 describe("parent/error.tsx — segment boundary", () => {
   it("renders the parent-specific title and subtitle", () => {
-    renderWithProviders(
-      <ParentError error={makeError()} reset={() => {}} />,
-    );
+    renderWithProviders(<ParentError error={makeError()} reset={() => {}} />);
     expect(screen.getByText("Captain's orders stalled!")).toBeInTheDocument();
     expect(
       screen.getByText(
@@ -42,9 +40,7 @@ describe("parent/error.tsx — segment boundary", () => {
   });
 
   it("renders both CTAs — retry button + back-to-approvals link", () => {
-    renderWithProviders(
-      <ParentError error={makeError()} reset={() => {}} />,
-    );
+    renderWithProviders(<ParentError error={makeError()} reset={() => {}} />);
     expect(
       screen.getByRole("button", { name: /try again/i }),
     ).toBeInTheDocument();
@@ -64,9 +60,7 @@ describe("parent/error.tsx — segment boundary", () => {
   });
 
   it("hides the Error ID line when error.digest is absent", () => {
-    renderWithProviders(
-      <ParentError error={makeError()} reset={() => {}} />,
-    );
+    renderWithProviders(<ParentError error={makeError()} reset={() => {}} />);
     expect(screen.queryByTestId("error-digest")).toBeNull();
   });
 
@@ -79,9 +73,7 @@ describe("parent/error.tsx — segment boundary", () => {
   });
 
   it("Back to Approvals link points to /parent (safe escape)", () => {
-    renderWithProviders(
-      <ParentError error={makeError()} reset={() => {}} />,
-    );
+    renderWithProviders(<ParentError error={makeError()} reset={() => {}} />);
     const link = screen.getByRole("link", { name: /back to approvals/i });
     expect(link.getAttribute("href")).toBe("/parent");
   });

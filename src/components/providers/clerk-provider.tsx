@@ -21,8 +21,7 @@ const clerkAppearance = {
     headerSubtitle: "hidden",
     socialButtonsBlockButton:
       "bg-stone-800 border-amber-800/30 text-amber-100 hover:bg-stone-700",
-    formButtonPrimary:
-      "bg-amber-600 hover:bg-amber-500 text-white font-bold",
+    formButtonPrimary: "bg-amber-600 hover:bg-amber-500 text-white font-bold",
     formFieldLabel: "text-amber-200",
     formFieldInput:
       "bg-stone-800 border-amber-800/40 text-amber-100 focus:border-amber-500",

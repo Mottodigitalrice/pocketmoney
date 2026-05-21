@@ -28,7 +28,7 @@ export function useUserSync() {
         email,
         name: user.fullName || undefined,
         imageUrl: user.imageUrl || undefined,
-      })
+      }),
     );
 
     hasSynced.current = true;

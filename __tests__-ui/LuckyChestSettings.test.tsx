@@ -30,7 +30,9 @@ describe("LuckyChestSettings — S2 (R4) schedule explainer (F10 5.19)", () => {
     const { rerender } = renderWithProviders(<LuckyChestSettings />, {
       contextValue: { luckyChestMaxAmount: 100 },
     });
-    expect(screen.getByTestId("lucky-chest-schedule-explainer")).toHaveTextContent("100");
+    expect(
+      screen.getByTestId("lucky-chest-schedule-explainer"),
+    ).toHaveTextContent("100");
     // Re-render with a new context value — passes via re-render not rerender
     // alone (renderWithProviders wraps in a Provider keyed to its own value).
     // For this test, just verifying the FIRST mount's content is enough; the

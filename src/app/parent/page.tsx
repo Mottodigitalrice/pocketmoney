@@ -13,9 +13,22 @@ import { AppSkeleton } from "@/components/features/shared/AppSkeleton";
 import { usePocketMoney } from "@/hooks/use-pocket-money";
 import { useTranslation } from "@/hooks/use-translation";
 
-type Tab = "quick_add" | "approvals" | "planner" | "jobs" | "overview" | "children";
+type Tab =
+  | "quick_add"
+  | "approvals"
+  | "planner"
+  | "jobs"
+  | "overview"
+  | "children";
 
-const tabIds: Tab[] = ["quick_add", "approvals", "planner", "jobs", "overview", "children"];
+const tabIds: Tab[] = [
+  "quick_add",
+  "approvals",
+  "planner",
+  "jobs",
+  "overview",
+  "children",
+];
 
 function isTab(value: string): value is Tab {
   return tabIds.includes(value as Tab);
@@ -29,7 +42,8 @@ export default function ParentPage() {
     return isTab(hashTab) ? hashTab : "quick_add";
   });
   const { t } = useTranslation();
-  const { familyChildren, addChild, editChild, deleteChild, isLoading } = usePocketMoney();
+  const { familyChildren, addChild, editChild, deleteChild, isLoading } =
+    usePocketMoney();
 
   // G2: parent dashboard also benefits from a skeleton while Convex hydrates,
   // so the tabs/widgets aren't visibly empty before data arrives.

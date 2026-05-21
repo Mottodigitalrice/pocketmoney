@@ -34,18 +34,14 @@ describe("findOrphansInList — empty inputs", () => {
 
 describe("findOrphansInList — no orphans (everything referenced)", () => {
   it("all referenced → empty output", () => {
-    expect(
-      findOrphansInList(["a", "b", "c"], ["a", "b", "c"])
-    ).toEqual([]);
+    expect(findOrphansInList(["a", "b", "c"], ["a", "b", "c"])).toEqual([]);
   });
 
   it("referenced is a superset of all → empty output (extra refs ignored)", () => {
     // It's legal for the family's jobInstances to reference an ID that's no
     // longer in _storage (e.g. already manually deleted). That extra ref
     // shouldn't somehow re-introduce an orphan.
-    expect(
-      findOrphansInList(["a", "b"], ["a", "b", "c", "d"])
-    ).toEqual([]);
+    expect(findOrphansInList(["a", "b"], ["a", "b", "c", "d"])).toEqual([]);
   });
 });
 
@@ -56,7 +52,7 @@ describe("findOrphansInList — all orphans (no references)", () => {
 
   it("referenced contains unrelated IDs → still every entry of all is an orphan", () => {
     expect(
-      findOrphansInList(["x", "y"], ["unrelated-1", "unrelated-2"])
+      findOrphansInList(["x", "y"], ["unrelated-1", "unrelated-2"]),
     ).toEqual(["x", "y"]);
   });
 });
@@ -81,15 +77,17 @@ describe("findOrphansInList — duplicate handling (idempotent)", () => {
     // Convex never returns duplicate _storage rows, but the helper should
     // still tolerate it so the deletion mutation can safely receive the
     // same orphan list twice (re-run after a partial failure).
-    expect(
-      findOrphansInList(["a", "a", "b", "b", "b"], [])
-    ).toEqual(["a", "b"]);
+    expect(findOrphansInList(["a", "a", "b", "b", "b"], [])).toEqual([
+      "a",
+      "b",
+    ]);
   });
 
   it("duplicate entries in `referenced` don't affect membership", () => {
-    expect(
-      findOrphansInList(["a", "b", "c"], ["b", "b", "b", "b"])
-    ).toEqual(["a", "c"]);
+    expect(findOrphansInList(["a", "b", "c"], ["b", "b", "b", "b"])).toEqual([
+      "a",
+      "c",
+    ]);
   });
 
   it("idempotent: calling on prior output yields the same output", () => {

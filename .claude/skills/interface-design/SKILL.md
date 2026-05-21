@@ -114,6 +114,7 @@ The difference: time in the product's world before any visual or structural thin
 ## Proposal Requirements
 
 Your direction must explicitly reference:
+
 - Domain concepts you explored
 - Colors from your color world exploration
 - Your signature element
@@ -170,6 +171,7 @@ Every pattern has infinite expressions. **No interface should look the same.**
 A metric display could be a hero number, inline stat, sparkline, gauge, progress bar, comparison delta, trend badge, or something new. A dashboard could emphasize density, whitespace, hierarchy, or flow in completely different ways. Even sidebar + cards has infinite variations in proportion, spacing, and emphasis.
 
 **Before building, ask:**
+
 - What's the ONE thing users do most here?
 - What products solve similar problems brilliantly? Study them.
 - Why would this interface feel designed for its purpose, not templated?
@@ -195,13 +197,17 @@ Your palette should feel like it came FROM somewhere — not like it was applied
 # Design Principles
 
 ## Spacing
+
 Pick a base unit and stick to multiples. Consistency matters more than the specific number. Random values signal no system.
 
 ## Padding
+
 Keep it symmetrical. If one side is 16px, others should match unless there's a clear reason.
 
 ## Depth
+
 Choose ONE approach and commit:
+
 - **Borders-only** — Clean, technical. For dense tools.
 - **Subtle shadows** — Soft lift. For approachable products.
 - **Layered shadows** — Premium, dimensional. For cards that need presence.
@@ -209,21 +215,27 @@ Choose ONE approach and commit:
 Don't mix approaches.
 
 ## Border Radius
+
 Sharper feels technical. Rounder feels friendly. Pick a scale and apply consistently.
 
 ## Typography
+
 Headlines need weight and tight tracking. Body needs readability. Data needs monospace. Build a hierarchy.
 
 ## Color & Surfaces
+
 Build from primitives: foreground (text hierarchy), background (surface elevation), border (separation hierarchy), brand, and semantic (destructive, warning, success). Every color should trace back to these. No random hex values — everything maps to the system.
 
 ## Animation
+
 Fast micro-interactions (~150ms), smooth easing. No bouncy/spring effects.
 
 ## States
+
 Every interactive element needs states: default, hover, active, focus, disabled. Data needs states too: loading, empty, error. Missing states feel broken.
 
 ## Controls
+
 Native `<select>` and `<input type="date">` can't be styled. Build custom components.
 
 ---
@@ -247,6 +259,7 @@ Native `<select>` and `<input type="date">` can't be styled. Build custom compon
 # Workflow
 
 ## Communication
+
 Be invisible. Don't announce modes or narrate process.
 
 **Never say:** "I'm in ESTABLISH MODE", "Let me check system.md..."
@@ -254,7 +267,9 @@ Be invisible. Don't announce modes or narrate process.
 **Instead:** Jump into work. State suggestions with reasoning.
 
 ## Suggest + Ask
+
 Lead with your exploration and recommendation, then confirm:
+
 ```
 "Domain: [5+ concepts from the product's world]
 Color world: [5+ colors that exist in this domain]
@@ -267,9 +282,11 @@ Direction: [approach that connects to the above]"
 ```
 
 ## If Project Has system.md
+
 Read `.interface-design/system.md` and apply. Decisions are made.
 
 ## If No system.md
+
 1. Explore domain — Produce all four required outputs
 2. Propose — Direction must reference all four
 3. Confirm — Get user buy-in
@@ -288,6 +305,7 @@ When you finish building something, **always offer to save**:
 ```
 
 If yes, write to `.interface-design/system.md`:
+
 - Direction and feel
 - Depth strategy (borders/shadows/layered)
 - Spacing base unit
@@ -300,6 +318,7 @@ This compounds — each save makes future work faster and more consistent.
 # Deep Dives
 
 For more detail on specific topics:
+
 - `references/principles.md` — Code examples, specific values, dark mode
 - `references/validation.md` — Memory management, when to update system.md
 

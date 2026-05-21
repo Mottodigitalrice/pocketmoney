@@ -7,18 +7,18 @@ import { LightRays } from "./LightRays";
 // because they're purely visual flourishes — flicker-on-load is acceptable.
 const BubbleEffect = dynamic(
   () => import("./BubbleEffect").then((m) => ({ default: m.BubbleEffect })),
-  { ssr: false }
+  { ssr: false },
 );
 const WaveAnimation = dynamic(
   () => import("./WaveAnimation").then((m) => ({ default: m.WaveAnimation })),
-  { ssr: false }
+  { ssr: false },
 );
 const CreaturePool = dynamic(
   () =>
     import("../sea-creatures/CreaturePool").then((m) => ({
       default: m.CreaturePool,
     })),
-  { ssr: false }
+  { ssr: false },
 );
 
 interface OceanSceneProps {
@@ -27,7 +27,11 @@ interface OceanSceneProps {
   showCreatures?: boolean;
 }
 
-export function OceanScene({ children, subtle = false, showCreatures = true }: OceanSceneProps) {
+export function OceanScene({
+  children,
+  subtle = false,
+  showCreatures = true,
+}: OceanSceneProps) {
   return (
     <div className="ocean-gradient relative min-h-screen overflow-x-hidden">
       <WaveAnimation position="top" />

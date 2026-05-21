@@ -45,9 +45,7 @@ describe("ConfirmDialog", () => {
     );
     expect(screen.getByTestId("confirm-dialog")).toBeInTheDocument();
     expect(screen.getByText("Delete child?")).toBeInTheDocument();
-    expect(
-      screen.getByText(/This will wipe wallet/),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/This will wipe wallet/)).toBeInTheDocument();
     expect(screen.getByTestId("confirm-dialog-confirm")).toHaveTextContent(
       "Delete",
     );

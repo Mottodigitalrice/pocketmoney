@@ -45,7 +45,8 @@ export default function HomePage() {
 
 function HomePageInner() {
   const { t } = useTranslation();
-  const { familyChildren, isLoading, userId, captainCodeEnabled } = usePocketMoney();
+  const { familyChildren, isLoading, userId, captainCodeEnabled } =
+    usePocketMoney();
   const router = useRouter();
   const { signOut } = useClerk();
   const [mathOpen, setMathOpen] = useState(false);
@@ -120,8 +121,8 @@ function HomePageInner() {
             familyChildren.length === 1
               ? "sm:grid-cols-2 max-w-2xl"
               : familyChildren.length === 2
-              ? "sm:grid-cols-3"
-              : "sm:grid-cols-2 lg:grid-cols-4"
+                ? "sm:grid-cols-3"
+                : "sm:grid-cols-2 lg:grid-cols-4"
           }`}
         >
           {/* Parent Card - click opens math gate */}
@@ -174,7 +175,8 @@ function HomePageInner() {
 
 function HomePageInnerWithoutClerk() {
   const { t } = useTranslation();
-  const { familyChildren, isLoading, userId, captainCodeEnabled } = usePocketMoney();
+  const { familyChildren, isLoading, userId, captainCodeEnabled } =
+    usePocketMoney();
   const router = useRouter();
   const [mathOpen, setMathOpen] = useState(false);
 

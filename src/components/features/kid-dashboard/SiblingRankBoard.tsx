@@ -271,7 +271,9 @@ export function SiblingRankBoard({ childId }: SiblingRankBoardProps) {
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
-                    <span className="text-2xl">{iconConfig?.emoji ?? "👤"}</span>
+                    <span className="text-2xl">
+                      {iconConfig?.emoji ?? "👤"}
+                    </span>
                     <p className="truncate font-extrabold text-amber-100">
                       {child.name}
                     </p>

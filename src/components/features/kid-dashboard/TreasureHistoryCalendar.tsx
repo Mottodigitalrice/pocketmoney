@@ -33,7 +33,10 @@ function TreasureHistoryCalendarSkeleton() {
       </div>
       <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
         {[0, 1, 2, 3, 4, 5, 6].map((i) => (
-          <Skeleton key={i} className="h-28 w-full rounded-xl bg-amber-900/30" />
+          <Skeleton
+            key={i}
+            className="h-28 w-full rounded-xl bg-amber-900/30"
+          />
         ))}
       </div>
     </div>
@@ -44,7 +47,9 @@ interface TreasureHistoryCalendarProps {
   childId: string;
 }
 
-export function TreasureHistoryCalendar({ childId }: TreasureHistoryCalendarProps) {
+export function TreasureHistoryCalendar({
+  childId,
+}: TreasureHistoryCalendarProps) {
   const { t, locale } = useTranslation();
   const {
     isLoading,
@@ -65,7 +70,7 @@ export function TreasureHistoryCalendar({ childId }: TreasureHistoryCalendarProp
   if (isLoading) return <TreasureHistoryCalendarSkeleton />;
 
   const approvedInstances = getInstancesForChild(childId).filter(
-    (instance) => instance.status === "approved" && instance.approvedAt
+    (instance) => instance.status === "approved" && instance.approvedAt,
   );
 
   const days = weekDates.map((date, index) => {
@@ -81,7 +86,10 @@ export function TreasureHistoryCalendar({ childId }: TreasureHistoryCalendarProp
       }))
       .filter((entry) => entry.job);
 
-    const earned = jobs.reduce((sum, entry) => sum + (entry.job?.yenAmount ?? 0), 0);
+    const earned = jobs.reduce(
+      (sum, entry) => sum + (entry.job?.yenAmount ?? 0),
+      0,
+    );
 
     return {
       date,
@@ -107,7 +115,9 @@ export function TreasureHistoryCalendar({ childId }: TreasureHistoryCalendarProp
       <div className="mb-4 flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <span className="text-2xl">📚</span>
-          <h2 className="text-lg font-bold text-white">{t("kid_history_title")}</h2>
+          <h2 className="text-lg font-bold text-white">
+            {t("kid_history_title")}
+          </h2>
         </div>
         {/* F20: chevron buttons promoted to size="icon" (h-9 w-9) + min 11.
             aria-label added so screen readers announce "previous week"
@@ -147,11 +157,13 @@ export function TreasureHistoryCalendar({ childId }: TreasureHistoryCalendarProp
             >
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="text-sm font-semibold text-amber-200">{day.dayLabel}</p>
+                  <p className="text-sm font-semibold text-amber-200">
+                    {day.dayLabel}
+                  </p>
                   <p className="text-xs text-white/55">
                     {new Date(`${day.date}T00:00:00`).toLocaleDateString(
                       locale === "ja" ? "ja-JP" : "en-US",
-                      { month: "short", day: "numeric" }
+                      { month: "short", day: "numeric" },
                     )}
                   </p>
                 </div>
@@ -195,9 +207,7 @@ export function TreasureHistoryCalendar({ childId }: TreasureHistoryCalendarProp
           <p className="text-lg font-bold text-amber-100">
             {t("history_empty_title")}
           </p>
-          <p className="text-sm text-white/70">
-            {t("history_empty_hint")}
-          </p>
+          <p className="text-sm text-white/70">{t("history_empty_hint")}</p>
         </div>
       )}
     </div>

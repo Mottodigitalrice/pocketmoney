@@ -36,7 +36,7 @@ export function TreasureChestAnimation({
       delay: Math.random() * 1.5,
       size: 20 + Math.random() * 20,
       duration: 2 + Math.random(),
-    }))
+    })),
   );
   const [sparkles] = useState<Sparkle[]>(() =>
     Array.from({ length: 15 }, (_, i) => ({
@@ -45,7 +45,7 @@ export function TreasureChestAnimation({
       y: 20 + Math.random() * 50,
       delay: Math.random() * 3,
       duration: 1 + Math.random() * 2,
-    }))
+    })),
   );
   const [showTotal, setShowTotal] = useState(false);
   const [countUp, setCountUp] = useState(0);
@@ -222,8 +222,22 @@ function TreasureIslandScene() {
       <ellipse cx="160" cy="155" rx="130" ry="110" fill="url(#goldGlow)" />
 
       {/* Water ring around island */}
-      <ellipse cx="160" cy="250" rx="155" ry="28" fill="#3A7BD5" opacity="0.5" />
-      <ellipse cx="160" cy="252" rx="148" ry="24" fill="#5BC0EB" opacity="0.3" />
+      <ellipse
+        cx="160"
+        cy="250"
+        rx="155"
+        ry="28"
+        fill="#3A7BD5"
+        opacity="0.5"
+      />
+      <ellipse
+        cx="160"
+        cy="252"
+        rx="148"
+        ry="24"
+        fill="#5BC0EB"
+        opacity="0.3"
+      />
 
       {/* Sandy island */}
       <ellipse cx="160" cy="242" rx="125" ry="35" fill="url(#sandGrad)" />
@@ -285,22 +299,102 @@ function TreasureIslandScene() {
       <circle cx="73" cy="123" r="3.5" fill="#6B3410" />
 
       {/* Scattered coins on sand */}
-      <ellipse cx="100" cy="234" rx="8" ry="3" fill="#FFD700" stroke="#B8860B" strokeWidth="0.8" />
-      <ellipse cx="215" cy="236" rx="7" ry="3" fill="#FFC800" stroke="#B8860B" strokeWidth="0.8" />
-      <ellipse cx="240" cy="240" rx="7" ry="3" fill="#FFD700" stroke="#B8860B" strokeWidth="0.8" />
-      <ellipse cx="85" cy="240" rx="6" ry="2.5" fill="#FFE44D" stroke="#B8860B" strokeWidth="0.8" />
-      <ellipse cx="200" cy="230" rx="8" ry="3" fill="#FFD700" stroke="#B8860B" strokeWidth="0.8" />
+      <ellipse
+        cx="100"
+        cy="234"
+        rx="8"
+        ry="3"
+        fill="#FFD700"
+        stroke="#B8860B"
+        strokeWidth="0.8"
+      />
+      <ellipse
+        cx="215"
+        cy="236"
+        rx="7"
+        ry="3"
+        fill="#FFC800"
+        stroke="#B8860B"
+        strokeWidth="0.8"
+      />
+      <ellipse
+        cx="240"
+        cy="240"
+        rx="7"
+        ry="3"
+        fill="#FFD700"
+        stroke="#B8860B"
+        strokeWidth="0.8"
+      />
+      <ellipse
+        cx="85"
+        cy="240"
+        rx="6"
+        ry="2.5"
+        fill="#FFE44D"
+        stroke="#B8860B"
+        strokeWidth="0.8"
+      />
+      <ellipse
+        cx="200"
+        cy="230"
+        rx="8"
+        ry="3"
+        fill="#FFD700"
+        stroke="#B8860B"
+        strokeWidth="0.8"
+      />
 
       {/* Gold pile under chest */}
       <ellipse cx="160" cy="218" rx="55" ry="18" fill="#DAA520" />
       <ellipse cx="160" cy="215" rx="50" ry="14" fill="#FFD700" />
       <ellipse cx="160" cy="212" rx="44" ry="10" fill="#FFE44D" />
       {/* Coins on pile */}
-      <ellipse cx="135" cy="216" rx="9" ry="4" fill="#FFD700" stroke="#B8860B" strokeWidth="0.6" />
-      <ellipse cx="185" cy="217" rx="9" ry="4" fill="#FFC800" stroke="#B8860B" strokeWidth="0.6" />
-      <ellipse cx="155" cy="219" rx="8" ry="3.5" fill="#FFE44D" stroke="#B8860B" strokeWidth="0.6" />
-      <ellipse cx="170" cy="213" rx="9" ry="4" fill="#FFD700" stroke="#B8860B" strokeWidth="0.6" />
-      <ellipse cx="145" cy="221" rx="8" ry="3.5" fill="#FFC800" stroke="#B8860B" strokeWidth="0.6" />
+      <ellipse
+        cx="135"
+        cy="216"
+        rx="9"
+        ry="4"
+        fill="#FFD700"
+        stroke="#B8860B"
+        strokeWidth="0.6"
+      />
+      <ellipse
+        cx="185"
+        cy="217"
+        rx="9"
+        ry="4"
+        fill="#FFC800"
+        stroke="#B8860B"
+        strokeWidth="0.6"
+      />
+      <ellipse
+        cx="155"
+        cy="219"
+        rx="8"
+        ry="3.5"
+        fill="#FFE44D"
+        stroke="#B8860B"
+        strokeWidth="0.6"
+      />
+      <ellipse
+        cx="170"
+        cy="213"
+        rx="9"
+        ry="4"
+        fill="#FFD700"
+        stroke="#B8860B"
+        strokeWidth="0.6"
+      />
+      <ellipse
+        cx="145"
+        cy="221"
+        rx="8"
+        ry="3.5"
+        fill="#FFC800"
+        stroke="#B8860B"
+        strokeWidth="0.6"
+      />
 
       {/* === TREASURE CHEST === */}
 
@@ -316,15 +410,66 @@ function TreasureIslandScene() {
         strokeWidth="2"
       />
       {/* Wood grain */}
-      <line x1="115" y1="175" x2="205" y2="175" stroke="#4A2008" strokeWidth="0.7" opacity="0.4" />
-      <line x1="115" y1="191" x2="205" y2="191" stroke="#4A2008" strokeWidth="0.7" opacity="0.4" />
+      <line
+        x1="115"
+        y1="175"
+        x2="205"
+        y2="175"
+        stroke="#4A2008"
+        strokeWidth="0.7"
+        opacity="0.4"
+      />
+      <line
+        x1="115"
+        y1="191"
+        x2="205"
+        y2="191"
+        stroke="#4A2008"
+        strokeWidth="0.7"
+        opacity="0.4"
+      />
       {/* Gold horizontal bands */}
-      <rect x="112" y="156" width="96" height="5" rx="2" fill="#FFD700" stroke="#B8860B" strokeWidth="0.8" />
-      <rect x="112" y="205" width="96" height="5" rx="2" fill="#FFD700" stroke="#B8860B" strokeWidth="0.8" />
+      <rect
+        x="112"
+        y="156"
+        width="96"
+        height="5"
+        rx="2"
+        fill="#FFD700"
+        stroke="#B8860B"
+        strokeWidth="0.8"
+      />
+      <rect
+        x="112"
+        y="205"
+        width="96"
+        height="5"
+        rx="2"
+        fill="#FFD700"
+        stroke="#B8860B"
+        strokeWidth="0.8"
+      />
       {/* Center vertical band */}
-      <rect x="156" y="156" width="8" height="54" fill="#FFD700" stroke="#B8860B" strokeWidth="0.6" />
+      <rect
+        x="156"
+        y="156"
+        width="8"
+        height="54"
+        fill="#FFD700"
+        stroke="#B8860B"
+        strokeWidth="0.6"
+      />
       {/* Lock plate */}
-      <rect x="155" y="163" width="10" height="14" rx="2" fill="#FFD700" stroke="#B8860B" strokeWidth="1" />
+      <rect
+        x="155"
+        y="163"
+        width="10"
+        height="14"
+        rx="2"
+        fill="#FFD700"
+        stroke="#B8860B"
+        strokeWidth="1"
+      />
       <circle cx="160" cy="172" r="2.5" fill="#B8860B" />
       <circle cx="160" cy="172" r="1.2" fill="#7A5A0A" />
 
@@ -337,29 +482,143 @@ function TreasureIslandScene() {
           strokeWidth="2"
         />
         {/* Lid wood grain */}
-        <path d="M120,143 Q160,121 200,143" fill="none" stroke="#4A2008" strokeWidth="0.7" opacity="0.4" />
+        <path
+          d="M120,143 Q160,121 200,143"
+          fill="none"
+          stroke="#4A2008"
+          strokeWidth="0.7"
+          opacity="0.4"
+        />
         {/* Gold bands on lid */}
-        <rect x="112" y="153" width="96" height="5" rx="2" fill="#FFD700" stroke="#B8860B" strokeWidth="0.8" />
-        <path d="M113,125 Q160,99 207,125" fill="none" stroke="#FFD700" strokeWidth="4" />
-        <path d="M113,125 Q160,99 207,125" fill="none" stroke="#B8860B" strokeWidth="0.8" opacity="0.5" />
+        <rect
+          x="112"
+          y="153"
+          width="96"
+          height="5"
+          rx="2"
+          fill="#FFD700"
+          stroke="#B8860B"
+          strokeWidth="0.8"
+        />
+        <path
+          d="M113,125 Q160,99 207,125"
+          fill="none"
+          stroke="#FFD700"
+          strokeWidth="4"
+        />
+        <path
+          d="M113,125 Q160,99 207,125"
+          fill="none"
+          stroke="#B8860B"
+          strokeWidth="0.8"
+          opacity="0.5"
+        />
         {/* Vertical band on lid */}
-        <rect x="156" y="109" width="8" height="49" rx="1.5" fill="#FFD700" stroke="#B8860B" strokeWidth="0.6" />
+        <rect
+          x="156"
+          y="109"
+          width="8"
+          height="49"
+          rx="1.5"
+          fill="#FFD700"
+          stroke="#B8860B"
+          strokeWidth="0.6"
+        />
       </g>
 
       {/* Gold coins overflowing from chest */}
-      <ellipse cx="130" cy="160" rx="9" ry="4" fill="#FFD700" stroke="#B8860B" strokeWidth="0.6" />
-      <ellipse cx="150" cy="156" rx="8" ry="4" fill="#FFC800" stroke="#B8860B" strokeWidth="0.6" />
-      <ellipse cx="170" cy="158" rx="9" ry="4" fill="#FFE44D" stroke="#B8860B" strokeWidth="0.6" />
-      <ellipse cx="188" cy="161" rx="8" ry="3.5" fill="#FFD700" stroke="#B8860B" strokeWidth="0.6" />
-      <ellipse cx="140" cy="153" rx="8" ry="4" fill="#FFD700" stroke="#B8860B" strokeWidth="0.6" />
-      <ellipse cx="162" cy="151" rx="8" ry="4" fill="#FFC800" stroke="#B8860B" strokeWidth="0.6" />
-      <ellipse cx="120" cy="162" rx="7" ry="3.5" fill="#FFE44D" stroke="#B8860B" strokeWidth="0.6" />
-      <ellipse cx="195" cy="163" rx="7" ry="3.5" fill="#FFD700" stroke="#B8860B" strokeWidth="0.6" />
+      <ellipse
+        cx="130"
+        cy="160"
+        rx="9"
+        ry="4"
+        fill="#FFD700"
+        stroke="#B8860B"
+        strokeWidth="0.6"
+      />
+      <ellipse
+        cx="150"
+        cy="156"
+        rx="8"
+        ry="4"
+        fill="#FFC800"
+        stroke="#B8860B"
+        strokeWidth="0.6"
+      />
+      <ellipse
+        cx="170"
+        cy="158"
+        rx="9"
+        ry="4"
+        fill="#FFE44D"
+        stroke="#B8860B"
+        strokeWidth="0.6"
+      />
+      <ellipse
+        cx="188"
+        cy="161"
+        rx="8"
+        ry="3.5"
+        fill="#FFD700"
+        stroke="#B8860B"
+        strokeWidth="0.6"
+      />
+      <ellipse
+        cx="140"
+        cy="153"
+        rx="8"
+        ry="4"
+        fill="#FFD700"
+        stroke="#B8860B"
+        strokeWidth="0.6"
+      />
+      <ellipse
+        cx="162"
+        cy="151"
+        rx="8"
+        ry="4"
+        fill="#FFC800"
+        stroke="#B8860B"
+        strokeWidth="0.6"
+      />
+      <ellipse
+        cx="120"
+        cy="162"
+        rx="7"
+        ry="3.5"
+        fill="#FFE44D"
+        stroke="#B8860B"
+        strokeWidth="0.6"
+      />
+      <ellipse
+        cx="195"
+        cy="163"
+        rx="7"
+        ry="3.5"
+        fill="#FFD700"
+        stroke="#B8860B"
+        strokeWidth="0.6"
+      />
 
       {/* Gems */}
-      <polygon points="138,147 143,135 148,147" fill="#FF3B3B" stroke="#CC0000" strokeWidth="0.8" />
-      <polygon points="168,143 173,131 178,143" fill="#50FF50" stroke="#006400" strokeWidth="0.8" />
-      <polygon points="125,153 130,143 135,153" fill="#5070FF" stroke="#0000CC" strokeWidth="0.8" />
+      <polygon
+        points="138,147 143,135 148,147"
+        fill="#FF3B3B"
+        stroke="#CC0000"
+        strokeWidth="0.8"
+      />
+      <polygon
+        points="168,143 173,131 178,143"
+        fill="#50FF50"
+        stroke="#006400"
+        strokeWidth="0.8"
+      />
+      <polygon
+        points="125,153 130,143 135,153"
+        fill="#5070FF"
+        stroke="#0000CC"
+        strokeWidth="0.8"
+      />
       {/* Diamond */}
       <polygon
         points="156,141 161,129 166,141 161,146"
@@ -368,7 +627,14 @@ function TreasureIslandScene() {
         strokeWidth="0.8"
       />
       {/* Pearl */}
-      <circle cx="180" cy="149" r="4" fill="#FAFAFA" stroke="#DDD" strokeWidth="0.5" />
+      <circle
+        cx="180"
+        cy="149"
+        r="4"
+        fill="#FAFAFA"
+        stroke="#DDD"
+        strokeWidth="0.5"
+      />
       <circle cx="178.5" cy="147.5" r="1.5" fill="white" opacity="0.8" />
     </svg>
   );

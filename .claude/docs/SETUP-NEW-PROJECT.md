@@ -3,6 +3,7 @@
 ## Quick Start
 
 1. **Clone this template:**
+
    ```bash
    git clone [this-repo-url] my-new-demo
    cd my-new-demo
@@ -11,11 +12,13 @@
    ```
 
 2. **Install dependencies:**
+
    ```bash
    npm install
    ```
 
 3. **Set up Convex:**
+
    ```bash
    npx convex dev
    # Create new project when prompted
@@ -90,6 +93,7 @@ convex/
 ### 1. Add a new database table
 
 Edit `convex/schema.ts`:
+
 ```typescript
 export default defineSchema({
   // ... existing tables
@@ -103,6 +107,7 @@ export default defineSchema({
 ### 2. Create functions
 
 Create `convex/functions/newTable.ts`:
+
 ```typescript
 import { query, mutation } from "../_generated/server";
 import { v } from "convex/values";
@@ -124,6 +129,7 @@ export const create = mutation({
 ### 3. Create UI components
 
 Create `src/components/features/new-feature/`:
+
 - `list.tsx` - Display items
 - `form.tsx` - Create/edit form
 - `item.tsx` - Single item display
@@ -154,10 +160,13 @@ npx convex deploy
 ## Troubleshooting
 
 ### "Convex functions not found"
+
 Run `npx convex dev` to sync schema and generate types.
 
 ### "Clerk middleware error"
+
 Check that `CLERK_SECRET_KEY` is set correctly.
 
 ### "OpenRouter API error"
+
 Verify `OPENROUTER_API_KEY` is valid and has credits.

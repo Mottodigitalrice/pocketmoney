@@ -189,14 +189,18 @@ export const _smokeTeardown = internalMutation({
 async function probeOwnership<T extends { userId: Id<"users">; _id: unknown }>(
   fetch: () => Promise<T | null>,
   actorUserId: Id<"users">,
-  label: string
+  label: string,
 ): Promise<{ label: string; threw: boolean; error?: string }> {
   const doc = await fetch();
   try {
     assertOwnedBy(doc, actorUserId, label);
     return { label, threw: false };
   } catch (e) {
-    return { label, threw: true, error: e instanceof Error ? e.message : String(e) };
+    return {
+      label,
+      threw: true,
+      error: e instanceof Error ? e.message : String(e),
+    };
   }
 }
 
@@ -217,20 +221,21 @@ export const _smokeRunAttackMatrix = internalQuery({
         label: v.string(),
         threw: v.boolean(),
         error: v.optional(v.string()),
-      })
+      }),
     ),
   }),
   handler: async (ctx, args) => {
     const { actorUserId, targetIds } = args;
-    const attempts: Array<{ label: string; threw: boolean; error?: string }> = [];
+    const attempts: Array<{ label: string; threw: boolean; error?: string }> =
+      [];
 
     // 1. children.update — fetch B's child as A
     attempts.push(
       await probeOwnership(
         () => ctx.db.get(targetIds.childId) as Promise<Doc<"children"> | null>,
         actorUserId,
-        "children.update target"
-      )
+        "children.update target",
+      ),
     );
 
     // 2. children.remove — same target, different op
@@ -238,8 +243,8 @@ export const _smokeRunAttackMatrix = internalQuery({
       await probeOwnership(
         () => ctx.db.get(targetIds.childId) as Promise<Doc<"children"> | null>,
         actorUserId,
-        "children.remove target"
-      )
+        "children.remove target",
+      ),
     );
 
     // 3. wallets.getByChild — A reading B's child
@@ -247,8 +252,8 @@ export const _smokeRunAttackMatrix = internalQuery({
       await probeOwnership(
         () => ctx.db.get(targetIds.childId) as Promise<Doc<"children"> | null>,
         actorUserId,
-        "wallets.getByChild child"
-      )
+        "wallets.getByChild child",
+      ),
     );
 
     // 4. wallets.ensureForChild — A creating wallets for B's child
@@ -256,8 +261,8 @@ export const _smokeRunAttackMatrix = internalQuery({
       await probeOwnership(
         () => ctx.db.get(targetIds.childId) as Promise<Doc<"children"> | null>,
         actorUserId,
-        "wallets.ensureForChild child"
-      )
+        "wallets.ensureForChild child",
+      ),
     );
 
     // 5. wallets.awardBonus — A awarding bonus to B's child
@@ -265,8 +270,8 @@ export const _smokeRunAttackMatrix = internalQuery({
       await probeOwnership(
         () => ctx.db.get(targetIds.childId) as Promise<Doc<"children"> | null>,
         actorUserId,
-        "wallets.awardBonus child"
-      )
+        "wallets.awardBonus child",
+      ),
     );
 
     // 6. transactions.getByChild
@@ -274,8 +279,8 @@ export const _smokeRunAttackMatrix = internalQuery({
       await probeOwnership(
         () => ctx.db.get(targetIds.childId) as Promise<Doc<"children"> | null>,
         actorUserId,
-        "transactions.getByChild child"
-      )
+        "transactions.getByChild child",
+      ),
     );
 
     // 7. transactions.withdraw — A withdrawing from B's child's wallet
@@ -283,8 +288,8 @@ export const _smokeRunAttackMatrix = internalQuery({
       await probeOwnership(
         () => ctx.db.get(targetIds.childId) as Promise<Doc<"children"> | null>,
         actorUserId,
-        "transactions.withdraw child"
-      )
+        "transactions.withdraw child",
+      ),
     );
 
     // 8. jobs.getById — A reading B's job
@@ -292,8 +297,8 @@ export const _smokeRunAttackMatrix = internalQuery({
       await probeOwnership(
         () => ctx.db.get(targetIds.jobId) as Promise<Doc<"jobs"> | null>,
         actorUserId,
-        "jobs.getById target"
-      )
+        "jobs.getById target",
+      ),
     );
 
     // 9. jobs.update
@@ -301,8 +306,8 @@ export const _smokeRunAttackMatrix = internalQuery({
       await probeOwnership(
         () => ctx.db.get(targetIds.jobId) as Promise<Doc<"jobs"> | null>,
         actorUserId,
-        "jobs.update target"
-      )
+        "jobs.update target",
+      ),
     );
 
     // 10. jobs.remove
@@ -310,8 +315,8 @@ export const _smokeRunAttackMatrix = internalQuery({
       await probeOwnership(
         () => ctx.db.get(targetIds.jobId) as Promise<Doc<"jobs"> | null>,
         actorUserId,
-        "jobs.remove target"
-      )
+        "jobs.remove target",
+      ),
     );
 
     // 11. scheduledJobs.getByChildDate
@@ -319,8 +324,8 @@ export const _smokeRunAttackMatrix = internalQuery({
       await probeOwnership(
         () => ctx.db.get(targetIds.childId) as Promise<Doc<"children"> | null>,
         actorUserId,
-        "scheduledJobs.getByChildDate child"
-      )
+        "scheduledJobs.getByChildDate child",
+      ),
     );
 
     // 12. scheduledJobs.create — job ownership
@@ -328,8 +333,8 @@ export const _smokeRunAttackMatrix = internalQuery({
       await probeOwnership(
         () => ctx.db.get(targetIds.jobId) as Promise<Doc<"jobs"> | null>,
         actorUserId,
-        "scheduledJobs.create job"
-      )
+        "scheduledJobs.create job",
+      ),
     );
 
     // 13. scheduledJobs.create — child ownership
@@ -337,8 +342,8 @@ export const _smokeRunAttackMatrix = internalQuery({
       await probeOwnership(
         () => ctx.db.get(targetIds.childId) as Promise<Doc<"children"> | null>,
         actorUserId,
-        "scheduledJobs.create child"
-      )
+        "scheduledJobs.create child",
+      ),
     );
 
     // 14. scheduledJobs.createBatch — job ownership
@@ -346,8 +351,8 @@ export const _smokeRunAttackMatrix = internalQuery({
       await probeOwnership(
         () => ctx.db.get(targetIds.jobId) as Promise<Doc<"jobs"> | null>,
         actorUserId,
-        "scheduledJobs.createBatch job"
-      )
+        "scheduledJobs.createBatch job",
+      ),
     );
 
     // 15. scheduledJobs.applyRecurringForWeek
@@ -355,8 +360,8 @@ export const _smokeRunAttackMatrix = internalQuery({
       await probeOwnership(
         () => ctx.db.get(targetIds.jobId) as Promise<Doc<"jobs"> | null>,
         actorUserId,
-        "scheduledJobs.applyRecurringForWeek job"
-      )
+        "scheduledJobs.applyRecurringForWeek job",
+      ),
     );
 
     // 16. scheduledJobs.quickAddForToday
@@ -364,18 +369,20 @@ export const _smokeRunAttackMatrix = internalQuery({
       await probeOwnership(
         () => ctx.db.get(targetIds.jobId) as Promise<Doc<"jobs"> | null>,
         actorUserId,
-        "scheduledJobs.quickAddForToday job"
-      )
+        "scheduledJobs.quickAddForToday job",
+      ),
     );
 
     // 17. scheduledJobs.remove
     attempts.push(
       await probeOwnership(
         () =>
-          ctx.db.get(targetIds.scheduledJobId) as Promise<Doc<"scheduledJobs"> | null>,
+          ctx.db.get(
+            targetIds.scheduledJobId,
+          ) as Promise<Doc<"scheduledJobs"> | null>,
         actorUserId,
-        "scheduledJobs.remove target"
-      )
+        "scheduledJobs.remove target",
+      ),
     );
 
     // 18. scheduledJobs.clearDay
@@ -383,8 +390,8 @@ export const _smokeRunAttackMatrix = internalQuery({
       await probeOwnership(
         () => ctx.db.get(targetIds.childId) as Promise<Doc<"children"> | null>,
         actorUserId,
-        "scheduledJobs.clearDay child"
-      )
+        "scheduledJobs.clearDay child",
+      ),
     );
 
     // 19. jobInstances.getByChild
@@ -392,8 +399,8 @@ export const _smokeRunAttackMatrix = internalQuery({
       await probeOwnership(
         () => ctx.db.get(targetIds.childId) as Promise<Doc<"children"> | null>,
         actorUserId,
-        "jobInstances.getByChild child"
-      )
+        "jobInstances.getByChild child",
+      ),
     );
 
     // 20. jobInstances.start — job
@@ -401,34 +408,40 @@ export const _smokeRunAttackMatrix = internalQuery({
       await probeOwnership(
         () => ctx.db.get(targetIds.jobId) as Promise<Doc<"jobs"> | null>,
         actorUserId,
-        "jobInstances.start job"
-      )
+        "jobInstances.start job",
+      ),
     );
 
     // 21. jobInstances.complete / approve / reject — instance ownership
     attempts.push(
       await probeOwnership(
         () =>
-          ctx.db.get(targetIds.jobInstanceId) as Promise<Doc<"jobInstances"> | null>,
+          ctx.db.get(
+            targetIds.jobInstanceId,
+          ) as Promise<Doc<"jobInstances"> | null>,
         actorUserId,
-        "jobInstances.complete target"
-      )
+        "jobInstances.complete target",
+      ),
     );
     attempts.push(
       await probeOwnership(
         () =>
-          ctx.db.get(targetIds.jobInstanceId) as Promise<Doc<"jobInstances"> | null>,
+          ctx.db.get(
+            targetIds.jobInstanceId,
+          ) as Promise<Doc<"jobInstances"> | null>,
         actorUserId,
-        "jobInstances.approve target"
-      )
+        "jobInstances.approve target",
+      ),
     );
     attempts.push(
       await probeOwnership(
         () =>
-          ctx.db.get(targetIds.jobInstanceId) as Promise<Doc<"jobInstances"> | null>,
+          ctx.db.get(
+            targetIds.jobInstanceId,
+          ) as Promise<Doc<"jobInstances"> | null>,
         actorUserId,
-        "jobInstances.reject target"
-      )
+        "jobInstances.reject target",
+      ),
     );
 
     // 22. goals.getByChild + create — both gate on child
@@ -436,15 +449,15 @@ export const _smokeRunAttackMatrix = internalQuery({
       await probeOwnership(
         () => ctx.db.get(targetIds.childId) as Promise<Doc<"children"> | null>,
         actorUserId,
-        "goals.getByChild child"
-      )
+        "goals.getByChild child",
+      ),
     );
     attempts.push(
       await probeOwnership(
         () => ctx.db.get(targetIds.childId) as Promise<Doc<"children"> | null>,
         actorUserId,
-        "goals.create child"
-      )
+        "goals.create child",
+      ),
     );
 
     // 23. luckyChests.open
@@ -452,8 +465,8 @@ export const _smokeRunAttackMatrix = internalQuery({
       await probeOwnership(
         () => ctx.db.get(targetIds.childId) as Promise<Doc<"children"> | null>,
         actorUserId,
-        "luckyChests.open child"
-      )
+        "luckyChests.open child",
+      ),
     );
 
     return { attempts };
@@ -475,10 +488,12 @@ export const runCrossTenantAttackMatrix = internalAction({
         label: v.string(),
         threw: v.boolean(),
         error: v.optional(v.string()),
-      })
+      }),
     ),
   }),
-  handler: async (ctx): Promise<{
+  handler: async (
+    ctx,
+  ): Promise<{
     totalAttempts: number;
     threwAsExpected: number;
     unexpectedSuccesses: string[];
@@ -496,7 +511,7 @@ export const runCrossTenantAttackMatrix = internalAction({
         clerkId: SMOKE_CLERK_A,
         email: "smoke-a@piratemoney.test",
         label: "A",
-      }
+      },
     );
     const familyB = await ctx.runMutation(
       internal.__smoke__.cross_tenant._smokeSetupFamily,
@@ -504,7 +519,7 @@ export const runCrossTenantAttackMatrix = internalAction({
         clerkId: SMOKE_CLERK_B,
         email: "smoke-b@piratemoney.test",
         label: "B",
-      }
+      },
     );
 
     let result;
@@ -520,7 +535,7 @@ export const runCrossTenantAttackMatrix = internalAction({
             scheduledJobId: familyB.scheduledJobId,
             jobInstanceId: familyB.jobInstanceId,
           },
-        }
+        },
       );
     } finally {
       await ctx.runMutation(internal.__smoke__.cross_tenant._smokeTeardown, {

@@ -5,10 +5,7 @@ import type { MutationCtx } from "../_generated/server";
 import { getCurrentUser } from "./users";
 import { assertOwnedBy } from "../lib/auth";
 import { splitEarning as splitEarningPure } from "../lib/walletMath";
-import {
-  computeMigrationDelta,
-  isDeltaZero,
-} from "../lib/migrationDiff";
+import { computeMigrationDelta, isDeltaZero } from "../lib/migrationDiff";
 import {
   assertIsWeekStartISO,
   hasTransactionInWeek,
@@ -29,7 +26,7 @@ export const splitEarning = (amount: number): Record<Jar, number> =>
 const jarValidator = v.union(
   v.literal("spend"),
   v.literal("save"),
-  v.literal("give")
+  v.literal("give"),
 );
 
 const walletDocValidator = v.object({
@@ -52,7 +49,7 @@ async function assertChildOwner(ctx: MutationCtx, childId: Id<"children">) {
 export async function ensureWalletsForChild(
   ctx: MutationCtx,
   userId: Id<"users">,
-  childId: Id<"children">
+  childId: Id<"children">,
 ) {
   const now = Date.now();
   const wallets = [];
@@ -91,7 +88,7 @@ export async function creditApprovedJob(
     jobInstanceId: Id<"jobInstances">;
     amount: number;
     note?: string;
-  }
+  },
 ) {
   const wallets = await ensureWalletsForChild(ctx, args.userId, args.childId);
   const split = splitEarning(args.amount);
@@ -131,7 +128,7 @@ async function creditWallet(
     type: "interest" | "migration";
     note: string;
     createdAt?: number;
-  }
+  },
 ) {
   if (args.amount <= 0) return;
 
@@ -160,7 +157,7 @@ export async function creditBonus(
     amount: number;
     note?: string;
     type?: "bonus" | "luckyChest";
-  }
+  },
 ) {
   const wallets = await ensureWalletsForChild(ctx, args.userId, args.childId);
   const split = splitEarning(args.amount);
@@ -402,7 +399,7 @@ export const awardBonus = mutation({
 async function creditWeekIfMissing(
   ctx: MutationCtx,
   wallet: Doc<"wallets">,
-  weekStartMs: number
+  weekStartMs: number,
 ): Promise<boolean> {
   if (wallet.jar !== "save" || wallet.balance <= 0) return false;
 
@@ -415,7 +412,7 @@ async function creditWeekIfMissing(
 
   // Preserve EXACT F2 formula: balance * 10% APR / 52 weeks, floored.
   const amount = Math.floor(
-    (wallet.balance * SAVE_INTEREST_APR) / WEEKS_PER_YEAR
+    (wallet.balance * SAVE_INTEREST_APR) / WEEKS_PER_YEAR,
   );
   if (amount <= 0) return false;
 

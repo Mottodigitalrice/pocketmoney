@@ -24,7 +24,11 @@ import type { TranslationKey } from "@/lib/i18n/translations";
  */
 function QuickAddTodaySkeleton() {
   return (
-    <div aria-hidden="true" data-testid="quick-add-today-skeleton" className="space-y-4">
+    <div
+      aria-hidden="true"
+      data-testid="quick-add-today-skeleton"
+      className="space-y-4"
+    >
       <div className="rounded-2xl border border-amber-700/20 bg-amber-900/20 p-4">
         <div className="flex items-start gap-3">
           <Skeleton className="size-10 rounded bg-amber-900/50" />
@@ -62,9 +66,12 @@ interface QuickAddTodayProps {
   onNavigateToChildren?: () => void;
 }
 
-export function QuickAddToday({ onNavigateToChildren }: QuickAddTodayProps = {}) {
+export function QuickAddToday({
+  onNavigateToChildren,
+}: QuickAddTodayProps = {}) {
   const { t, locale } = useTranslation();
-  const { isLoading, jobs, familyChildren, quickAddForToday } = usePocketMoney();
+  const { isLoading, jobs, familyChildren, quickAddForToday } =
+    usePocketMoney();
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
   const [selectedChildIds, setSelectedChildIds] = useState<string[]>([]);
   const [preApprove, setPreApprove] = useState(false);
@@ -72,7 +79,7 @@ export function QuickAddToday({ onNavigateToChildren }: QuickAddTodayProps = {})
 
   const libraryJobs = useMemo(
     () => jobs.filter((job) => !job.isOneOff),
-    [jobs]
+    [jobs],
   );
 
   // G2: skeleton while context hydrates. After hooks so order is stable.
@@ -96,7 +103,7 @@ export function QuickAddToday({ onNavigateToChildren }: QuickAddTodayProps = {})
     setSelectedChildIds((current) =>
       current.includes(childId)
         ? current.filter((id) => id !== childId)
-        : [...current, childId]
+        : [...current, childId],
     );
   };
 
@@ -201,13 +208,17 @@ export function QuickAddToday({ onNavigateToChildren }: QuickAddTodayProps = {})
         </div>
       </div>
 
-      <Dialog open={!!selectedJob} onOpenChange={(open) => !open && closeAssignDialog()}>
+      <Dialog
+        open={!!selectedJob}
+        onOpenChange={(open) => !open && closeAssignDialog()}
+      >
         <DialogContent className="border-amber-700/50 bg-amber-950 text-amber-100 sm:max-w-md">
           {selectedJob && (
             <>
               <DialogHeader>
                 <DialogTitle className="text-amber-100">
-                  {selectedJob.icon} {selectedJob.titleKey
+                  {selectedJob.icon}{" "}
+                  {selectedJob.titleKey
                     ? t(selectedJob.titleKey as TranslationKey)
                     : locale === "ja" && selectedJob.titleJa
                       ? selectedJob.titleJa
@@ -222,7 +233,8 @@ export function QuickAddToday({ onNavigateToChildren }: QuickAddTodayProps = {})
                   </p>
                   <div className="grid grid-cols-2 gap-2">
                     {familyChildren.map((child) => {
-                      const iconConfig = CHILD_ICON_CONFIG[child.icon as ChildIcon];
+                      const iconConfig =
+                        CHILD_ICON_CONFIG[child.icon as ChildIcon];
                       const isSelected = selectedChildIds.includes(child._id);
 
                       return (
@@ -239,7 +251,9 @@ export function QuickAddToday({ onNavigateToChildren }: QuickAddTodayProps = {})
                           }`}
                         >
                           <div className="flex items-center gap-2">
-                            <span className="text-2xl">{iconConfig?.emoji ?? "👤"}</span>
+                            <span className="text-2xl">
+                              {iconConfig?.emoji ?? "👤"}
+                            </span>
                             <span className="font-semibold text-amber-100">
                               {child.name}
                             </span>
@@ -257,7 +271,9 @@ export function QuickAddToday({ onNavigateToChildren }: QuickAddTodayProps = {})
                         {t("quick_add_preapprove")}
                       </p>
                       <p className="mt-1 text-sm text-amber-300/70">
-                        <BudouXText>{t("quick_add_preapprove_hint")}</BudouXText>
+                        <BudouXText>
+                          {t("quick_add_preapprove_hint")}
+                        </BudouXText>
                       </p>
                     </div>
                     <Switch

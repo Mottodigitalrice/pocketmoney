@@ -36,24 +36,36 @@ interface JobFormProps {
 }
 
 const ICONS = [
-  "👕", "🧸", "🛏️", "🍽️", "🌱", "👟", "🐾", "📚", "🧹", "🧺",
-  "🏠", "🛋️", "🪥", "🎒", "🛒", "🪟", "♻️", "👨‍🍳", "🧽", "🪣",
+  "👕",
+  "🧸",
+  "🛏️",
+  "🍽️",
+  "🌱",
+  "👟",
+  "🐾",
+  "📚",
+  "🧹",
+  "🧺",
+  "🏠",
+  "🛋️",
+  "🪥",
+  "🎒",
+  "🛒",
+  "🪟",
+  "♻️",
+  "👨‍🍳",
+  "🧽",
+  "🪣",
 ];
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
-export function JobForm({
-  open,
-  onClose,
-  onSave,
-  editingJob,
-}: JobFormProps) {
+export function JobForm({ open, onClose, onSave, editingJob }: JobFormProps) {
   const { t } = useTranslation();
   const [title, setTitle] = useState("");
   const [yenAmount, setYenAmount] = useState(100);
   const [icon, setIcon] = useState("👕");
-  const [recurrenceType, setRecurrenceType] =
-    useState<RecurrenceType>("none");
+  const [recurrenceType, setRecurrenceType] = useState<RecurrenceType>("none");
   const [recurrenceDays, setRecurrenceDays] = useState<number[]>([]);
   const [recurrencePriority, setRecurrencePriority] =
     useState<JobPriority>("optional");
@@ -76,7 +88,7 @@ export function JobForm({
     setRecurrenceDays((current) =>
       current.includes(index)
         ? current.filter((day) => day !== index)
-        : [...current, index].sort((a, b) => a - b)
+        : [...current, index].sort((a, b) => a - b),
     );
   };
 
@@ -207,25 +219,30 @@ export function JobForm({
                 aria-label={t("job_form_recurrence_label")}
                 className="grid grid-cols-2 gap-2"
               >
-                {(["none", "daily", "weekdays", "specificDays"] as RecurrenceType[]).map(
-                  (type) => (
-                    <button
-                      key={type}
-                      type="button"
-                      role="radio"
-                      aria-checked={recurrenceType === type}
-                      onClick={() => setRecurrenceType(type)}
-                      // F20: min-h-11 brings these toggle pills up to 44px.
-                      className={`min-h-11 rounded-lg border px-3 py-2 text-sm font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 ${
-                        recurrenceType === type
-                          ? "border-amber-400 bg-amber-600 text-white"
-                          : "border-amber-700/30 bg-amber-950/30 text-amber-300 hover:bg-amber-800/40"
-                      }`}
-                    >
-                      {t(`recurrence_${type}` as TranslationKey)}
-                    </button>
-                  )
-                )}
+                {(
+                  [
+                    "none",
+                    "daily",
+                    "weekdays",
+                    "specificDays",
+                  ] as RecurrenceType[]
+                ).map((type) => (
+                  <button
+                    key={type}
+                    type="button"
+                    role="radio"
+                    aria-checked={recurrenceType === type}
+                    onClick={() => setRecurrenceType(type)}
+                    // F20: min-h-11 brings these toggle pills up to 44px.
+                    className={`min-h-11 rounded-lg border px-3 py-2 text-sm font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 ${
+                      recurrenceType === type
+                        ? "border-amber-400 bg-amber-600 text-white"
+                        : "border-amber-700/30 bg-amber-950/30 text-amber-300 hover:bg-amber-800/40"
+                    }`}
+                  >
+                    {t(`recurrence_${type}` as TranslationKey)}
+                  </button>
+                ))}
               </div>
 
               {recurrenceType === "specificDays" && (

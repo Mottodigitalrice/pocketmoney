@@ -24,6 +24,7 @@
 ## Request Flow
 
 ### Authenticated Page Request
+
 1. Browser requests `/dashboard`
 2. Middleware checks Clerk session
 3. If no session → redirect to `/sign-in`
@@ -31,6 +32,7 @@
 5. Server component can call Convex directly
 
 ### Data Mutation Flow
+
 1. User action triggers mutation
 2. Client calls `useMutation(api.functions.xxx.create)`
 3. Convex validates args with Zod-like validators
@@ -38,6 +40,7 @@
 5. All subscribed `useQuery` hooks update automatically
 
 ### AI Request Flow
+
 1. Client sends POST to `/api/ai`
 2. API route validates user session
 3. Calls OpenRouter with selected model
@@ -82,11 +85,13 @@ convex/
 ### Server vs Client Components
 
 **Server Components (default):**
+
 - Fetch data directly
 - Access server-only resources
 - No interactivity
 
 **Client Components ("use client"):**
+
 - User interactions
 - Browser APIs
 - Convex hooks (useQuery, useMutation)
@@ -122,9 +127,9 @@ const { user, isLoaded } = useUser();
 
 ## Environment Boundaries
 
-| Variable | Where Used | Prefix |
-|----------|------------|--------|
-| Clerk Publishable Key | Client | `NEXT_PUBLIC_` |
-| Clerk Secret Key | Server only | none |
-| Convex URL | Client | `NEXT_PUBLIC_` |
-| OpenRouter Key | Server only | none |
+| Variable              | Where Used  | Prefix         |
+| --------------------- | ----------- | -------------- |
+| Clerk Publishable Key | Client      | `NEXT_PUBLIC_` |
+| Clerk Secret Key      | Server only | none           |
+| Convex URL            | Client      | `NEXT_PUBLIC_` |
+| OpenRouter Key        | Server only | none           |

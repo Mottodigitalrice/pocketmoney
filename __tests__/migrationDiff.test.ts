@@ -34,7 +34,7 @@ import {
 // Helper to assert a result has the expected delta + expected `actual` echo.
 function expectDelta(
   result: ReturnType<typeof computeMigrationDelta>,
-  expectedDelta: JarSplit
+  expectedDelta: JarSplit,
 ) {
   expect(result.delta).toEqual(expectedDelta);
 }

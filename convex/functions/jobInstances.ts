@@ -33,7 +33,7 @@ const jobInstanceStatusValidator = v.union(
   v.literal("in_progress"),
   v.literal("completed"),
   v.literal("approved"),
-  v.literal("rejected")
+  v.literal("rejected"),
 );
 
 // Job instance shape plus a resolved proofUrl (or null when proof is absent
@@ -68,7 +68,7 @@ function isImageContentType(contentType: string) {
 
 export async function deleteJobInstanceAndProof(
   ctx: MutationCtx,
-  instance: Doc<"jobInstances">
+  instance: Doc<"jobInstances">,
 ) {
   if (instance.proofStorageId && !instance.proofDeletedAt) {
     try {
@@ -81,10 +81,9 @@ export async function deleteJobInstanceAndProof(
   await ctx.db.delete(instance._id);
 }
 
-async function withProofUrl<T extends { proofStorageId?: Id<"_storage">; proofDeletedAt?: number }>(
-  ctx: QueryCtx,
-  instance: T
-) {
+async function withProofUrl<
+  T extends { proofStorageId?: Id<"_storage">; proofDeletedAt?: number },
+>(ctx: QueryCtx, instance: T) {
   if (!instance.proofStorageId || instance.proofDeletedAt) {
     return { ...instance, proofUrl: null };
   }
@@ -106,7 +105,7 @@ export const getByFamily = query({
       .withIndex("by_user", (q) => q.eq("userId", user._id))
       .collect();
     return await Promise.all(
-      instances.map(async (instance) => await withProofUrl(ctx, instance))
+      instances.map(async (instance) => await withProofUrl(ctx, instance)),
     );
   },
 });
@@ -126,7 +125,7 @@ export const getByChild = query({
       .withIndex("by_child", (q) => q.eq("childId", args.childId))
       .collect();
     return await Promise.all(
-      instances.map(async (instance) => await withProofUrl(ctx, instance))
+      instances.map(async (instance) => await withProofUrl(ctx, instance)),
     );
   },
 });
@@ -153,7 +152,9 @@ export const start = mutation({
     const [job, child, scheduledJob] = await Promise.all([
       ctx.db.get(args.jobId),
       ctx.db.get(args.childId),
-      args.scheduledJobId ? ctx.db.get(args.scheduledJobId) : Promise.resolve(null),
+      args.scheduledJobId
+        ? ctx.db.get(args.scheduledJobId)
+        : Promise.resolve(null),
     ]);
 
     assertOwnedBy(job, user._id, "job");
@@ -191,7 +192,7 @@ export const complete = mutation({
     const instance = assertOwnedByOrNull(
       await ctx.db.get(args.instanceId),
       user._id,
-      "job instance"
+      "job instance",
     );
     if (!instance) return null;
     if (instance.status !== "in_progress") {
@@ -201,7 +202,7 @@ export const complete = mutation({
     const job = assertOwnedBy(
       await ctx.db.get(instance.jobId),
       user._id,
-      "job"
+      "job",
     );
     if (job.requiresPhotoProof && !args.proof && !instance.proofStorageId) {
       throw new Error("Photo proof is required for this job");
@@ -261,7 +262,7 @@ export const approve = mutation({
     const instance = assertOwnedByOrNull(
       await ctx.db.get(args.instanceId),
       user._id,
-      "job instance"
+      "job instance",
     );
     if (!instance) return null;
     // (b) Idempotency guard: already-approved instance must NOT re-credit.
@@ -278,7 +279,7 @@ export const approve = mutation({
     const job = assertOwnedBy(
       await ctx.db.get(instance.jobId),
       user._id,
-      "job"
+      "job",
     );
 
     await ctx.db.patch(args.instanceId, {
@@ -374,7 +375,7 @@ export const reject = mutation({
     const instance = assertOwnedByOrNull(
       await ctx.db.get(args.instanceId),
       user._id,
-      "job instance"
+      "job instance",
     );
     if (!instance) return null;
     if (instance.status === "rejected") return null;
@@ -391,4 +392,3 @@ export const reject = mutation({
     return null;
   },
 });
-

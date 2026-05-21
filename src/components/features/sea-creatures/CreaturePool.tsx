@@ -38,24 +38,24 @@ export function CreaturePool() {
           key: seed,
         };
       }),
-    [creatures, respawnSeeds]
+    [creatures, respawnSeeds],
   );
 
-  const handleRespawn = useCallback(
-    (index: number) => {
-      setRespawnSeeds((prev) => {
-        const next = [...prev];
-        next[index] = Date.now() + index;
-        return next;
-      });
-    },
-    []
-  );
+  const handleRespawn = useCallback((index: number) => {
+    setRespawnSeeds((prev) => {
+      const next = [...prev];
+      next[index] = Date.now() + index;
+      return next;
+    });
+  }, []);
 
   if (creatures.length === 0 || configs.length === 0) return null;
 
   return (
-    <div className="pointer-events-none absolute inset-0 overflow-hidden" style={{ zIndex: 10 }}>
+    <div
+      className="pointer-events-none absolute inset-0 overflow-hidden"
+      style={{ zIndex: 10 }}
+    >
       {creatures.map((creature, i) =>
         configs[i] ? (
           <SwimmingCreature
@@ -68,7 +68,7 @@ export function CreaturePool() {
             scale={configs[i].scale}
             onComplete={() => handleRespawn(i)}
           />
-        ) : null
+        ) : null,
       )}
     </div>
   );

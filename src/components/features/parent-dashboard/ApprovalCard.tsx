@@ -18,13 +18,15 @@ interface ApprovalCardProps {
   onReject: () => void;
 }
 
-export function ApprovalCard({ instance, onApprove, onReject }: ApprovalCardProps) {
+export function ApprovalCard({
+  instance,
+  onApprove,
+  onReject,
+}: ApprovalCardProps) {
   const { t, locale } = useTranslation();
   const { getChildById } = usePocketMoney();
   const child = getChildById(instance.childId);
-  const iconConfig = child
-    ? CHILD_ICON_CONFIG[child.icon as ChildIcon]
-    : null;
+  const iconConfig = child ? CHILD_ICON_CONFIG[child.icon as ChildIcon] : null;
   // F20 Goal D: tap-to-enlarge proof image. Opens a full-screen overlay
   // with ESC + tap-outside-image + close-button dismiss. Hand-rolled
   // portal-style overlay (fixed inset-0 z-[60]) rather than wrapping in

@@ -24,7 +24,7 @@
 
 export function findOrphansInList(
   allStorageIds: string[],
-  referencedStorageIds: string[]
+  referencedStorageIds: string[],
 ): string[] {
   const referencedSet = new Set(referencedStorageIds);
   const seenOrphans = new Set<string>();
