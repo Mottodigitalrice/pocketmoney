@@ -540,6 +540,20 @@ const ja = {
   week_planner_go_to_children: "クルータブへ移動",
   kid_back_home: "← ホームへもどる",
   error_digest_label: "エラーID:",
+
+  // Wave 2 — segment-specific error boundaries (/parent + /kid/[childId]).
+  // Mirrors `error_page_*` tone — playful + reassuring, JA-fluent should
+  // still sanity-check that the parent strings land warm vs. juvenile.
+  error_segment_parent_title: "船長の命令が止まった!",
+  error_segment_parent_subtitle:
+    "承認が送られませんでした。もう一度ためすか、つながりをかくにんしてね。",
+  error_segment_parent_retry: "もう一度",
+  error_segment_parent_home: "承認に戻る",
+  error_segment_kid_title: "あ、危ない!",
+  error_segment_kid_subtitle:
+    "なにかおかしいね。もう一度ためすか、ほかのお友達をえらんでね。",
+  error_segment_kid_retry: "もう一度",
+  error_segment_kid_home: "お友達をえらぶ",
 } as const;
 
 export default ja;

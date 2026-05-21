@@ -511,6 +511,20 @@ const en = {
   week_planner_go_to_children: "Go to the Crew tab",
   kid_back_home: "← Back home",
   error_digest_label: "Error ID:",
+
+  // Wave 2 — segment-specific error boundaries (/parent + /kid/[childId]).
+  // Same pirate tone as `error_page_*`, but copy is scoped to the segment so
+  // the recovery CTA can route somewhere safer than a generic remount.
+  error_segment_parent_title: "Captain's orders stalled!",
+  error_segment_parent_subtitle:
+    "Your approval didn't sail through. Try again or check your connection.",
+  error_segment_parent_retry: "Try Again",
+  error_segment_parent_home: "Back to Approvals",
+  error_segment_kid_title: "Whoa there, sailor!",
+  error_segment_kid_subtitle:
+    "Something went wrong. Let's try again or go pick a different friend.",
+  error_segment_kid_retry: "Try Again",
+  error_segment_kid_home: "Pick a Friend",
 } as const;
 
 export default en;
