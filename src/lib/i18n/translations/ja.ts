@@ -598,6 +598,15 @@ const ja = {
   error_segment_kid_retry: "もう一度",
   error_segment_kid_home: "お友達をえらぶ",
 
+  // Wave 8b — onboarding segment error boundary (/onboarding). Mirrors EN —
+  // warm, simple, pirate-themed. Adult-ish register since parents drive
+  // onboarding, but stays gentle so a failed save doesn't feel scary.
+  error_onboarding_title: "地図が海に落ちちゃった!",
+  error_onboarding_subtitle:
+    "クルーの登録でちょっとつまずいたみたい。もう一度ためすか、ホームに戻ってもだいじょうぶだよ。",
+  error_onboarding_cta_retry: "もう一度",
+  error_onboarding_cta_back: "ホームへ戻る",
+
   // ===========================================================================
   // Wave 5 — /landing route (F10 1.1 EN+JA routing, 1.2 JP trust signals,
   // 1.3 hero "tracking only" disclaimer). Adult-facing surface — kanji is fine,

@@ -112,6 +112,17 @@ without `SENTRY_AUTH_TOKEN`.
 upload is build-time only and requires the auth token — without it, builds
 remain offline.
 
+## Running Lighthouse locally
+
+Clerk's middleware dev-browser handshake blocks headless audits. Set
+`LIGHTHOUSE_AUDIT=1` at build/run time to bypass Clerk for the audit run:
+
+```bash
+LIGHTHOUSE_AUDIT=1 npm run build && LIGHTHOUSE_AUDIT=1 npm start
+```
+
+Never set this in production — it disables auth for the whole app.
+
 ## Claude Code Integration
 
 This template is optimized for [Claude Code](https://claude.ai/code). The `.claude/` directory contains:

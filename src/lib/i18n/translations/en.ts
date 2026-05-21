@@ -567,6 +567,15 @@ const en = {
   error_segment_kid_retry: "Try Again",
   error_segment_kid_home: "Pick a Friend",
 
+  // Wave 8b — onboarding segment error boundary (/onboarding). Catches Convex
+  // mutation failures inside the 4-step funnel — friendly warm copy, retry +
+  // escape-to-home CTAs (home is safer than re-entering the broken funnel).
+  error_onboarding_title: "The map slipped overboard!",
+  error_onboarding_subtitle:
+    "We hit a snag setting up your crew. Try again, or head home and we'll keep your spot.",
+  error_onboarding_cta_retry: "Try Again",
+  error_onboarding_cta_back: "Go Home",
+
   // ===========================================================================
   // Wave 5 — /landing route (F10 1.1 EN+JA routing, 1.2 JP trust signals,
   // 1.3 hero "tracking only" disclaimer). Keys are scoped `landing_*` so we
