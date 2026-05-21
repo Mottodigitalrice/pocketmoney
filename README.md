@@ -89,6 +89,25 @@ npm run test:ui          # UI (jsdom) tests only
 `npm ci`. It does not deploy — promotion to Vercel stays manual via
 `npm run deploy`.
 
+## Observability
+
+Errors are wired to **Sentry** via `@sentry/nextjs`, but the integration is
+**fully env-gated** — if `NEXT_PUBLIC_SENTRY_DSN` is empty (the default), no
+SDK init runs and no network traffic occurs. The app is in "stub mode" and
+errors fall back to `console.error`.
+
+**Files:** `instrumentation.ts` + `instrumentation-client.ts` (in `src/`),
+`sentry.server.config.ts` + `sentry.edge.config.ts` (project root). All four
+short-circuit when no DSN is set. `next.config.ts` is wrapped with
+`withSentryConfig()` — the build plugin runs but performs no remote calls
+without `SENTRY_AUTH_TOKEN`.
+
+**Activate (Wave 4+):** create a Sentry project, then set
+`NEXT_PUBLIC_SENTRY_DSN` (runtime) and optionally `SENTRY_AUTH_TOKEN` +
+`SENTRY_ORG` + `SENTRY_PROJECT` (build-time, for source-map upload). Source-map
+upload is build-time only and requires the auth token — without it, builds
+remain offline.
+
 ## Claude Code Integration
 
 This template is optimized for [Claude Code](https://claude.ai/code). The `.claude/` directory contains:

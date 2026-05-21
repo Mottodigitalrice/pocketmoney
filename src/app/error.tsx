@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import * as Sentry from "@sentry/nextjs";
 import { Button } from "@/components/ui/button";
 import { BudouXText } from "@/components/shared/BudouXText";
 import { useTranslation } from "@/hooks/use-translation";
@@ -29,6 +30,20 @@ export default function Error({
   useEffect(() => {
     // Log digest + message for any error reporting tooling.
     console.error("[error.tsx]", error.digest ?? "(no digest)", error);
+
+    // Forward to Sentry. Wrapped in try/catch so a missing init
+    // (stub mode — no DSN) never throws and never reaches the user.
+    try {
+      Sentry.captureException(error, {
+        tags: {
+          type: "client-boundary",
+          digest: error.digest,
+        },
+      });
+    } catch {
+      // No-op — Sentry not initialized or capture failed; the console.error
+      // above is the source of truth in stub mode.
+    }
   }, [error]);
 
   return (
