@@ -2,6 +2,8 @@
 
 import { useRef, useEffect, useState, type ReactNode } from "react";
 import Link from "next/link";
+import { useTranslation } from "@/hooks/use-translation";
+import { BudouXText } from "@/components/shared/BudouXText";
 
 // ---------------------------------------------------------------------------
 // Scroll-reveal hook
@@ -167,6 +169,7 @@ function FloatingCoins() {
 // SECTION: Navbar
 // ===========================================================================
 function Navbar() {
+  const { t } = useTranslation();
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -184,20 +187,20 @@ function Navbar() {
     >
       <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3">
         <span className="text-lg font-extrabold tracking-tight text-white">
-          🏴‍☠️ Pirate Money
+          🏴‍☠️ {t("landing_brand")}
         </span>
         <div className="flex items-center gap-3">
           <Link
             href="/sign-in"
-            className="rounded-full px-4 py-1.5 text-sm font-semibold text-white/90 transition hover:text-white"
+            className="rounded-full px-4 py-1.5 text-sm font-semibold text-white transition hover:text-amber-200"
           >
-            Sign In
+            {t("landing_nav_sign_in")}
           </Link>
           <Link
             href="/sign-up"
             className="rounded-full bg-amber-500 px-5 py-1.5 text-sm font-bold text-gray-900 shadow-md transition hover:bg-amber-400 hover:shadow-lg active:scale-95"
           >
-            Get Started
+            {t("landing_nav_get_started")}
           </Link>
         </div>
       </div>
@@ -209,6 +212,7 @@ function Navbar() {
 // SECTION: Hero
 // ===========================================================================
 function HeroSection() {
+  const { t } = useTranslation();
   return (
     <section className="ocean-gradient relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-5 pt-20 pb-32 text-center">
       <FloatingCoins />
@@ -248,16 +252,20 @@ function HeroSection() {
         <div className="mb-4 text-5xl">🏴‍☠️</div>
 
         <h1 className="mx-auto max-w-4xl text-5xl font-black leading-tight tracking-tight text-white drop-shadow-lg sm:text-6xl lg:text-7xl">
-          Turn Chores Into{" "}
+          <BudouXText>{t("landing_hero_title_lead")}</BudouXText>{" "}
           <span className="bg-gradient-to-r from-amber-300 to-yellow-200 bg-clip-text text-transparent">
-            Treasure
+            <BudouXText>{t("landing_hero_title_highlight")}</BudouXText>
           </span>
         </h1>
 
-        <p className="mx-auto mt-6 max-w-2xl text-lg text-white/80 sm:text-xl">
-          Kids earn real pocket money by completing household jobs.
-          <br className="hidden sm:block" /> Fun for kids, easy for parents,
-          great for the whole family.
+        <p className="mx-auto mt-6 max-w-2xl text-lg text-white/90 sm:text-xl">
+          <BudouXText>{t("landing_hero_subtitle")}</BudouXText>
+        </p>
+
+        {/* F10 1.3: hero disclaimer — make it clear the app tracks balances
+            and the parent pays out real cash. */}
+        <p className="mx-auto mt-3 max-w-xl text-sm font-medium text-amber-100 sm:text-base">
+          <BudouXText>{t("landing_hero_disclaimer")}</BudouXText>
         </p>
 
         <div
@@ -268,7 +276,7 @@ function HeroSection() {
             href="/sign-up"
             className="group rounded-full bg-amber-500 px-8 py-4 text-lg font-bold text-gray-900 shadow-lg transition-all hover:bg-amber-400 hover:shadow-xl hover:scale-105 active:scale-95"
           >
-            Get Started Free{" "}
+            {t("landing_hero_cta_primary")}{" "}
             <span className="inline-block transition-transform group-hover:translate-x-1">
               →
             </span>
@@ -277,18 +285,20 @@ function HeroSection() {
             href="#how-it-works"
             className="rounded-full border-2 border-white/30 bg-white/10 px-8 py-4 text-lg font-semibold text-white backdrop-blur-sm transition-all hover:bg-white/20"
           >
-            See How It Works
+            {t("landing_hero_cta_secondary")}
           </a>
         </div>
 
-        {/* Trust signals */}
+        {/* Trust signals — F10 1.2: privacy/data-stays-yours line replaces
+            the "Free forever" freemium-flavoured hook, which reads as
+            suspicious in JP commercial register. */}
         <div
-          className="animate-float-up mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-white/50"
+          className="animate-float-up mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm font-medium text-white/90"
           style={{ animationDelay: "0.8s" }}
         >
-          <span>✓ Free forever</span>
-          <span>✓ No credit card</span>
-          <span>✓ Set up in 2 minutes</span>
+          <span>✓ {t("landing_trust_privacy")}</span>
+          <span>✓ {t("landing_trust_no_card")}</span>
+          <span>✓ {t("landing_trust_quick_setup")}</span>
         </div>
       </div>
 
@@ -316,11 +326,12 @@ function HeroSection() {
 // SECTION: Stats strip
 // ===========================================================================
 function StatsStrip() {
+  const { t } = useTranslation();
   const stats = [
-    { emoji: "📋", label: "20+ Built-in Chores" },
-    { emoji: "🌏", label: "English & 日本語" },
-    { emoji: "💰", label: "Real Yen Tracking" },
-    { emoji: "⚡", label: "Real-Time Updates" },
+    { emoji: "📋", label: t("landing_stats_chores") },
+    { emoji: "🌏", label: t("landing_stats_bilingual") },
+    { emoji: "💰", label: t("landing_stats_yen") },
+    { emoji: "⚡", label: t("landing_stats_realtime") },
   ];
   return (
     <section className="bg-white py-10">
@@ -330,7 +341,7 @@ function StatsStrip() {
             <div className="flex items-center gap-2.5 text-gray-700">
               <span className="text-2xl">{s.emoji}</span>
               <span className="text-sm font-semibold sm:text-base">
-                {s.label}
+                <BudouXText>{s.label}</BudouXText>
               </span>
             </div>
           </FadeIn>
@@ -344,26 +355,27 @@ function StatsStrip() {
 // SECTION: How It Works
 // ===========================================================================
 function HowItWorks() {
+  const { t } = useTranslation();
   const steps = [
     {
       num: "1",
       emoji: "📋",
-      title: "Parents Plan",
-      desc: "Create chores, set yen amounts, and schedule the week for each child.",
+      title: t("landing_how_step1_title"),
+      desc: t("landing_how_step1_desc"),
       color: "from-amber-500 to-orange-500",
     },
     {
       num: "2",
       emoji: "✅",
-      title: "Kids Complete",
-      desc: "Kids see their jobs on a fun mission board and mark them done.",
+      title: t("landing_how_step2_title"),
+      desc: t("landing_how_step2_desc"),
       color: "from-cyan-500 to-blue-500",
     },
     {
       num: "3",
       emoji: "💰",
-      title: "Approve & Earn",
-      desc: "Parents review the work, approve it, and pocket money is earned!",
+      title: t("landing_how_step3_title"),
+      desc: t("landing_how_step3_desc"),
       color: "from-green-500 to-emerald-500",
     },
   ];
@@ -373,10 +385,10 @@ function HowItWorks() {
       <div className="mx-auto max-w-5xl px-5">
         <FadeIn className="mb-16 text-center">
           <p className="mb-3 text-sm font-bold uppercase tracking-widest text-amber-600">
-            Simple as 1-2-3
+            {t("landing_how_eyebrow")}
           </p>
           <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl lg:text-5xl">
-            How It Works
+            {t("landing_how_title")}
           </h2>
         </FadeIn>
 
@@ -392,9 +404,11 @@ function HowItWorks() {
                 </div>
                 {/* Arrow between steps (desktop only) */}
                 <h3 className="mb-2 text-xl font-bold text-gray-900">
-                  {step.title}
+                  <BudouXText>{step.title}</BudouXText>
                 </h3>
-                <p className="text-gray-600">{step.desc}</p>
+                <p className="text-gray-600">
+                  <BudouXText>{step.desc}</BudouXText>
+                </p>
               </div>
             </FadeIn>
           ))}
@@ -415,20 +429,29 @@ function HowItWorks() {
 // SECTION: Parent Showcase
 // ===========================================================================
 function ParentScreenMockup() {
+  const { t } = useTranslation();
   return (
     <div className="min-h-[420px] bg-gradient-to-b from-amber-900 to-amber-950 p-4">
       {/* Header */}
       <div className="mb-3 text-center">
         <p className="text-xs font-bold text-amber-300">
-          🏴‍☠️ Captain&apos;s Deck
+          🏴‍☠️ {t("landing_mock_parent_header_eyebrow")}
         </p>
-        <p className="text-sm font-bold text-white">Week Planner</p>
+        <p className="text-sm font-bold text-white">
+          {t("landing_mock_parent_header_title")}
+        </p>
       </div>
 
       {/* Week grid */}
       <div className="mb-3 rounded-xl bg-amber-800/50 p-3">
         <div className="mb-1.5 grid grid-cols-5 gap-1 text-center">
-          {["Mon", "Tue", "Wed", "Thu", "Fri"].map((day) => (
+          {[
+            t("landing_mock_day_mon"),
+            t("landing_mock_day_tue"),
+            t("landing_mock_day_wed"),
+            t("landing_mock_day_thu"),
+            t("landing_mock_day_fri"),
+          ].map((day) => (
             <div key={day} className="text-[10px] font-bold text-amber-300">
               {day}
             </div>
@@ -452,17 +475,29 @@ function ParentScreenMockup() {
         </div>
         <div className="mt-2 flex items-center justify-between">
           <span className="text-[10px] text-amber-200">
-            🦈 Bobby&apos;s Week
+            🦈 {t("landing_mock_parent_bobbys_week")}
           </span>
           <span className="text-xs font-bold text-amber-300">¥850</span>
         </div>
       </div>
 
       {/* Approval queue */}
-      <p className="mb-2 text-xs font-bold text-amber-300">✅ Approve (2)</p>
+      <p className="mb-2 text-xs font-bold text-amber-300">
+        ✅ {t("landing_mock_parent_approve_label")}
+      </p>
       {[
-        { icon: "🧸", title: "Clean up toys", amount: 50, child: "Bobby" },
-        { icon: "🌱", title: "Water plants", amount: 100, child: "Sarah" },
+        {
+          icon: "🧸",
+          title: t("landing_mock_parent_job1_title"),
+          amount: 50,
+          child: t("landing_mock_parent_job1_child"),
+        },
+        {
+          icon: "🌱",
+          title: t("landing_mock_parent_job2_title"),
+          amount: 100,
+          child: t("landing_mock_parent_job2_child"),
+        },
       ].map((item, i) => (
         <div
           key={i}
@@ -492,31 +527,31 @@ function ParentScreenMockup() {
 }
 
 function ParentShowcase() {
+  const { t } = useTranslation();
+  const bullets = [
+    `📅 ${t("landing_parent_bullet_planner")}`,
+    `💰 ${t("landing_parent_bullet_yen")}`,
+    `✅ ${t("landing_parent_bullet_approve")}`,
+    `🔒 ${t("landing_parent_bullet_lock")}`,
+  ];
   return (
     <section className="bg-slate-900 py-20 sm:py-28">
       <div className="mx-auto grid max-w-6xl items-center gap-12 px-5 lg:grid-cols-2 lg:gap-16">
         {/* Text */}
         <FadeIn direction="left">
           <p className="mb-3 text-sm font-bold uppercase tracking-widest text-amber-400">
-            For Parents
+            {t("landing_parent_eyebrow")}
           </p>
           <h2 className="mb-5 text-3xl font-bold text-white sm:text-4xl">
-            Plan the week in seconds
+            <BudouXText>{t("landing_parent_title")}</BudouXText>
           </h2>
-          <p className="mb-8 text-lg text-slate-300">
-            Assign chores to each child, set yen amounts, and schedule the
-            entire week. When kids finish their jobs, review and approve with a
-            single tap.
+          <p className="mb-8 text-lg text-slate-200">
+            <BudouXText>{t("landing_parent_body")}</BudouXText>
           </p>
           <ul className="space-y-3">
-            {[
-              "📅 Drag-and-drop week planner",
-              "💰 Custom yen amounts per chore",
-              "✅ Approve or send back for redo",
-              "🔒 Math challenge keeps kids out",
-            ].map((item, i) => (
-              <li key={i} className="flex items-center gap-3 text-slate-200">
-                <span>{item}</span>
+            {bullets.map((item, i) => (
+              <li key={i} className="flex items-center gap-3 text-slate-100">
+                <BudouXText>{item}</BudouXText>
               </li>
             ))}
           </ul>
@@ -539,18 +574,21 @@ function ParentShowcase() {
 // SECTION: Kid Showcase
 // ===========================================================================
 function KidScreenMockup() {
+  const { t } = useTranslation();
   return (
     <div className="min-h-[420px] bg-gradient-to-b from-cyan-500 to-blue-600 p-4">
       {/* Header */}
       <div className="mb-2 text-center">
         <p className="text-2xl">🦈</p>
-        <p className="text-sm font-bold text-white">Bobby&apos;s Jobs</p>
+        <p className="text-sm font-bold text-white">
+          {t("landing_mock_kid_header")}
+        </p>
       </div>
 
       {/* Weekly tracker */}
       <div className="mb-3 rounded-xl bg-white/20 p-2.5 backdrop-blur-sm">
         <div className="mb-1 flex justify-between text-[10px] text-white/80">
-          <span>This week</span>
+          <span>{t("landing_mock_kid_this_week")}</span>
           <span className="font-bold text-white">¥350 / ¥850</span>
         </div>
         <div className="h-2 overflow-hidden rounded-full bg-white/20">
@@ -566,7 +604,7 @@ function KidScreenMockup() {
         {/* To Do */}
         <div>
           <p className="mb-1 text-center text-[9px] font-bold text-white/80">
-            TO DO
+            {t("landing_mock_kid_todo")}
           </p>
           {[
             { icon: "👕", amount: 100 },
@@ -587,7 +625,7 @@ function KidScreenMockup() {
         {/* Doing */}
         <div>
           <p className="mb-1 text-center text-[9px] font-bold text-white/80">
-            DOING
+            {t("landing_mock_kid_doing")}
           </p>
           <div className="mb-1 rounded-lg border border-amber-400/50 bg-amber-400/30 p-1.5 text-center">
             <span className="block text-lg">🌱</span>
@@ -598,7 +636,7 @@ function KidScreenMockup() {
         {/* Done */}
         <div>
           <p className="mb-1 text-center text-[9px] font-bold text-white/80">
-            DONE ✨
+            {t("landing_mock_kid_done")} ✨
           </p>
           {[
             { icon: "🧸", amount: 50 },
@@ -620,7 +658,7 @@ function KidScreenMockup() {
       {/* Celebration hint */}
       <div className="mt-3 rounded-lg bg-white/10 p-2 text-center">
         <p className="text-[10px] text-white/80">
-          🐬 Complete all jobs for a surprise!
+          🐬 {t("landing_mock_kid_surprise")}
         </p>
       </div>
     </div>
@@ -628,6 +666,13 @@ function KidScreenMockup() {
 }
 
 function KidShowcase() {
+  const { t } = useTranslation();
+  const bullets = [
+    `🎮 ${t("landing_kid_bullet_board")}`,
+    `📊 ${t("landing_kid_bullet_tracker")}`,
+    `🐬 ${t("landing_kid_bullet_celebration")}`,
+    `🦈 ${t("landing_kid_bullet_avatar")}`,
+  ];
   return (
     <section className="bg-white py-20 sm:py-28">
       <div className="mx-auto grid max-w-6xl items-center gap-12 px-5 lg:grid-cols-2 lg:gap-16">
@@ -643,25 +688,18 @@ function KidShowcase() {
         {/* Text */}
         <FadeIn direction="right" className="order-1 lg:order-2">
           <p className="mb-3 text-sm font-bold uppercase tracking-widest text-cyan-600">
-            For Kids
+            {t("landing_kid_eyebrow")}
           </p>
           <h2 className="mb-5 text-3xl font-bold text-gray-900 sm:text-4xl">
-            Your own mission board
+            <BudouXText>{t("landing_kid_title")}</BudouXText>
           </h2>
           <p className="mb-8 text-lg text-gray-600">
-            See today&apos;s jobs, drag them to &quot;Doing&quot;, and mark them
-            done. Watch your earnings grow all week. Complete everything for a
-            dolphin celebration!
+            <BudouXText>{t("landing_kid_body")}</BudouXText>
           </p>
           <ul className="space-y-3">
-            {[
-              "🎮 Fun drag-and-drop job board",
-              "📊 Weekly earnings tracker",
-              "🐬 Celebration animations",
-              "🦈 Choose your own sea creature avatar",
-            ].map((item, i) => (
+            {bullets.map((item, i) => (
               <li key={i} className="flex items-center gap-3 text-gray-700">
-                <span>{item}</span>
+                <BudouXText>{item}</BudouXText>
               </li>
             ))}
           </ul>
@@ -675,46 +713,47 @@ function KidShowcase() {
 // SECTION: Features Grid
 // ===========================================================================
 function FeaturesGrid() {
+  const { t } = useTranslation();
   const features = [
     {
       emoji: "📅",
-      title: "Weekly Planner",
-      desc: "Assign chores for each day of the week to each child.",
+      title: t("landing_feat_planner_title"),
+      desc: t("landing_feat_planner_desc"),
       bg: "bg-amber-50",
       border: "border-amber-200",
     },
     {
       emoji: "✅",
-      title: "Approval System",
-      desc: "Parents review and approve completed chores before they count.",
+      title: t("landing_feat_approval_title"),
+      desc: t("landing_feat_approval_desc"),
       bg: "bg-green-50",
       border: "border-green-200",
     },
     {
       emoji: "💰",
-      title: "Earnings Tracker",
-      desc: "Kids see their weekly progress bar filling up in real-time.",
+      title: t("landing_feat_tracker_title"),
+      desc: t("landing_feat_tracker_desc"),
       bg: "bg-yellow-50",
       border: "border-yellow-200",
     },
     {
       emoji: "🎮",
-      title: "Kid-Friendly UI",
-      desc: "A fun kanban board that kids actually enjoy using.",
+      title: t("landing_feat_kidui_title"),
+      desc: t("landing_feat_kidui_desc"),
       bg: "bg-cyan-50",
       border: "border-cyan-200",
     },
     {
       emoji: "🌏",
-      title: "Bilingual",
-      desc: "Full English and Japanese support — switch with one tap.",
+      title: t("landing_feat_bilingual_title"),
+      desc: t("landing_feat_bilingual_desc"),
       bg: "bg-purple-50",
       border: "border-purple-200",
     },
     {
       emoji: "🔒",
-      title: "Parent Lock",
-      desc: "Math challenge keeps the parent dashboard safe from little hands.",
+      title: t("landing_feat_lock_title"),
+      desc: t("landing_feat_lock_desc"),
       bg: "bg-red-50",
       border: "border-red-200",
     },
@@ -725,10 +764,10 @@ function FeaturesGrid() {
       <div className="mx-auto max-w-6xl px-5">
         <FadeIn className="mb-16 text-center">
           <p className="mb-3 text-sm font-bold uppercase tracking-widest text-indigo-600">
-            Features
+            {t("landing_feat_eyebrow")}
           </p>
           <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl lg:text-5xl">
-            Everything your family needs
+            <BudouXText>{t("landing_feat_title")}</BudouXText>
           </h2>
         </FadeIn>
 
@@ -740,9 +779,11 @@ function FeaturesGrid() {
               >
                 <div className="mb-3 text-3xl">{f.emoji}</div>
                 <h3 className="mb-1.5 text-lg font-bold text-gray-900">
-                  {f.title}
+                  <BudouXText>{f.title}</BudouXText>
                 </h3>
-                <p className="text-sm text-gray-600">{f.desc}</p>
+                <p className="text-sm text-gray-600">
+                  <BudouXText>{f.desc}</BudouXText>
+                </p>
               </div>
             </FadeIn>
           ))}
@@ -756,19 +797,20 @@ function FeaturesGrid() {
 // SECTION: Chore Preview
 // ===========================================================================
 function ChorePreview() {
+  const { t } = useTranslation();
   const chores = [
-    { icon: "👕", title: "Fold washing", yen: 100 },
-    { icon: "🧸", title: "Clean up toys", yen: 50 },
-    { icon: "🛏️", title: "Make the bed", yen: 50 },
-    { icon: "🌱", title: "Water plants", yen: 100 },
-    { icon: "🐾", title: "Feed the pets", yen: 150 },
-    { icon: "📚", title: "Pick up books", yen: 50 },
-    { icon: "🧹", title: "Sweep floor", yen: 200 },
-    { icon: "🪟", title: "Wipe windows", yen: 300 },
-    { icon: "🍽️", title: "Set the table", yen: 100 },
-    { icon: "🎒", title: "Pack school bag", yen: 100 },
-    { icon: "🪥", title: "Brush teeth", yen: 100 },
-    { icon: "👨‍🍳", title: "Help cook", yen: 500 },
+    { icon: "👕", title: t("landing_chore_fold"), yen: 100 },
+    { icon: "🧸", title: t("landing_chore_toys"), yen: 50 },
+    { icon: "🛏️", title: t("landing_chore_bed"), yen: 50 },
+    { icon: "🌱", title: t("landing_chore_water"), yen: 100 },
+    { icon: "🐾", title: t("landing_chore_pets"), yen: 150 },
+    { icon: "📚", title: t("landing_chore_books"), yen: 50 },
+    { icon: "🧹", title: t("landing_chore_sweep"), yen: 200 },
+    { icon: "🪟", title: t("landing_chore_windows"), yen: 300 },
+    { icon: "🍽️", title: t("landing_chore_table"), yen: 100 },
+    { icon: "🎒", title: t("landing_chore_bag"), yen: 100 },
+    { icon: "🪥", title: t("landing_chore_teeth"), yen: 100 },
+    { icon: "👨‍🍳", title: t("landing_chore_cook"), yen: 500 },
   ];
 
   return (
@@ -776,13 +818,13 @@ function ChorePreview() {
       <div className="mx-auto max-w-5xl px-5">
         <FadeIn className="mb-12 text-center">
           <p className="mb-3 text-sm font-bold uppercase tracking-widest text-emerald-600">
-            Ready to go
+            {t("landing_chores_eyebrow")}
           </p>
           <h2 className="mb-3 text-3xl font-bold text-gray-900 sm:text-4xl">
-            20+ built-in chores
+            <BudouXText>{t("landing_chores_title")}</BudouXText>
           </h2>
           <p className="text-gray-600">
-            Start with our curated chore library, or create your own.
+            <BudouXText>{t("landing_chores_body")}</BudouXText>
           </p>
         </FadeIn>
 
@@ -806,8 +848,8 @@ function ChorePreview() {
         </FadeIn>
 
         <FadeIn delay={0.2}>
-          <p className="mt-6 text-center text-sm text-gray-500">
-            + custom chores, one-off tasks, and more
+          <p className="mt-6 text-center text-sm text-gray-600">
+            <BudouXText>{t("landing_chores_more")}</BudouXText>
           </p>
         </FadeIn>
       </div>
@@ -819,6 +861,7 @@ function ChorePreview() {
 // SECTION: Final CTA
 // ===========================================================================
 function FinalCTA() {
+  const { t } = useTranslation();
   return (
     <section className="ocean-gradient relative overflow-hidden py-24 sm:py-32">
       {/* Decorative */}
@@ -840,19 +883,19 @@ function FinalCTA() {
       <div className="relative z-10 mx-auto max-w-3xl px-5 text-center">
         <FadeIn>
           <h2 className="mb-5 text-3xl font-bold text-white sm:text-4xl lg:text-5xl">
-            Ready to make chores{" "}
+            <BudouXText>{t("landing_final_title_lead")}</BudouXText>{" "}
             <span className="bg-gradient-to-r from-amber-300 to-yellow-200 bg-clip-text text-transparent">
-              an adventure?
+              <BudouXText>{t("landing_final_title_highlight")}</BudouXText>
             </span>
           </h2>
-          <p className="mb-10 text-lg text-white/70">
-            Free to use. Set up in 2 minutes. No credit card needed.
+          <p className="mb-10 text-lg text-white/90">
+            <BudouXText>{t("landing_final_body")}</BudouXText>
           </p>
           <Link
             href="/sign-up"
             className="inline-block rounded-full bg-amber-500 px-10 py-4 text-lg font-bold text-gray-900 shadow-lg transition-all hover:bg-amber-400 hover:shadow-xl hover:scale-105 active:scale-95"
           >
-            Start Your Family&apos;s Adventure →
+            {t("landing_final_cta")} →
           </Link>
         </FadeIn>
       </div>
@@ -864,22 +907,29 @@ function FinalCTA() {
 // SECTION: Footer
 // ===========================================================================
 function Footer() {
+  const { t } = useTranslation();
+  // F10 a11y: Lighthouse `color-contrast` was failing on these three links
+  // and the copyright line. text-slate-{500,600} against bg-slate-900 fall
+  // below WCAG AA 4.5:1; bumping to text-slate-200 / text-slate-300 clears
+  // the gate (≥7:1 for normal text, well above AAA).
   return (
     <footer className="bg-slate-900 py-8">
       <div className="mx-auto max-w-6xl px-5">
         <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
-          <span className="text-sm font-bold text-slate-400">
-            🏴‍☠️ Pirate Money
+          <span className="text-sm font-bold text-slate-200">
+            🏴‍☠️ {t("landing_brand")}
           </span>
-          <div className="flex gap-6 text-sm text-slate-500">
-            <Link href="/sign-in" className="transition hover:text-slate-300">
-              Sign In
+          <div className="flex gap-6 text-sm text-slate-200">
+            <Link href="/sign-in" className="transition hover:text-amber-300">
+              {t("landing_nav_sign_in")}
             </Link>
-            <Link href="/sign-up" className="transition hover:text-slate-300">
-              Sign Up
+            <Link href="/sign-up" className="transition hover:text-amber-300">
+              {t("landing_footer_sign_up")}
             </Link>
           </div>
-          <span className="text-xs text-slate-600">Made by Mottodigital</span>
+          <span className="text-xs text-slate-300">
+            {t("landing_footer_made_by")}
+          </span>
         </div>
       </div>
     </footer>
@@ -890,20 +940,26 @@ function Footer() {
 // MAIN LANDING PAGE
 // ===========================================================================
 export function LandingPage() {
+  // F10 a11y: Lighthouse `landmark-one-main` was failing because no
+  // <main> existed on this route. The nav and footer are now siblings
+  // and the body content is wrapped in a single <main>, giving screen
+  // readers an unambiguous primary landmark to jump to.
   return (
     <div className="overflow-x-hidden">
       <Navbar />
-      <HeroSection />
-      <StatsStrip />
-      <HowItWorks />
-      <Wave fill="#0f172a" className="bg-white" />
-      <ParentShowcase />
-      <Wave fill="#ffffff" className="bg-slate-900" />
-      <KidShowcase />
-      <Wave fill="#f8fafc" className="bg-white" />
-      <FeaturesGrid />
-      <ChorePreview />
-      <FinalCTA />
+      <main id="main">
+        <HeroSection />
+        <StatsStrip />
+        <HowItWorks />
+        <Wave fill="#0f172a" className="bg-white" />
+        <ParentShowcase />
+        <Wave fill="#ffffff" className="bg-slate-900" />
+        <KidShowcase />
+        <Wave fill="#f8fafc" className="bg-white" />
+        <FeaturesGrid />
+        <ChorePreview />
+        <FinalCTA />
+      </main>
       <Footer />
     </div>
   );

@@ -566,6 +566,144 @@ const en = {
     "Something went wrong. Let's try again or go pick a different friend.",
   error_segment_kid_retry: "Try Again",
   error_segment_kid_home: "Pick a Friend",
+
+  // ===========================================================================
+  // Wave 5 — /landing route (F10 1.1 EN+JA routing, 1.2 JP trust signals,
+  // 1.3 hero "tracking only" disclaimer). Keys are scoped `landing_*` so we
+  // never collide with in-app surface copy.
+  // ===========================================================================
+  landing_brand: "Pirate Money",
+
+  // Nav + footer chrome
+  landing_nav_sign_in: "Sign In",
+  landing_nav_get_started: "Get Started",
+  landing_footer_sign_up: "Sign Up",
+  landing_footer_made_by: "Made by Mottodigital",
+
+  // Hero
+  landing_hero_title_lead: "Turn Chores Into",
+  landing_hero_title_highlight: "Treasure",
+  landing_hero_subtitle:
+    "Kids earn real pocket money by completing household jobs. Fun for kids, easy for parents, great for the whole family.",
+  // F10 1.3: clarify the app records balances, the parent pays out real cash.
+  landing_hero_disclaimer: "We track the numbers — you pay out the real coins.",
+  landing_hero_cta_primary: "Get Started Free",
+  landing_hero_cta_secondary: "See How It Works",
+
+  // Hero trust signals — F10 1.2: privacy-focused, not freemium.
+  landing_trust_privacy:
+    "Your family's data stays in your family — no ads, no tracking",
+  landing_trust_no_card: "No credit card needed",
+  landing_trust_quick_setup: "Set up in 2 minutes",
+
+  // Stats strip
+  landing_stats_chores: "20+ Built-in Chores",
+  landing_stats_bilingual: "English & 日本語",
+  landing_stats_yen: "Real Yen Tracking",
+  landing_stats_realtime: "Real-Time Updates",
+
+  // How It Works
+  landing_how_eyebrow: "Simple as 1-2-3",
+  landing_how_title: "How It Works",
+  landing_how_step1_title: "Parents Plan",
+  landing_how_step1_desc:
+    "Create chores, set yen amounts, and schedule the week for each child.",
+  landing_how_step2_title: "Kids Complete",
+  landing_how_step2_desc:
+    "Kids see their jobs on a fun mission board and mark them done.",
+  landing_how_step3_title: "Approve & Earn",
+  landing_how_step3_desc:
+    "Parents review the work, approve it, and pocket money is earned.",
+
+  // Parent showcase
+  landing_parent_eyebrow: "For Parents",
+  landing_parent_title: "Plan the week in seconds",
+  landing_parent_body:
+    "Assign chores to each child, set yen amounts, and schedule the entire week. When kids finish their jobs, review and approve with a single tap.",
+  landing_parent_bullet_planner: "Drag-and-drop week planner",
+  landing_parent_bullet_yen: "Custom yen amounts per chore",
+  landing_parent_bullet_approve: "Approve or send back for redo",
+  landing_parent_bullet_lock: "Math challenge keeps kids out",
+
+  // Parent mockup phone-frame
+  landing_mock_parent_header_eyebrow: "Captain's Deck",
+  landing_mock_parent_header_title: "Week Planner",
+  landing_mock_day_mon: "Mon",
+  landing_mock_day_tue: "Tue",
+  landing_mock_day_wed: "Wed",
+  landing_mock_day_thu: "Thu",
+  landing_mock_day_fri: "Fri",
+  landing_mock_parent_bobbys_week: "Bobby's Week",
+  landing_mock_parent_approve_label: "Approve (2)",
+  landing_mock_parent_job1_title: "Clean up toys",
+  landing_mock_parent_job1_child: "Bobby",
+  landing_mock_parent_job2_title: "Water plants",
+  landing_mock_parent_job2_child: "Sarah",
+
+  // Kid showcase
+  landing_kid_eyebrow: "For Kids",
+  landing_kid_title: "Your own mission board",
+  landing_kid_body:
+    'See today\'s jobs, drag them to "Doing", and mark them done. Watch your earnings grow all week. Complete everything for a dolphin celebration!',
+  landing_kid_bullet_board: "Fun drag-and-drop job board",
+  landing_kid_bullet_tracker: "Weekly earnings tracker",
+  landing_kid_bullet_celebration: "Celebration animations",
+  landing_kid_bullet_avatar: "Choose your own sea creature avatar",
+
+  // Kid mockup phone-frame
+  landing_mock_kid_header: "Bobby's Jobs",
+  landing_mock_kid_this_week: "This week",
+  landing_mock_kid_todo: "TO DO",
+  landing_mock_kid_doing: "DOING",
+  landing_mock_kid_done: "DONE",
+  landing_mock_kid_surprise: "Complete all jobs for a surprise!",
+
+  // Features grid
+  landing_feat_eyebrow: "Features",
+  landing_feat_title: "Everything your family needs",
+  landing_feat_planner_title: "Weekly Planner",
+  landing_feat_planner_desc:
+    "Assign chores for each day of the week to each child.",
+  landing_feat_approval_title: "Approval System",
+  landing_feat_approval_desc:
+    "Parents review and approve completed chores before they count.",
+  landing_feat_tracker_title: "Earnings Tracker",
+  landing_feat_tracker_desc:
+    "Kids see their weekly progress bar filling up in real-time.",
+  landing_feat_kidui_title: "Kid-Friendly UI",
+  landing_feat_kidui_desc: "A fun kanban board that kids actually enjoy using.",
+  landing_feat_bilingual_title: "Bilingual",
+  landing_feat_bilingual_desc:
+    "Full English and Japanese support — switch with one tap.",
+  landing_feat_lock_title: "Parent Lock",
+  landing_feat_lock_desc:
+    "Math challenge keeps the parent dashboard safe from little hands.",
+
+  // Chore preview
+  landing_chores_eyebrow: "Ready to go",
+  landing_chores_title: "20+ built-in chores",
+  landing_chores_body:
+    "Start with our curated chore library, or create your own.",
+  landing_chores_more: "+ custom chores, one-off tasks, and more",
+  landing_chore_fold: "Fold washing",
+  landing_chore_toys: "Clean up toys",
+  landing_chore_bed: "Make the bed",
+  landing_chore_water: "Water plants",
+  landing_chore_pets: "Feed the pets",
+  landing_chore_books: "Pick up books",
+  landing_chore_sweep: "Sweep floor",
+  landing_chore_windows: "Wipe windows",
+  landing_chore_table: "Set the table",
+  landing_chore_bag: "Pack school bag",
+  landing_chore_teeth: "Brush teeth",
+  landing_chore_cook: "Help cook",
+
+  // Final CTA
+  landing_final_title_lead: "Ready to make chores",
+  landing_final_title_highlight: "an adventure?",
+  landing_final_body:
+    "Free to use. Set up in 2 minutes. No credit card needed.",
+  landing_final_cta: "Start Your Family's Adventure",
 } as const;
 
 export default en;

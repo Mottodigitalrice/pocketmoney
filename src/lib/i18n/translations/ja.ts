@@ -597,6 +597,145 @@ const ja = {
     "なにかおかしいね。もう一度ためすか、ほかのお友達をえらんでね。",
   error_segment_kid_retry: "もう一度",
   error_segment_kid_home: "お友達をえらぶ",
+
+  // ===========================================================================
+  // Wave 5 — /landing route (F10 1.1 EN+JA routing, 1.2 JP trust signals,
+  // 1.3 hero "tracking only" disclaimer). Adult-facing surface — kanji is fine,
+  // tone is warm, family-focused, simple. Mirrors lewis-voice register.
+  // ===========================================================================
+  landing_brand: "Pirate Money",
+
+  // Nav + footer chrome
+  landing_nav_sign_in: "ログイン",
+  landing_nav_get_started: "はじめる",
+  landing_footer_sign_up: "新規登録",
+  landing_footer_made_by: "Mottodigital が制作",
+
+  // Hero
+  landing_hero_title_lead: "おてつだいを",
+  landing_hero_title_highlight: "宝物に",
+  landing_hero_subtitle:
+    "おうちのお手伝いで、子どもがおこづかいをかせげます。子どもには楽しく、親御さんには簡単に、家族みんなで使えるアプリです。",
+  // F10 1.3: hero disclaimer — track only, parents pay out real cash.
+  landing_hero_disclaimer: "お金は親御さんがお渡しします。アプリは記録だけ。",
+  landing_hero_cta_primary: "無料ではじめる",
+  landing_hero_cta_secondary: "使い方を見る",
+
+  // Hero trust signals — F10 1.2: privacy-focused, not freemium.
+  landing_trust_privacy:
+    "ご家族のデータはご家族のもの。広告も、トラッキングも、第三者への提供もありません",
+  landing_trust_no_card: "クレジットカード不要",
+  landing_trust_quick_setup: "2分でセットアップ",
+
+  // Stats strip
+  landing_stats_chores: "20以上のお手伝い",
+  landing_stats_bilingual: "English & 日本語",
+  landing_stats_yen: "円でしっかり記録",
+  landing_stats_realtime: "リアルタイム更新",
+
+  // How It Works
+  landing_how_eyebrow: "ステップは3つだけ",
+  landing_how_title: "使い方",
+  landing_how_step1_title: "親御さんが計画",
+  landing_how_step1_desc:
+    "お手伝いをつくって、金額を決めて、お子さんごとに1週間の予定を立てます。",
+  landing_how_step2_title: "お子さんが完了",
+  landing_how_step2_desc:
+    "お子さんは自分のミッションボードで今日のお仕事を見て、完了をつけます。",
+  landing_how_step3_title: "承認しておこづかい",
+  landing_how_step3_desc:
+    "親御さんが内容を確認して承認すれば、おこづかいが加算されます。",
+
+  // Parent showcase
+  landing_parent_eyebrow: "親御さんへ",
+  landing_parent_title: "1週間の予定を数秒で",
+  landing_parent_body:
+    "お子さんごとにお手伝いを割り当てて、金額を決めて、1週間の予定をまとめて作れます。お子さんが完了したら、ワンタップで承認できます。",
+  landing_parent_bullet_planner: "ドラッグ&ドロップの週間プランナー",
+  landing_parent_bullet_yen: "お手伝いごとに金額を自由に設定",
+  landing_parent_bullet_approve: "承認、または「やり直し」で送り返す",
+  landing_parent_bullet_lock: "計算問題ロックで、お子さんは入れません",
+
+  // Parent mockup phone-frame
+  landing_mock_parent_header_eyebrow: "船長のデッキ",
+  landing_mock_parent_header_title: "週間プランナー",
+  landing_mock_day_mon: "月",
+  landing_mock_day_tue: "火",
+  landing_mock_day_wed: "水",
+  landing_mock_day_thu: "木",
+  landing_mock_day_fri: "金",
+  landing_mock_parent_bobbys_week: "ボビーの1週間",
+  landing_mock_parent_approve_label: "承認 (2)",
+  landing_mock_parent_job1_title: "おもちゃを片付け",
+  landing_mock_parent_job1_child: "ボビー",
+  landing_mock_parent_job2_title: "お花に水やり",
+  landing_mock_parent_job2_child: "サラ",
+
+  // Kid showcase
+  landing_kid_eyebrow: "お子さんへ",
+  landing_kid_title: "じぶんのミッションボード",
+  landing_kid_body:
+    "きょうのおしごとを見て、「やってる」にうごかして、おわったら「できた」にしよう。1しゅうかんでどれだけかせげたか、ばっちりわかるよ。ぜんぶおわらせるとイルカのおいわい!",
+  landing_kid_bullet_board: "たのしいドラッグ&ドロップのボード",
+  landing_kid_bullet_tracker: "1しゅうかんのかせぎがひとめでわかる",
+  landing_kid_bullet_celebration: "おいわいのアニメーション",
+  landing_kid_bullet_avatar: "すきな海の生き物アバターをえらべる",
+
+  // Kid mockup phone-frame
+  landing_mock_kid_header: "ボビーのおしごと",
+  landing_mock_kid_this_week: "こんしゅう",
+  landing_mock_kid_todo: "やること",
+  landing_mock_kid_doing: "やってる",
+  landing_mock_kid_done: "できた",
+  landing_mock_kid_surprise: "ぜんぶおわらせるとサプライズ!",
+
+  // Features grid
+  landing_feat_eyebrow: "機能",
+  landing_feat_title: "家族に必要なものぜんぶ",
+  landing_feat_planner_title: "週間プランナー",
+  landing_feat_planner_desc:
+    "お子さんごとに、曜日ごとにお手伝いを割り当てられます。",
+  landing_feat_approval_title: "承認システム",
+  landing_feat_approval_desc:
+    "親御さんが確認・承認してから、おこづかいに加算されます。",
+  landing_feat_tracker_title: "かせぎトラッカー",
+  landing_feat_tracker_desc:
+    "お子さんは1週間のしんちょくバーがリアルタイムで増えていくのを見られます。",
+  landing_feat_kidui_title: "子ども向けデザイン",
+  landing_feat_kidui_desc:
+    "お子さんが本当に楽しめる、たのしいかんばんボードです。",
+  landing_feat_bilingual_title: "バイリンガル",
+  landing_feat_bilingual_desc:
+    "日本語と英語にフル対応。ワンタップで切り替えられます。",
+  landing_feat_lock_title: "親御さんロック",
+  landing_feat_lock_desc:
+    "計算問題ロックで、親御さんのダッシュボードを守ります。",
+
+  // Chore preview
+  landing_chores_eyebrow: "すぐ使える",
+  landing_chores_title: "20以上のお手伝い",
+  landing_chores_body:
+    "選びぬいたお手伝いライブラリから始めても、自分でつくってもOK。",
+  landing_chores_more: "+ オリジナルのお手伝い、単発タスクなど",
+  landing_chore_fold: "洗濯物をたたむ",
+  landing_chore_toys: "おもちゃを片付ける",
+  landing_chore_bed: "ベッドメイキング",
+  landing_chore_water: "お花に水やり",
+  landing_chore_pets: "ペットにごはん",
+  landing_chore_books: "本を片付ける",
+  landing_chore_sweep: "ゆかをはく",
+  landing_chore_windows: "窓をふく",
+  landing_chore_table: "テーブルをセット",
+  landing_chore_bag: "学校のかばんを準備",
+  landing_chore_teeth: "歯みがき",
+  landing_chore_cook: "料理のおてつだい",
+
+  // Final CTA
+  landing_final_title_lead: "おてつだいを",
+  landing_final_title_highlight: "冒険にしませんか?",
+  landing_final_body:
+    "無料で使えます。2分でセットアップ。クレジットカードは不要です。",
+  landing_final_cta: "家族の冒険をはじめる",
 } as const;
 
 export default ja;
