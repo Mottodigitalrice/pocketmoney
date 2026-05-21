@@ -2,6 +2,43 @@
 
 All notable changes to Pirate Money. Format inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); the project does not follow strict semver until friends rollout.
 
+## [Unreleased] — 2026-05-22 — Autonomous polish session
+
+Cloud + local autonomous session ran wave-based execution on this branch. Local-session shipped real code per below; cloud-session shipped paint-by-numbers spec docs (see `projects/active/piratemoney/working-files/2026-05-21-*-specs/`).
+
+### Added
+
+- Segment error boundaries for `/parent`, `/kid/[childId]`, and `/onboarding` — localized recover-and-retry UX scoped to each route segment.
+- Sentry stub — `@sentry/nextjs@^10` wired across server / edge / client runtimes, fully env-gated. Zero network traffic without `NEXT_PUBLIC_SENTRY_DSN`.
+- Prettier — `prettier@^3.x` + `eslint-config-prettier`, with `.prettierrc.json` + `.prettierignore` and a whole-tree reformat.
+- `LIGHTHOUSE_AUDIT=1` middleware bypass — lets unauthenticated Lighthouse runs reach protected routes for perf/a11y audits without faking Clerk.
+- 24+ new i18n keys — 16 segment-error strings, 8 onboarding-error strings (EN + JA).
+- `sentry.constants.ts` module — single source of truth for `SENTRY_TRACES_SAMPLE_RATE`, `SENTRY_REPLAYS_SESSION_SAMPLE_RATE`, `SENTRY_REPLAYS_ON_ERROR_SAMPLE_RATE`. Change once, applies to all three Sentry runtimes.
+
+### Changed
+
+- Landing page routes all copy through `useTranslation()` (F10 1.1) — no remaining hardcoded strings.
+- Landing now wraps in `<main>` for a11y semantics.
+- `text-slate-*` darkened on landing to fix color-contrast warnings.
+- Parent dashboard tabs migrated to search params (F10 5.20) — back/forward + deep-link friendly.
+- Kanban empty states softened (F10 6.4) — friendlier copy, clearer CTAs.
+- 169-file Prettier reformat across the whole tree (separate commit for revert safety).
+
+### Fixed
+
+- UI test flakes hardened — WeekPlanner + onboarding `StepAddJobs` subtitle.
+- Lighthouse a11y `/landing` 94 → 100 on mobile and desktop.
+
+### Tests
+
+- Backend: 240 (unchanged).
+- UI: 119 → ~150+ — segment-error +12, onboarding-error +5, parent-tabs +4, kanban +1. Landing not re-tested in this session.
+
+### Notes
+
+- E2E Playwright and auth-route Lighthouse deferred — Clerk dev keys missing from `.env.local` at session start.
+- Sentry stub is a no-op without DSN: zero external traffic, zero spend.
+
 ## [Unreleased]
 
 Track E rollout (LINE digest, privacy policy, Vercel push to friends) is staged but not active. Real Clerk dev keys are required to unblock F7/F8/F9 Playwright + auth-route Lighthouse. Both gated on Lewis.

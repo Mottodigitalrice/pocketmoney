@@ -13,19 +13,26 @@
  */
 import * as Sentry from "@sentry/nextjs";
 
+import {
+  SENTRY_REPLAYS_ON_ERROR_SAMPLE_RATE,
+  SENTRY_REPLAYS_SESSION_SAMPLE_RATE,
+  SENTRY_TRACES_SAMPLE_RATE,
+} from "../sentry.constants";
+
 if (!process.env.NEXT_PUBLIC_SENTRY_DSN) {
   // Stub mode — no DSN, no init, no network. Intentional no-op.
 } else {
   Sentry.init({
     dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
     environment: process.env.NODE_ENV,
-    tracesSampleRate: process.env.NODE_ENV === "development" ? 1.0 : 0.1,
+    tracesSampleRate:
+      process.env.NODE_ENV === "development" ? 1.0 : SENTRY_TRACES_SAMPLE_RATE,
     debug: false,
     // Reasonable default for stub: only capture session replays on error in
     // case we flip a DSN on later. Keep replay sample rates at 0 so no replay
     // traffic occurs without an explicit prod tune.
-    replaysSessionSampleRate: 0,
-    replaysOnErrorSampleRate: 0,
+    replaysSessionSampleRate: SENTRY_REPLAYS_SESSION_SAMPLE_RATE,
+    replaysOnErrorSampleRate: SENTRY_REPLAYS_ON_ERROR_SAMPLE_RATE,
   });
 }
 

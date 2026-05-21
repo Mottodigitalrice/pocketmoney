@@ -8,13 +8,16 @@
  */
 import * as Sentry from "@sentry/nextjs";
 
+import { SENTRY_TRACES_SAMPLE_RATE } from "./sentry.constants";
+
 if (!process.env.NEXT_PUBLIC_SENTRY_DSN) {
   // Stub mode — no DSN, no init, no network. Intentional no-op.
 } else {
   Sentry.init({
     dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
     environment: process.env.NODE_ENV,
-    tracesSampleRate: process.env.NODE_ENV === "development" ? 1.0 : 0.1,
+    tracesSampleRate:
+      process.env.NODE_ENV === "development" ? 1.0 : SENTRY_TRACES_SAMPLE_RATE,
     // Honor explicit debug opt-in only; default to silent.
     debug: false,
   });
