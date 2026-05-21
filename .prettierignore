@@ -1,0 +1,11 @@
+node_modules/
+.next/
+coverage/
+convex/_generated/
+public/
+*.lock
+*.svg
+out/
+dist/
+build/
+.vercel/
