@@ -197,6 +197,11 @@ export function KanbanBoard({ childId }: KanbanBoardProps) {
         ref={scrollRef}
         className="hide-scrollbar flex gap-4 overflow-x-auto snap-x snap-mandatory md:grid md:grid-cols-3 md:gap-6 md:overflow-visible"
       >
+        {/* F10 6.4: by the time we reach this branch, hasNoJobsToday
+            is false → at least one column has content → any empty column
+            should render the soft "—" placeholder, not the rich dashed
+            block. softEmpty is set unconditionally; KanbanColumn only
+            renders the empty UI when its own count === 0 anyway. */}
         <div className="min-w-[85vw] snap-start md:min-w-0">
           <KanbanColumn
             title={t("kanban_available")}
@@ -204,6 +209,7 @@ export function KanbanBoard({ childId }: KanbanBoardProps) {
             count={available.length}
             color="bg-blue-500/80"
             columnType="available"
+            softEmpty
           >
             {available.map((sj) => (
               <JobCard
@@ -229,6 +235,7 @@ export function KanbanBoard({ childId }: KanbanBoardProps) {
             count={inProgress.length}
             color="bg-amber-500/80"
             columnType="doing"
+            softEmpty
           >
             {inProgress.map((inst) => (
               <JobCard
@@ -251,6 +258,7 @@ export function KanbanBoard({ childId }: KanbanBoardProps) {
             count={completed.length}
             color="bg-green-500/80"
             columnType="done"
+            softEmpty
           >
             {completed.map((inst) => (
               <JobCard

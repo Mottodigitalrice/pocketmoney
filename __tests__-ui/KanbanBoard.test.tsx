@@ -12,7 +12,10 @@
  *   - Skeleton renders while `isLoading=true`.
  *   - Three columns render with their translated titles when data is present.
  *   - Cards are distributed into the correct column by status.
- *   - Empty-state copy renders inside an empty column.
+ *   - F10 6.4: empty columns render a soft "—" placeholder (not rich)
+ *     when another column has content. Rich dashed block stays reserved
+ *     for the board-level all-empty case (onboarding moment for a new
+ *     kid).
  *   - Dot-indicator tablist has correct aria attributes (role="tab", aria-selected).
  *   - "No jobs today" empty state when all three columns are empty.
  */
@@ -135,8 +138,11 @@ describe("KanbanBoard", () => {
     expect(statuses).toContain("completed");
   });
 
-  it("renders the per-column empty state when a column has no items", () => {
-    const { container } = renderWithProviders(
+  // F10 6.4: when at least one column has content, the other (empty)
+  // columns render a soft "—" placeholder — not the rich dashed block.
+  // Three rich empties side-by-side reads as visual noise.
+  it("renders soft '—' placeholders in empty columns when another column has content", () => {
+    const { container, getByTestId, queryByTestId } = renderWithProviders(
       <KanbanBoard childId={CHILD_ID} />,
       {
         contextValue: {
@@ -150,12 +156,39 @@ describe("KanbanBoard", () => {
         },
       },
     );
-    // Empty-column messages come from `kanban_empty_available` /
-    // `kanban_empty_done` keys. The doing column has a card so its empty
-    // copy should NOT render.
-    expect(container).toHaveTextContent(/All jobs taken/i);
-    expect(container).toHaveTextContent(/Complete jobs to see/i);
+    // Rich empty-state copy must NOT render for the two empty columns.
+    expect(container).not.toHaveTextContent(/All jobs taken/i);
+    expect(container).not.toHaveTextContent(/Complete jobs to see/i);
     expect(container).not.toHaveTextContent(/Pick a job to start/i);
+    // Soft placeholders render in the empty columns only.
+    expect(getByTestId("kanban-column-soft-empty-available")).toBeInTheDocument();
+    expect(getByTestId("kanban-column-soft-empty-done")).toBeInTheDocument();
+    expect(queryByTestId("kanban-column-soft-empty-doing")).toBeNull();
+  });
+
+  // F10 6.4: even with two columns empty, the rich dashed-border block
+  // should appear at most once across the whole board (the all-empty
+  // board-level path handles that case separately). In the per-column
+  // some-empty path it must appear zero times.
+  it("renders no rich dashed empty blocks when one column has content", () => {
+    const { container } = renderWithProviders(
+      <KanbanBoard childId={CHILD_ID} />,
+      {
+        contextValue: {
+          getTodayAvailableJobs: () => [scheduled("s1", JOB_TIDY)],
+          getInProgressJobs: () => [],
+          getCompletedJobs: () => [],
+          getInstancesForChild: () => [],
+          getJobById: () => JOB_TIDY,
+        },
+      },
+    );
+    // Rich empty blocks use the dashed border class — none of them should
+    // appear in the some-empty case.
+    const richEmpties = container.querySelectorAll(
+      ".border-dashed.border-white\\/30",
+    );
+    expect(richEmpties).toHaveLength(0);
   });
 
   it("exposes the dot-indicator tablist with correct aria roles", () => {
