@@ -180,25 +180,34 @@ describe("OnboardingPage — H3 fixes", () => {
     expect(routerPushSpy).toHaveBeenCalledWith("/");
   });
 
-  it("3.2 — StepAddJobs subtitle copy mentions the 20 built-in chores fallback", () => {
-    renderOnboarding();
+  it(
+    "3.2 — StepAddJobs subtitle copy mentions the 20 built-in chores fallback",
+    async () => {
+      // Use the same async-step pattern as the H3 3.7 test (which is
+      // stable) — fireEvent + raw setTimeout flushes between each step.
+      // Then findByText polls + retries with an 8s safety belt so the
+      // 5s default testing-library timeout can't race React 19's slower
+      // hydration flush on OnboardingPageInner.
+      renderOnboarding();
 
-    // Hop straight to StepAddJobs via the welcome → children → jobs flow.
-    fireEvent.click(screen.getByText(/Get Started/));
-    return new Promise<void>((resolve) => {
-      setTimeout(() => {
-        fillFirstChild();
-        fireEvent.click(screen.getByText("Next"));
-        setTimeout(() => {
-          // Skip-jobs explanatory copy should now be visible on StepAddJobs.
-          expect(
-            screen.getByText(/skip this and we'll set up 20 starter chores/i),
-          ).toBeInTheDocument();
-          resolve();
-        }, 250);
-      }, 250);
-    });
-  });
+      // StepWelcome → StepAddChildren.
+      fireEvent.click(screen.getByText(/Get Started/));
+      await new Promise((r) => setTimeout(r, 250));
+
+      // StepAddChildren → StepAddJobs.
+      fillFirstChild();
+      fireEvent.click(screen.getByText("Next"));
+      await new Promise((r) => setTimeout(r, 250));
+
+      // Skip-jobs explanatory copy should now be visible on StepAddJobs.
+      await screen.findByText(
+        /skip this and we'll set up 20 starter chores/i,
+        {},
+        { timeout: 8000 },
+      );
+    },
+    15000,
+  );
 
   // 3.7 — silent save errors are now surfaced.
   it("3.7 — when createChild throws, StepDone shows the translated error + retry button", async () => {
@@ -324,17 +333,25 @@ describe("OnboardingPage — S1 (R4) StepAddChildren copy", () => {
 
 // S1 (R4) — StepAddJobs copy refinements (F10 3.3)
 describe("OnboardingPage — S1 (R4) StepAddJobs copy", () => {
-  it("3.3 — yen tip is visible under the yen input on the job form card", async () => {
-    renderOnboarding();
-    fireEvent.click(screen.getByText(/Get Started/));
-    await new Promise((r) => setTimeout(r, 250));
-    fillFirstChild();
-    fireEvent.click(screen.getByText("Next"));
-    await new Promise((r) => setTimeout(r, 250));
+  it(
+    "3.3 — yen tip is visible under the yen input on the job form card",
+    async () => {
+      renderOnboarding();
+      fireEvent.click(screen.getByText(/Get Started/));
+      await new Promise((r) => setTimeout(r, 250));
+      fillFirstChild();
+      fireEvent.click(screen.getByText("Next"));
+      await new Promise((r) => setTimeout(r, 250));
 
-    // Now on StepAddJobs with the default seeded job card; tip should render.
-    expect(
-      screen.getByText(/¥50–¥300 per chore is typical/i),
-    ).toBeInTheDocument();
-  });
+      // Now on StepAddJobs with the default seeded job card; tip should
+      // render. findByText polls (8s safety belt) so React 19's hydration
+      // can flush even on slow thread-pool scheduling — getByText raced.
+      await screen.findByText(
+        /¥50–¥300 per chore is typical/i,
+        {},
+        { timeout: 8000 },
+      );
+    },
+    15000,
+  );
 });

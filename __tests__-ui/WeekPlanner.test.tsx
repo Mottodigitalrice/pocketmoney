@@ -26,6 +26,7 @@
  *     and trust the integration test layer for the full flow.
  */
 import { describe, it, expect, vi } from "vitest";
+import { act, waitFor } from "@testing-library/react";
 import { renderWithProviders, screen, fireEvent } from "./test-utils";
 import { WeekPlanner } from "@/components/features/parent-dashboard/WeekPlanner";
 import type { Child, Job, ScheduledJobWithJob } from "@/types";
@@ -106,12 +107,17 @@ function makeContext(overrides: Record<string, unknown> = {}) {
     jobs: [JOB_TIDY, JOB_DISHES],
     getLocalDateString: () => TODAY,
     getWeekDates: (date?: Date) => {
-      // base date is mocked Date(today + offset*7). Offset 0 → WEEK; offset
-      // -1 → PREV_WEEK. We detect by looking at the year-month-day of the
-      // input; any date in May 2026 < 11 → previous week.
+      // The component derives weekDates from `base = today + weekOffset*7`
+      // and previousWeekDates from `base = today + (weekOffset-1)*7`. We
+      // detect "previous week" by checking whether the input date is more
+      // than ~4 days behind today's real clock — that comparison is stable
+      // regardless of the calendar day this test runs on (today's date is
+      // not pinned in this suite).
       if (!date) return [...WEEK];
-      const day = date.getDate();
-      if (day < 11) return [...PREV_WEEK];
+      const now = new Date();
+      const diffMs = now.getTime() - date.getTime();
+      const fourDaysMs = 4 * 24 * 60 * 60 * 1000;
+      if (diffMs > fourDaysMs) return [...PREV_WEEK];
       return [...WEEK];
     },
     getScheduledJobsForChildDate: () => [],
@@ -222,7 +228,7 @@ describe("WeekPlanner", () => {
     expect(clearScheduledDay).toHaveBeenCalledWith(CHILD_A._id, "2026-05-12");
   });
 
-  it("copies last week's entries into the current week via Copy last week", () => {
+  it("copies last week's entries into the current week via Copy last week", async () => {
     const scheduleJobBatch = vi.fn();
     // Last week had one entry per weekday — index-wise the same map:
     //   PREV_WEEK[1]=2026-05-05 → maps to WEEK[1]=2026-05-12.
@@ -243,9 +249,15 @@ describe("WeekPlanner", () => {
 
     // `planner_copy_last_week` → "Copy last week".
     const copyBtn = screen.getByRole("button", { name: /Copy last week/i });
-    fireEvent.click(copyBtn);
-
-    expect(scheduleJobBatch).toHaveBeenCalledTimes(1);
+    // React 19: wrap click in act() so the sync handler's effects flush
+    // before we read the mock. Then poll via waitFor — assertions on
+    // mock.calls.length race the React batching window otherwise.
+    await act(async () => {
+      fireEvent.click(copyBtn);
+    });
+    await waitFor(() => {
+      expect(scheduleJobBatch).toHaveBeenCalledTimes(1);
+    });
     expect(scheduleJobBatch).toHaveBeenCalledWith([
       {
         jobId: JOB_DISHES._id,
