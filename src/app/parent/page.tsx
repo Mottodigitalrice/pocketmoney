@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ParentHeader } from "@/components/features/parent-dashboard/ParentHeader";
 import { QuickAddToday } from "@/components/features/parent-dashboard/QuickAddToday";
 import { ApprovalQueue } from "@/components/features/parent-dashboard/ApprovalQueue";
@@ -30,17 +31,37 @@ const tabIds: Tab[] = [
   "children",
 ];
 
-function isTab(value: string): value is Tab {
-  return tabIds.includes(value as Tab);
+const DEFAULT_TAB: Tab = "quick_add";
+
+function isTab(value: string | null): value is Tab {
+  return value !== null && tabIds.includes(value as Tab);
 }
 
+// F10 5.20 — tab state lives in `?tab=...` instead of `#...`. Reading the
+// search params on the server pass means we hydrate with the correct active
+// tab on the first paint (no flash to "quick_add" then re-render). The
+// Suspense boundary below is required by Next 16 whenever a tree calls
+// `useSearchParams()` — otherwise `next build` fails.
 export default function ParentPage() {
-  const [activeTab, setActiveTab] = useState<Tab>(() => {
-    if (typeof window === "undefined") return "quick_add";
+  return (
+    <Suspense fallback={<AppSkeleton variant="parent" />}>
+      <ParentPageInner />
+    </Suspense>
+  );
+}
 
-    const hashTab = window.location.hash.replace("#", "");
-    return isTab(hashTab) ? hashTab : "quick_add";
-  });
+function ParentPageInner() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const tabParam = searchParams.get("tab");
+  const activeTab: Tab = isTab(tabParam) ? tabParam : DEFAULT_TAB;
+
+  const setActiveTab = (tab: Tab) => {
+    // `scroll: false` keeps the user's scroll position when toggling tabs.
+    // `replace` (not `push`) so back-button doesn't accumulate tab-history.
+    router.replace(`?tab=${tab}`, { scroll: false });
+  };
+
   const { t } = useTranslation();
   const { familyChildren, addChild, editChild, deleteChild, isLoading } =
     usePocketMoney();
@@ -79,10 +100,7 @@ export default function ParentPage() {
             aria-selected={activeTab === tab.id}
             aria-controls={`parent-panel-${tab.id}`}
             tabIndex={activeTab === tab.id ? 0 : -1}
-            onClick={() => {
-              setActiveTab(tab.id);
-              window.history.replaceState(null, "", `#${tab.id}`);
-            }}
+            onClick={() => setActiveTab(tab.id)}
             // F19 a11y: bumped inactive-tab text from amber-300/70 (≈3.5:1)
             // to amber-200 (≈6.5:1) on the amber-900/40 backdrop.
             className={`whitespace-nowrap rounded-xl px-4 py-3 text-center text-sm font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 sm:flex-1 sm:text-base ${
@@ -97,7 +115,8 @@ export default function ParentPage() {
       </div>
 
       {/* H4 — empty-state CTAs in QuickAddToday/WeekPlanner can call this
-          to switch to the Crew tab. Keeps URL hash in sync with state. */}
+          to switch to the Crew tab. URL `?tab=` stays in sync via the
+          router.replace inside setActiveTab. */}
       {/* Tab content */}
       <div
         role="tabpanel"
@@ -107,19 +126,13 @@ export default function ParentPage() {
       >
         {activeTab === "quick_add" && (
           <QuickAddToday
-            onNavigateToChildren={() => {
-              setActiveTab("children");
-              window.history.replaceState(null, "", "#children");
-            }}
+            onNavigateToChildren={() => setActiveTab("children")}
           />
         )}
         {activeTab === "approvals" && <ApprovalQueue />}
         {activeTab === "planner" && (
           <WeekPlanner
-            onNavigateToChildren={() => {
-              setActiveTab("children");
-              window.history.replaceState(null, "", "#children");
-            }}
+            onNavigateToChildren={() => setActiveTab("children")}
           />
         )}
         {activeTab === "jobs" && <JobManager />}
