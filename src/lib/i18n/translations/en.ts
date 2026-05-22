@@ -753,6 +753,12 @@ const en = {
   a11y_logout: "Log out",
   a11y_home: "Home",
   a11y_pick_emoji: "Pick emoji {{emoji}}",
+
+  // Wave 8c — onboarding celebration
+  onboarding_celebrate_title: "Welcome aboard, Captain {{familyName}}!",
+  onboarding_celebrate_subtitle: "Your crew is ready. Set sail!",
+  onboarding_celebrate_announce:
+    "Family setup complete. Welcome to Pirate Money.",
 } as const;
 
 export default en;

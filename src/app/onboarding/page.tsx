@@ -1,17 +1,25 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import { useMutation, useQuery } from "convex/react";
+import { useReducedMotion } from "motion/react";
 import { api } from "../../../convex/_generated/api";
 import { CHILD_ICON_CONFIG } from "@/lib/constants";
 import { hasAppDataEnv } from "@/lib/env";
 import { LanguageToggle } from "@/components/shared/LanguageToggle";
 import { BudouXText } from "@/components/shared/BudouXText";
+import { OnboardingCompleteCelebration } from "@/components/features/onboarding/OnboardingCompleteCelebration";
 import { useTranslation } from "@/hooks/use-translation";
 import { mapConvexError } from "@/lib/convex-errors";
 import type { ChildIcon } from "@/types";
+
+// Wave 8c — onboarding-complete celebration timing. Reduced-motion users still
+// get a brief delight beat (text only, no coin-rain) but at ~half duration so
+// the redirect doesn't feel laggy when animation is suppressed.
+const CELEBRATION_MS = 2000;
+const CELEBRATION_MS_REDUCED = 800;
 
 // ---------------------------------------------------------------------------
 // Types
@@ -753,6 +761,9 @@ function OnboardingPageInner() {
   const router = useRouter();
   const { user } = useUser();
   const { t } = useTranslation();
+  // Wave 8c — celebration duration is shorter under reduced motion so the
+  // redirect still feels intentional but not laggy.
+  const prefersReducedMotion = useReducedMotion();
 
   // Convex
   const convexUser = useQuery(
@@ -769,6 +780,14 @@ function OnboardingPageInner() {
   // H3 — punchlist 3.7: track save failures so we can surface a friendly
   // toast/inline error instead of silently console.error'ing.
   const [saveError, setSaveError] = useState<string | null>(null);
+  // Wave 8c — once the Convex save resolves, flip into a brief celebration
+  // overlay before redirecting to `/`. The router.push is scheduled in a
+  // setTimeout so the overlay actually paints (and screen readers announce)
+  // before the navigation tears the page down.
+  const [isCelebrating, setIsCelebrating] = useState(false);
+  const celebrationTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
   const [localChildren, setLocalChildren] = useState<LocalChild[]>([
     { id: crypto.randomUUID(), name: "", icon: null },
   ]);
@@ -785,6 +804,17 @@ function OnboardingPageInner() {
       setStep(next);
       setVisible(true);
     }, 200);
+  }, []);
+
+  // Wave 8c — clean up the celebration timer if the component unmounts before
+  // the redirect fires (e.g. the parent backs out via the browser).
+  useEffect(() => {
+    return () => {
+      if (celebrationTimerRef.current) {
+        clearTimeout(celebrationTimerRef.current);
+        celebrationTimerRef.current = null;
+      }
+    };
   }, []);
 
   // Complete onboarding: save children + jobs, then redirect.
@@ -823,8 +853,22 @@ function OnboardingPageInner() {
         }
       }
 
-      // Redirect to home
-      router.push("/");
+      // Wave 8c — fire the micro-celebration BEFORE redirect. The overlay
+      // renders for ~2s (or ~800ms under reduced motion), then router.push
+      // tears the page down. Keep `isSaving` true so the "Start Adventure"
+      // button stays disabled while the celebration plays (otherwise a fast
+      // double-click could re-fire handleComplete).
+      setIsCelebrating(true);
+      if (celebrationTimerRef.current) {
+        clearTimeout(celebrationTimerRef.current);
+      }
+      const delay = prefersReducedMotion
+        ? CELEBRATION_MS_REDUCED
+        : CELEBRATION_MS;
+      celebrationTimerRef.current = setTimeout(() => {
+        celebrationTimerRef.current = null;
+        router.push("/");
+      }, delay);
     } catch (error) {
       const mapped = mapConvexError(error, t);
       // Keep the raw message in console for debugging — the UI gets the
@@ -842,6 +886,7 @@ function OnboardingPageInner() {
     seedDefaults,
     router,
     t,
+    prefersReducedMotion,
   ]);
 
   return (
@@ -891,6 +936,17 @@ function OnboardingPageInner() {
           />
         )}
       </div>
+
+      {/* Wave 8c — onboarding-complete celebration overlay. Renders on top of
+          the (now-frozen) StepDone for ~2s while the redirect timer ticks.
+          familyName = first crew member's name (StepAddChildren validation
+          guarantees at least one non-empty name before reaching this step).
+          Fallback "Crew" if for some reason the name is empty. */}
+      {isCelebrating && (
+        <OnboardingCompleteCelebration
+          familyName={localChildren[0]?.name?.trim() || "Crew"}
+        />
+      )}
     </div>
   );
 }

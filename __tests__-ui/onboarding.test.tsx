@@ -57,6 +57,20 @@ vi.mock("@/lib/env", () => ({
   hasConvexEnv: true,
 }));
 
+// Wave 8c — mock motion/react's useReducedMotion so the celebration tests can
+// flip the reduced-motion branch deterministically (jsdom doesn't ship
+// matchMedia, so the un-mocked hook would log warnings and return false). The
+// default `false` mirrors normal viewport behavior; specific reduced-motion
+// tests override via `vi.mocked(useReducedMotion).mockReturnValueOnce(true)`.
+vi.mock("motion/react", async () => {
+  const actual =
+    await vi.importActual<typeof import("motion/react")>("motion/react");
+  return {
+    ...actual,
+    useReducedMotion: vi.fn(() => false),
+  };
+});
+
 vi.mock("convex/react", () => ({
   useQuery: useQueryMock,
   useMutation: useMutationMock,
@@ -81,6 +95,7 @@ vi.mock("next/navigation", () => ({
 
 // Import AFTER mocks so the page picks up the mocked modules.
 import OnboardingPage from "@/app/onboarding/page";
+import { useReducedMotion } from "motion/react";
 
 /** Render helper that wraps in LanguageProvider with a seeded locale. */
 function renderOnboarding(locale: "en" | "ja" = "en") {
@@ -197,6 +212,14 @@ describe("OnboardingPage — H3 fixes", () => {
     expect(createJobSpy).not.toHaveBeenCalled();
     // And createChild ran once for Jayden.
     expect(createChildSpy).toHaveBeenCalledTimes(1);
+
+    // Wave 8c — the redirect is now scheduled behind the celebration overlay
+    // (~2000ms). Advance fake timers past the celebration window so the
+    // router.push fires before the assertion below.
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(2050);
+    });
+
     // Router was pushed to /.
     expect(routerPushSpy).toHaveBeenCalledWith("/");
 
@@ -431,4 +454,126 @@ describe("OnboardingPage — S1 (R4) StepAddJobs copy", () => {
       { timeout: 8000 },
     );
   }, 15000);
+});
+
+// Wave 8c — onboarding-complete celebration tests.
+//
+// The flow under test: parent fills the funnel → hits "Start Your Adventure"
+// on StepDone → handleComplete resolves all mutations → `isCelebrating` flips
+// → full-screen celebration overlay renders for ~2000ms (or ~800ms under
+// reduced motion) → router.push("/") fires.
+//
+// Re-uses the same `vi.useFakeTimers({ toFake: ["setTimeout"] })` harness
+// that Wave 5b put in place (only setTimeout is faked so React 19's
+// scheduler still runs microtasks/RAF on real time).
+describe("OnboardingPage — Wave 8c celebration", () => {
+  // Helper: drive the funnel from welcome → done → click Start Adventure.
+  // Returns after the click + a 50ms microtask flush so the resolved
+  // mutations have applied state (isCelebrating = true).
+  async function runFunnelAndStart() {
+    renderOnboarding();
+    fireEvent.click(screen.getByText(/Get Started/));
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(250);
+    });
+    fillFirstChild();
+    fireEvent.click(screen.getByText("Next"));
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(250);
+    });
+    // Skip custom jobs (defaults will seed). Same path the H3 3.2 test takes.
+    fireEvent.click(screen.getByTestId("onboarding-skip-jobs"));
+    fireEvent.click(screen.getByTestId("onboarding-jobs-next"));
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(250);
+    });
+    fireEvent.click(screen.getByText(/Start Your Adventure/));
+    // Flush the awaited mutations + the setIsCelebrating state update.
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(50);
+    });
+  }
+
+  beforeEach(() => {
+    vi.useFakeTimers({ toFake: ["setTimeout"] });
+    // Default to "motion enabled" — the reduced-motion test overrides this.
+    vi.mocked(useReducedMotion).mockReturnValue(false);
+  });
+
+  afterEach(() => {
+    vi.mocked(useReducedMotion).mockReset();
+    vi.mocked(useReducedMotion).mockReturnValue(false);
+    vi.useRealTimers();
+  });
+
+  it("Wave 8c — celebration overlay renders after final-step submit", async () => {
+    await runFunnelAndStart();
+    // Overlay testid is the contract for downstream / Playwright probes.
+    expect(
+      screen.getByTestId("onboarding-celebrate-overlay"),
+    ).toBeInTheDocument();
+    // Redirect should NOT have fired yet — we're inside the celebration window.
+    expect(routerPushSpy).not.toHaveBeenCalled();
+  });
+
+  it("Wave 8c — celebration title interpolates the first crew member's name", async () => {
+    await runFunnelAndStart();
+    // The first child's name (fillFirstChild typed "Jayden") is interpolated
+    // into "Welcome aboard, Captain {{familyName}}!".
+    const overlay = screen.getByTestId("onboarding-celebrate-overlay");
+    expect(overlay).toHaveTextContent(/Welcome aboard, Captain Jayden!/);
+  });
+
+  it("Wave 8c — aria-live announcement region renders the announce key", async () => {
+    await runFunnelAndStart();
+    const announce = screen.getByTestId("onboarding-celebrate-a11y-announce");
+    expect(announce).toBeInTheDocument();
+    // Polite + atomic so screen readers wait for the full string.
+    expect(announce).toHaveAttribute("aria-live", "polite");
+    expect(announce).toHaveAttribute("aria-atomic", "true");
+    expect(announce).toHaveTextContent(
+      /Family setup complete\. Welcome to Pirate Money\./,
+    );
+  });
+
+  it("Wave 8c — full-motion redirect fires after ~2000ms", async () => {
+    await runFunnelAndStart();
+    // Just before the window closes — still no redirect.
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(1900);
+    });
+    expect(routerPushSpy).not.toHaveBeenCalled();
+    // Past 2000ms — redirect fires.
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(200);
+    });
+    expect(routerPushSpy).toHaveBeenCalledWith("/");
+  });
+
+  it("Wave 8c — reduced-motion path redirects at ~800ms (skips coin-rain)", async () => {
+    // Flip the reduced-motion branch BEFORE the page renders, so the page +
+    // the celebration component both see `true`.
+    vi.mocked(useReducedMotion).mockReturnValue(true);
+
+    await runFunnelAndStart();
+
+    // Coin-rain overlay is skipped under reduced motion.
+    expect(screen.queryByTestId("onboarding-celebrate-coin-burst")).toBeNull();
+    // Overlay + announce region still render — reduced motion suppresses
+    // particles, not the message itself.
+    expect(
+      screen.getByTestId("onboarding-celebrate-overlay"),
+    ).toBeInTheDocument();
+
+    // Just before the reduced window closes — still no redirect.
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(700);
+    });
+    expect(routerPushSpy).not.toHaveBeenCalled();
+    // Past 800ms — redirect fires.
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(200);
+    });
+    expect(routerPushSpy).toHaveBeenCalledWith("/");
+  });
 });

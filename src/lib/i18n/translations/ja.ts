@@ -779,6 +779,11 @@ const ja = {
   a11y_logout: "ログアウト",
   a11y_home: "ホーム",
   a11y_pick_emoji: "絵文字 {{emoji}} をえらぶ",
+
+  // Wave 8c — onboarding celebration
+  onboarding_celebrate_title: "{{familyName}}号、しゅっぱつ！",
+  onboarding_celebrate_subtitle: "クルーのじゅんびOK！さあ、出航だ！",
+  onboarding_celebrate_announce: "ファミリー設定完了。Pirate Moneyへようこそ。",
 } as const;
 
 export default ja;
