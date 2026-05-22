@@ -505,10 +505,20 @@ const en = {
   error_overdraft: "That jar doesn't have enough treasure for this withdrawal.",
   error_lucky_chest_locked:
     "You already opened the Lucky Chest this week — try again on Monday!",
+  error_lucky_chest_cooldown: "Wait a moment — try again in a few seconds!",
   error_child_deleted:
     "That crew member is no longer aboard. The page will refresh.",
   error_already_approved:
     "This chore was already approved — no take-backs needed!",
+  error_parent_note_too_long: "Note is too long. Keep it under 500 characters.",
+  error_job_title_too_long:
+    "Job title is too long. Keep it under 100 characters.",
+  error_job_title_ja_too_long:
+    "Japanese job title is too long. Keep it under 100 characters.",
+  error_job_yen_amount_out_of_bounds:
+    "Job amount must be between ¥0 and ¥1,000,000.",
+  error_invalid_date_format:
+    "Date format is invalid. Use YYYY-MM-DD (e.g., 2026-05-23).",
   error_ownership: "That doesn't belong to your crew.",
   error_validation:
     "Something in that form isn't quite right. Please check and try again.",

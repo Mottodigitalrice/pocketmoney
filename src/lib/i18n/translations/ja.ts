@@ -528,9 +528,19 @@ const ja = {
   error_overdraft: "そのつぼには、引き出すぶんのたからものがたりません。",
   error_lucky_chest_locked:
     "今週はもうラッキーチェストをあけたよ。月曜にまたためしてね!",
+  error_lucky_chest_cooldown: "ちょっと待って、すぐにもう一回やってみよう!",
   error_child_deleted: "そのクルーはもう乗っていません。ページを更新します。",
   error_already_approved:
     "このおしごとはもう承認ずみです。取り消しはいりません。",
+  error_parent_note_too_long: "メモが長すぎます。500文字以下にしてください。",
+  error_job_title_too_long:
+    "ジョブのタイトルが長すぎます。100文字以下にしてください。",
+  error_job_title_ja_too_long:
+    "日本語のタイトルが長すぎます。100文字以下にしてください。",
+  error_job_yen_amount_out_of_bounds:
+    "ジョブの金額は¥0から¥1,000,000の間にしてください。",
+  error_invalid_date_format:
+    "日付の形式が正しくありません。YYYY-MM-DD形式(例:2026-05-23)にしてください。",
   error_ownership: "それはあなたのクルーのものではありません。",
   error_validation:
     "入力内容にきになるところがあります。確認してもう一度送ってね。",

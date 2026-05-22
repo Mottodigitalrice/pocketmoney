@@ -15,8 +15,14 @@
  * Backend errors covered (from convex/functions/**.ts):
  *   - `OVERDRAFT: balance ¥X cannot cover withdrawal ¥Y`  (transactions.ts)
  *   - `LUCKY_CHEST_ALREADY_OPENED_THIS_WEEK`             (luckyChests.ts)
+ *   - `LUCKY_CHEST_COOLDOWN`                             (luckyChests.ts — MED-1)
  *   - `CHILD_DELETED_AFTER_COMPLETION`                   (jobInstances.ts)
  *   - `CANNOT_REJECT_APPROVED_INSTANCE`                  (jobInstances.ts)
+ *   - `PARENT_NOTE_TOO_LONG`                             (inputValidation.ts — MED-2)
+ *   - `JOB_TITLE_TOO_LONG: <label>`                      (inputValidation.ts — MED-3)
+ *   - `JOB_TITLE_JA_TOO_LONG`                            (inputValidation.ts — MED-3)
+ *   - `JOB_YEN_AMOUNT_OUT_OF_BOUNDS`                     (inputValidation.ts — MED-3)
+ *   - `INVALID_DATE_FORMAT: <label>`                     (dateValidation.ts — MED-4)
  *   - `Not your X`                                       (assertOwnedBy)
  *   - `Not authenticated`                                (Convex auth)
  *   - Any network-layer fetch failure                    (browser)
@@ -29,8 +35,14 @@ export type ErrorCode =
   | "NETWORK"
   | "OVERDRAFT"
   | "LUCKY_CHEST_ALREADY_OPENED_THIS_WEEK"
+  | "LUCKY_CHEST_COOLDOWN"
   | "CHILD_DELETED_AFTER_COMPLETION"
   | "CANNOT_REJECT_APPROVED_INSTANCE"
+  | "PARENT_NOTE_TOO_LONG"
+  | "JOB_TITLE_TOO_LONG"
+  | "JOB_TITLE_JA_TOO_LONG"
+  | "JOB_YEN_AMOUNT_OUT_OF_BOUNDS"
+  | "INVALID_DATE_FORMAT"
   | "OWNERSHIP"
   | "VALIDATION"
   | "UNKNOWN";
@@ -67,12 +79,36 @@ const CODE_META: Record<
     key: "error_lucky_chest_locked",
     severity: "validation",
   },
+  LUCKY_CHEST_COOLDOWN: {
+    key: "error_lucky_chest_cooldown",
+    severity: "validation",
+  },
   CHILD_DELETED_AFTER_COMPLETION: {
     key: "error_child_deleted",
     severity: "validation",
   },
   CANNOT_REJECT_APPROVED_INSTANCE: {
     key: "error_already_approved",
+    severity: "validation",
+  },
+  PARENT_NOTE_TOO_LONG: {
+    key: "error_parent_note_too_long",
+    severity: "validation",
+  },
+  JOB_TITLE_TOO_LONG: {
+    key: "error_job_title_too_long",
+    severity: "validation",
+  },
+  JOB_TITLE_JA_TOO_LONG: {
+    key: "error_job_title_ja_too_long",
+    severity: "validation",
+  },
+  JOB_YEN_AMOUNT_OUT_OF_BOUNDS: {
+    key: "error_job_yen_amount_out_of_bounds",
+    severity: "validation",
+  },
+  INVALID_DATE_FORMAT: {
+    key: "error_invalid_date_format",
     severity: "validation",
   },
   OWNERSHIP: { key: "error_ownership", severity: "ownership" },
@@ -129,12 +165,25 @@ function classify(raw: string): ErrorCode {
   if (/LUCKY_CHEST_ALREADY_OPENED_THIS_WEEK/.test(raw)) {
     return "LUCKY_CHEST_ALREADY_OPENED_THIS_WEEK";
   }
+  if (/LUCKY_CHEST_COOLDOWN/.test(raw)) {
+    return "LUCKY_CHEST_COOLDOWN";
+  }
   if (/CHILD_DELETED_AFTER_COMPLETION/.test(raw)) {
     return "CHILD_DELETED_AFTER_COMPLETION";
   }
   if (/CANNOT_REJECT_APPROVED_INSTANCE/.test(raw)) {
     return "CANNOT_REJECT_APPROVED_INSTANCE";
   }
+  if (/PARENT_NOTE_TOO_LONG/.test(raw)) return "PARENT_NOTE_TOO_LONG";
+  // JOB_TITLE_JA_TOO_LONG before JOB_TITLE_TOO_LONG (prefix) — more specific.
+  if (/JOB_TITLE_JA_TOO_LONG/.test(raw)) return "JOB_TITLE_JA_TOO_LONG";
+  // JOB_TITLE_TOO_LONG is thrown with a label suffix (`JOB_TITLE_TOO_LONG: <label>`).
+  if (/JOB_TITLE_TOO_LONG/.test(raw)) return "JOB_TITLE_TOO_LONG";
+  if (/JOB_YEN_AMOUNT_OUT_OF_BOUNDS/.test(raw)) {
+    return "JOB_YEN_AMOUNT_OUT_OF_BOUNDS";
+  }
+  // INVALID_DATE_FORMAT is thrown with a label suffix (`INVALID_DATE_FORMAT: <label>`).
+  if (/INVALID_DATE_FORMAT/.test(raw)) return "INVALID_DATE_FORMAT";
 
   // `assertOwnedBy` throws "Not your <thing>".
   if (/not your /i.test(raw)) return "OWNERSHIP";

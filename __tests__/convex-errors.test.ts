@@ -78,6 +78,49 @@ describe("mapConvexError — classify", () => {
     expect(r.message).toBe("error_already_approved");
   });
 
+  // Round 5 follow-up — 6 new MED error codes (MED-1/2/3/4).
+  it("classifies LUCKY_CHEST_COOLDOWN (MED-1)", () => {
+    const r = mapConvexError(new Error("LUCKY_CHEST_COOLDOWN"), tStub);
+    expect(r.code).toBe("LUCKY_CHEST_COOLDOWN");
+    expect(r.message).toBe("error_lucky_chest_cooldown");
+    expect(r.severity).toBe("validation");
+  });
+
+  it("classifies PARENT_NOTE_TOO_LONG (MED-2)", () => {
+    const r = mapConvexError(new Error("PARENT_NOTE_TOO_LONG"), tStub);
+    expect(r.code).toBe("PARENT_NOTE_TOO_LONG");
+    expect(r.message).toBe("error_parent_note_too_long");
+    expect(r.severity).toBe("validation");
+  });
+
+  it("classifies 'JOB_TITLE_TOO_LONG: <label>' prefix (MED-3)", () => {
+    const r = mapConvexError(new Error("JOB_TITLE_TOO_LONG: title"), tStub);
+    expect(r.code).toBe("JOB_TITLE_TOO_LONG");
+    expect(r.message).toBe("error_job_title_too_long");
+    expect(r.severity).toBe("validation");
+  });
+
+  it("classifies JOB_TITLE_JA_TOO_LONG (MED-3) — not shadowed by JOB_TITLE_TOO_LONG", () => {
+    const r = mapConvexError(new Error("JOB_TITLE_JA_TOO_LONG"), tStub);
+    expect(r.code).toBe("JOB_TITLE_JA_TOO_LONG");
+    expect(r.message).toBe("error_job_title_ja_too_long");
+    expect(r.severity).toBe("validation");
+  });
+
+  it("classifies JOB_YEN_AMOUNT_OUT_OF_BOUNDS (MED-3)", () => {
+    const r = mapConvexError(new Error("JOB_YEN_AMOUNT_OUT_OF_BOUNDS"), tStub);
+    expect(r.code).toBe("JOB_YEN_AMOUNT_OUT_OF_BOUNDS");
+    expect(r.message).toBe("error_job_yen_amount_out_of_bounds");
+    expect(r.severity).toBe("validation");
+  });
+
+  it("classifies 'INVALID_DATE_FORMAT: <label>' prefix (MED-4)", () => {
+    const r = mapConvexError(new Error("INVALID_DATE_FORMAT: date"), tStub);
+    expect(r.code).toBe("INVALID_DATE_FORMAT");
+    expect(r.message).toBe("error_invalid_date_format");
+    expect(r.severity).toBe("validation");
+  });
+
   it("classifies 'Not your X' (assertOwnedBy) as OWNERSHIP", () => {
     for (const raw of ["Not your child", "Not your job", "Not your wallet"]) {
       const r = mapConvexError(new Error(raw), tStub);
@@ -138,6 +181,24 @@ describe("errorCodeToTranslationKey", () => {
     );
     expect(errorCodeToTranslationKey("CANNOT_REJECT_APPROVED_INSTANCE")).toBe(
       "error_already_approved",
+    );
+    expect(errorCodeToTranslationKey("LUCKY_CHEST_COOLDOWN")).toBe(
+      "error_lucky_chest_cooldown",
+    );
+    expect(errorCodeToTranslationKey("PARENT_NOTE_TOO_LONG")).toBe(
+      "error_parent_note_too_long",
+    );
+    expect(errorCodeToTranslationKey("JOB_TITLE_TOO_LONG")).toBe(
+      "error_job_title_too_long",
+    );
+    expect(errorCodeToTranslationKey("JOB_TITLE_JA_TOO_LONG")).toBe(
+      "error_job_title_ja_too_long",
+    );
+    expect(errorCodeToTranslationKey("JOB_YEN_AMOUNT_OUT_OF_BOUNDS")).toBe(
+      "error_job_yen_amount_out_of_bounds",
+    );
+    expect(errorCodeToTranslationKey("INVALID_DATE_FORMAT")).toBe(
+      "error_invalid_date_format",
     );
     expect(errorCodeToTranslationKey("OWNERSHIP")).toBe("error_ownership");
     expect(errorCodeToTranslationKey("VALIDATION")).toBe("error_validation");
