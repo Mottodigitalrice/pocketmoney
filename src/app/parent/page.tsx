@@ -1,18 +1,73 @@
 "use client";
 
 import { Suspense } from "react";
+import dynamic from "next/dynamic";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ParentHeader } from "@/components/features/parent-dashboard/ParentHeader";
 import { QuickAddToday } from "@/components/features/parent-dashboard/QuickAddToday";
 import { ApprovalQueue } from "@/components/features/parent-dashboard/ApprovalQueue";
-import { WeekPlanner } from "@/components/features/parent-dashboard/WeekPlanner";
-import { JobManager } from "@/components/features/parent-dashboard/JobManager";
-import { ChildOverview } from "@/components/features/parent-dashboard/ChildOverview";
-import { ChildManager } from "@/components/features/parent-dashboard/ChildManager";
-import { LuckyChestSettings } from "@/components/features/parent-dashboard/LuckyChestSettings";
 import { AppSkeleton } from "@/components/features/shared/AppSkeleton";
 import { usePocketMoney } from "@/hooks/use-pocket-money";
 import { useTranslation } from "@/hooks/use-translation";
+
+// Wave 4a perf: tabs 3-6 (planner / jobs / overview / children) are lazy.
+// The default-load path (quick_add) plus ApprovalQueue stay eager because
+// they're the two lightweight "today" surfaces — splitting them would add
+// a skeleton flash on the most common entry point without saving real KB.
+// The heavier tabs (WeekPlanner's 7-day grid, JobManager's recurring-job
+// editor, ChildManager, LuckyChestSettings, ChildOverview's per-child
+// rollup) defer behind `dynamic({ ssr: false })` and reuse AppSkeleton
+// while their chunk loads.
+const WeekPlanner = dynamic(
+  () =>
+    import("@/components/features/parent-dashboard/WeekPlanner").then((m) => ({
+      default: m.WeekPlanner,
+    })),
+  {
+    ssr: false,
+    loading: () => <AppSkeleton variant="parent" />,
+  },
+);
+const JobManager = dynamic(
+  () =>
+    import("@/components/features/parent-dashboard/JobManager").then((m) => ({
+      default: m.JobManager,
+    })),
+  {
+    ssr: false,
+    loading: () => <AppSkeleton variant="parent" />,
+  },
+);
+const ChildOverview = dynamic(
+  () =>
+    import("@/components/features/parent-dashboard/ChildOverview").then(
+      (m) => ({ default: m.ChildOverview }),
+    ),
+  {
+    ssr: false,
+    loading: () => <AppSkeleton variant="parent" />,
+  },
+);
+const ChildManager = dynamic(
+  () =>
+    import("@/components/features/parent-dashboard/ChildManager").then((m) => ({
+      default: m.ChildManager,
+    })),
+  {
+    ssr: false,
+    loading: () => <AppSkeleton variant="parent" />,
+  },
+);
+const LuckyChestSettings = dynamic(
+  () =>
+    import("@/components/features/parent-dashboard/LuckyChestSettings").then(
+      (m) => ({ default: m.LuckyChestSettings }),
+    ),
+  {
+    ssr: false,
+    loading: () => <AppSkeleton variant="parent" />,
+  },
+);
 
 type Tab =
   | "quick_add"
@@ -131,9 +186,7 @@ function ParentPageInner() {
         )}
         {activeTab === "approvals" && <ApprovalQueue />}
         {activeTab === "planner" && (
-          <WeekPlanner
-            onNavigateToChildren={() => setActiveTab("children")}
-          />
+          <WeekPlanner onNavigateToChildren={() => setActiveTab("children")} />
         )}
         {activeTab === "jobs" && <JobManager />}
         {activeTab === "overview" && (

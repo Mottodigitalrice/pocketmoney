@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { memo, useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { Job, JobPriority, JobStatus } from "@/types";
 import { Button } from "@/components/ui/button";
@@ -20,7 +20,7 @@ interface JobCardProps {
   onComplete?: (proofFile?: File) => Promise<void> | void;
 }
 
-export function JobCard({
+function JobCardInner({
   job,
   status,
   instanceId,
@@ -215,3 +215,42 @@ export function JobCard({
     </motion.div>
   );
 }
+
+/**
+ * Wave 4a perf: JobCard renders inside three Kanban columns and re-renders
+ * on every Convex subscription tick (any job/instance update on the family).
+ * Memo with a tight equality check stops siblings from re-rendering when one
+ * card's status flips. Identity comparisons are intentional:
+ *   - `job` is the Job document — its `_id` + `title` + `yenAmount` are the
+ *     only fields the card reads from `job`.
+ *   - `instanceId` is the JobInstance id (stable per row).
+ *   - `parentNote`, `priority`, `status` are scalars.
+ *   - `onStart` / `onComplete` are closures from KanbanBoard. KanbanBoard
+ *     recreates them per render (not memoized upstream), so reference
+ *     equality would always fail. We skip them in arePropsEqual — the
+ *     callbacks read latest state via the captured props on call-time so
+ *     stale-closure risk is bounded to the single tick of state we're
+ *     about to overwrite anyway. If KanbanBoard later useCallback-wraps
+ *     these, the equality check still works.
+ *
+ * `key={instance._id}` on the AnimatePresence child in KanbanBoard is
+ * preserved by React.memo — memo is identity-aware via the wrapped
+ * component's outer key, not via internal prop comparison.
+ */
+function arePropsEqual(prev: JobCardProps, next: JobCardProps): boolean {
+  return (
+    prev.status === next.status &&
+    prev.instanceId === next.instanceId &&
+    prev.parentNote === next.parentNote &&
+    prev.priority === next.priority &&
+    prev.job._id === next.job._id &&
+    prev.job.title === next.job.title &&
+    prev.job.titleJa === next.job.titleJa &&
+    prev.job.titleKey === next.job.titleKey &&
+    prev.job.icon === next.job.icon &&
+    prev.job.yenAmount === next.job.yenAmount &&
+    prev.job.requiresPhotoProof === next.job.requiresPhotoProof
+  );
+}
+
+export const JobCard = memo(JobCardInner, arePropsEqual);
