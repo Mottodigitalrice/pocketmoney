@@ -762,6 +762,8 @@ const ja = {
   a11y_lucky_chest_opened: "ラッキーチェスト開封!¥{{amount}}ゲット!",
   a11y_weekly_goal_reached: "今週の目標達成!",
   a11y_rank_up: "{{nextRank}}にランクアップ!",
+  // stop-test-1b: ためるゴールが100%に到達したときの読み上げ用。
+  goal_reached_announce: "もくひょうたっせい!{{goalTitle}}をかえるよ。",
 
   // Wave 6 — icon-only button labels.
   a11y_logout: "ログアウト",

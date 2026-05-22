@@ -736,6 +736,8 @@ const en = {
   a11y_lucky_chest_opened: "Lucky Chest opened — earned ¥{{amount}}!",
   a11y_weekly_goal_reached: "Weekly goal reached!",
   a11y_rank_up: "Rank up to {{nextRank}}!",
+  // stop-test-1b: announced when a save-goal crosses 100% funded.
+  goal_reached_announce: "Goal reached! You can buy {{goalTitle}} now.",
 
   // Wave 6 — icon-only button labels.
   a11y_logout: "Log out",

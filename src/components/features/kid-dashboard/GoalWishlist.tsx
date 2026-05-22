@@ -1,7 +1,8 @@
 "use client";
 
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { Target } from "lucide-react";
+import { useReducedMotion } from "motion/react";
 import { usePocketMoney } from "@/hooks/use-pocket-money";
 import { useTranslation } from "@/hooks/use-translation";
 import { CURRENCY } from "@/lib/constants";
@@ -15,6 +16,53 @@ interface GoalWishlistProps {
 }
 
 const emojiOptions = ["🎮", "⚽", "🧸", "📚", "🚲", "🎧", "🎁", "🏴‍☠️"];
+
+interface CoinDrop {
+  id: number;
+  left: number;
+  delay: number;
+  duration: number;
+}
+
+/**
+ * stop-test-1b: brief coin-rain overlay when a save-goal crosses 100%.
+ * Mirrors LuckyChestCoinBurst (Wave 2a) but scoped to 8 coins / 2s — the
+ * goal-reached moment is a celebration but smaller than the chest open, so
+ * we keep the burst proportional. Skipped entirely under
+ * prefers-reduced-motion at the caller (pulse-gold is also disabled in CSS).
+ */
+function GoalReachedCoinBurst() {
+  const [coins] = useState<CoinDrop[]>(() =>
+    Array.from({ length: 8 }, (_, i) => ({
+      id: i,
+      left: 10 + Math.random() * 80,
+      delay: Math.random() * 0.6,
+      duration: 1.2 + Math.random() * 0.8,
+    })),
+  );
+  return (
+    <div
+      aria-hidden="true"
+      data-testid="goal-reached-coin-burst"
+      className="pointer-events-none fixed inset-0 z-40 overflow-hidden"
+    >
+      {coins.map((coin) => (
+        <div
+          key={coin.id}
+          className="animate-coin-rain absolute text-2xl"
+          style={{
+            left: `${coin.left}%`,
+            top: -32,
+            animationDelay: `${coin.delay}s`,
+            animationDuration: `${coin.duration}s`,
+          }}
+        >
+          🪙
+        </div>
+      ))}
+    </div>
+  );
+}
 
 /**
  * G2: GoalWishlistSkeleton — title row + progress bar + 2 line skeletons.
@@ -70,6 +118,19 @@ export function GoalWishlist({ childId }: GoalWishlistProps) {
   // still see the form expanded so the very first goal is one tap away.
   const [showSwapForm, setShowSwapForm] = useState(false);
 
+  // stop-test-1b: respect prefers-reduced-motion for the coin-rain overlay.
+  // The pulse-gold class is already disabled by the existing CSS media
+  // block (Wave 6), and the aria-live announcement always fires.
+  const prefersReducedMotion = useReducedMotion();
+
+  // stop-test-1b: track previous progress so the celebration fires once
+  // per < 100 → ≥ 100 crossing, not on every re-render (locale toggle,
+  // sibling Convex tick, etc.). Mirrors WeeklyTracker's Wave 2a pattern.
+  const [celebratingFull, setCelebratingFull] = useState(false);
+  const prevProgressRef = useRef<number>(0);
+  const celebrateTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const announceTitleRef = useRef<string>("");
+
   const goals = getGoalsForChild(childId);
   const recentGoals = useMemo(
     () =>
@@ -80,15 +141,48 @@ export function GoalWishlist({ childId }: GoalWishlistProps) {
     [goals],
   );
 
-  // G2: skeleton while context hydrates. Placed after hooks so order stays stable.
-  if (isLoading) return <GoalWishlistSkeleton />;
-
   const saveBalance = getWalletBalance(childId, "save");
   const activeGoal = getActiveGoalForChild(childId);
   const target = activeGoal?.targetAmount ?? 0;
   const progress =
     target > 0 ? Math.min(100, Math.round((saveBalance / target) * 100)) : 0;
   const remaining = Math.max(0, target - saveBalance);
+  const activeGoalTitle = activeGoal?.title ?? "";
+
+  useEffect(() => {
+    const prev = prevProgressRef.current;
+    prevProgressRef.current = progress;
+    if (prev < 100 && progress >= 100 && target > 0) {
+      // Capture the goal title at crossing time so a downstream goal swap
+      // doesn't change what we just announced.
+      announceTitleRef.current = activeGoalTitle;
+      // Defer the state write out of the effect body so we don't trigger a
+      // synchronous cascading render — matches the queueMicrotask pattern
+      // used by WeeklyTracker's Wave 2a celebration effect.
+      queueMicrotask(() => {
+        setCelebratingFull(true);
+      });
+      if (celebrateTimerRef.current) {
+        clearTimeout(celebrateTimerRef.current);
+      }
+      celebrateTimerRef.current = setTimeout(() => {
+        setCelebratingFull(false);
+        celebrateTimerRef.current = null;
+      }, 1500);
+    }
+  }, [progress, target, activeGoalTitle]);
+
+  useEffect(() => {
+    return () => {
+      if (celebrateTimerRef.current) {
+        clearTimeout(celebrateTimerRef.current);
+        celebrateTimerRef.current = null;
+      }
+    };
+  }, []);
+
+  // G2: skeleton while context hydrates. Placed after hooks so order stays stable.
+  if (isLoading) return <GoalWishlistSkeleton />;
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -133,6 +227,25 @@ export function GoalWishlist({ childId }: GoalWishlistProps) {
 
   return (
     <div className="mx-4 overflow-hidden rounded-2xl border border-sky-300/30 bg-sky-950/40 p-4 backdrop-blur-sm sm:mx-8">
+      {/* stop-test-1b: coin-rain on goal-reached. Skipped under reduced motion
+          — the aria-live announcement still fires below. */}
+      {celebratingFull && !prefersReducedMotion && <GoalReachedCoinBurst />}
+      {/* stop-test-1b: a11y announcement for the goal-reached crossing.
+          Mirrors WeeklyTracker / LuckyChest patterns — hidden polite live
+          region carries the same beat as the visual pulse + coin-burst. */}
+      {celebratingFull && (
+        <div
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
+          className="sr-only"
+          data-testid="goal-wishlist-a11y-announce"
+        >
+          {t("goal_reached_announce", {
+            goalTitle: announceTitleRef.current,
+          })}
+        </div>
+      )}
       <div className="mb-4 flex items-center gap-3">
         <div className="flex size-10 items-center justify-center rounded-xl bg-sky-500/20 text-sky-100">
           <Target className="size-5" />
@@ -167,9 +280,15 @@ export function GoalWishlist({ childId }: GoalWishlistProps) {
             </p>
           </div>
 
-          <div className="mt-4 h-4 overflow-hidden rounded-full bg-sky-950">
+          <div
+            className={`mt-4 h-4 overflow-hidden rounded-full bg-sky-950 ${
+              celebratingFull ? "animate-pulse-gold" : ""
+            }`}
+            data-testid="goal-wishlist-progress"
+            data-celebrating={celebratingFull ? "true" : "false"}
+          >
             <div
-              className="h-full rounded-full bg-gradient-to-r from-sky-300 to-emerald-300 transition-all duration-700"
+              className="h-full rounded-full bg-gradient-to-r from-sky-300 to-emerald-300 transition-all duration-300 ease-out"
               style={{ width: `${progress}%` }}
             />
           </div>

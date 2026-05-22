@@ -8,7 +8,8 @@
  *   - Completed state: saveBalance >= targetAmount → 100% funded + "Ready!".
  *   - Skeleton variant renders when isLoading=true.
  */
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi, afterEach } from "vitest";
+import { act } from "react";
 import { renderWithProviders, fireEvent } from "./test-utils";
 import { GoalWishlist } from "@/components/features/kid-dashboard/GoalWishlist";
 import type { Goal } from "@/types";
@@ -200,5 +201,135 @@ describe("GoalWishlist — S5 (R4) collapse swap form behind toggle (F10 6.6)", 
     );
     const toggle = getByTestId("goal-new-toggle");
     expect(toggle).toHaveTextContent(/ほかのもほしい/);
+  });
+});
+
+// stop-test-1b — goal milestone celebration (Wave 2 survey follow-up).
+// The progress bar pulses gold + a brief coin-rain fires when the goal
+// crosses < 100 → ≥ 100, and a polite aria-live region announces the
+// crossing. Mirrors WeeklyTracker's Wave 2a pattern.
+describe("GoalWishlist — stop-test-1b goal milestone celebration", () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it("locks the progress bar transition to duration-300 (regression-pin)", () => {
+    // Wave 2 survey called out duration-700 as too sluggish; we tightened
+    // to duration-300 ease-out to match the WeeklyTracker pacing. Pin it.
+    const { container } = renderWithProviders(
+      <GoalWishlist childId={CHILD_ID} />,
+      {
+        contextValue: {
+          getActiveGoalForChild: () => goalFixture({ targetAmount: 1000 }),
+          getGoalsForChild: () => [goalFixture({ targetAmount: 1000 })],
+          getWalletBalance: () => 250,
+        },
+      },
+    );
+    const bar = container.querySelector(
+      ".bg-gradient-to-r.from-sky-300",
+    ) as HTMLElement | null;
+    expect(bar).not.toBeNull();
+    expect(bar!.className).toMatch(/duration-300/);
+    expect(bar!.className).toMatch(/ease-out/);
+    // And the slow Wave-1 transition is gone.
+    expect(bar!.className).not.toMatch(/duration-700/);
+  });
+
+  it("flips celebrating state when progress crosses < 100 → ≥ 100 and clears after 1500ms", async () => {
+    vi.useFakeTimers();
+    // First render: 50% — below the threshold. Mock the context's
+    // saveBalance via a mutable closure so we can re-render with new
+    // values without changing the goal identity.
+    let balance = 500; // 50% of 1000 target
+    const goal = goalFixture({ targetAmount: 1000 });
+    const { getByTestId, queryByTestId, rerender } = renderWithProviders(
+      <GoalWishlist childId={CHILD_ID} />,
+      {
+        contextValue: {
+          getActiveGoalForChild: () => goal,
+          getGoalsForChild: () => [goal],
+          getWalletBalance: () => balance,
+        },
+      },
+    );
+    // Pre-crossing: progress bar is NOT celebrating, no a11y announce.
+    const bar = getByTestId("goal-wishlist-progress");
+    expect(bar.dataset.celebrating).toBe("false");
+    expect(queryByTestId("goal-wishlist-a11y-announce")).toBeNull();
+
+    // Push the balance past the target and re-render. The effect's
+    // queueMicrotask flips celebratingFull to true on next tick — drain
+    // microtasks via act() so React commits the state update.
+    balance = 1200;
+    await act(async () => {
+      rerender(<GoalWishlist childId={CHILD_ID} />);
+      await Promise.resolve();
+    });
+
+    // Celebrating now: data-attribute flipped, pulse-gold class applied,
+    // coin-burst overlay rendered, aria-live region announces the title.
+    expect(bar.dataset.celebrating).toBe("true");
+    expect(bar.className).toMatch(/animate-pulse-gold/);
+    expect(getByTestId("goal-reached-coin-burst")).toBeInTheDocument();
+    const announce = getByTestId("goal-wishlist-a11y-announce");
+    expect(announce).toBeInTheDocument();
+    expect(announce).toHaveTextContent(/Goal reached/i);
+    expect(announce).toHaveTextContent(/New skateboard/);
+
+    // After 1500ms the celebration clears — bar drops the pulse,
+    // overlay + announce unmount.
+    await act(async () => {
+      vi.advanceTimersByTime(1500);
+    });
+    expect(bar.dataset.celebrating).toBe("false");
+    expect(bar.className).not.toMatch(/animate-pulse-gold/);
+    expect(queryByTestId("goal-reached-coin-burst")).toBeNull();
+    expect(queryByTestId("goal-wishlist-a11y-announce")).toBeNull();
+  });
+
+  it("does NOT fire on first render when progress is already ≥ 100 (no false crossing)", () => {
+    // A kid returning to the app with a fully-funded goal shouldn't
+    // re-trigger the celebration every time the page mounts.
+    const { queryByTestId, getByTestId } = renderWithProviders(
+      <GoalWishlist childId={CHILD_ID} />,
+      {
+        contextValue: {
+          getActiveGoalForChild: () => goalFixture({ targetAmount: 500 }),
+          getGoalsForChild: () => [goalFixture({ targetAmount: 500 })],
+          getWalletBalance: () => 600,
+        },
+      },
+    );
+    expect(getByTestId("goal-wishlist-progress").dataset.celebrating).toBe(
+      "false",
+    );
+    expect(queryByTestId("goal-reached-coin-burst")).toBeNull();
+    expect(queryByTestId("goal-wishlist-a11y-announce")).toBeNull();
+  });
+
+  it("renders the JP version of the goal-reached announcement", async () => {
+    vi.useFakeTimers();
+    let balance = 100;
+    const goal = goalFixture({ targetAmount: 1000, title: "ゲーム機" });
+    const { getByTestId, rerender } = renderWithProviders(
+      <GoalWishlist childId={CHILD_ID} />,
+      {
+        initialLang: "ja",
+        contextValue: {
+          getActiveGoalForChild: () => goal,
+          getGoalsForChild: () => [goal],
+          getWalletBalance: () => balance,
+        },
+      },
+    );
+    balance = 1500;
+    await act(async () => {
+      rerender(<GoalWishlist childId={CHILD_ID} />);
+      await Promise.resolve();
+    });
+    const announce = getByTestId("goal-wishlist-a11y-announce");
+    expect(announce).toHaveTextContent(/もくひょうたっせい/);
+    expect(announce).toHaveTextContent(/ゲーム機/);
   });
 });
