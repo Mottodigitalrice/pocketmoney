@@ -5,6 +5,7 @@ import type { MutationCtx, QueryCtx } from "../_generated/server";
 import { getCurrentUser } from "./users";
 import { creditApprovedJob } from "./wallets";
 import { assertOwnedBy, assertOwnedByOrNull } from "../lib/auth";
+import { sanitizeParentNote } from "../lib/inputValidation";
 
 const PROOF_RETENTION_MS = 14 * 24 * 60 * 60 * 1000;
 /**
@@ -383,11 +384,19 @@ export const reject = mutation({
       throw new Error("CANNOT_REJECT_APPROVED_INSTANCE");
     }
 
+    // MED-2 (wave 3a): cap parentNote at 500 chars and strip ASCII control
+    // chars (except LF). Defense-in-depth — the client React-escapes on
+    // render, but persisting NULs/DEL/etc. can later corrupt JSON exports,
+    // CSV downloads, and DB-level FTS. Throws PARENT_NOTE_TOO_LONG if the
+    // raw input exceeds the cap (counted pre-strip so a sneaky NUL bomb
+    // can't pass).
+    const sanitizedNote = sanitizeParentNote(args.parentNote);
+
     await ctx.db.patch(args.instanceId, {
       status: "rejected",
       rejectedAt: Date.now(),
       rejectionCount: (instance.rejectionCount ?? 0) + 1,
-      parentNote: args.parentNote,
+      parentNote: sanitizedNote,
     });
     return null;
   },

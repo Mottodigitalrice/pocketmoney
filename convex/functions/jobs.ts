@@ -3,6 +3,11 @@ import { mutation, query } from "../_generated/server";
 import { getCurrentUser } from "./users";
 import { deleteJobInstanceAndProof } from "./jobInstances";
 import { assertOwnedBy, assertOwnedByOrNull } from "../lib/auth";
+import {
+  assertJobTitle,
+  assertJobTitleJa,
+  assertJobYenAmount,
+} from "../lib/inputValidation";
 
 const recurrenceValidator = v.object({
   type: v.union(
@@ -77,6 +82,14 @@ export const create = mutation({
   returns: v.id("jobs"),
   handler: async (ctx, args) => {
     const user = await getCurrentUser(ctx);
+
+    // MED-3 (wave 3a): cap title/amount to prevent ledger inflation and UI DoS.
+    assertJobTitle(args.title);
+    if (args.titleJa !== undefined) {
+      assertJobTitleJa(args.titleJa);
+    }
+    assertJobYenAmount(args.yenAmount);
+
     return await ctx.db.insert("jobs", {
       userId: user._id,
       title: args.title,
@@ -115,6 +128,18 @@ export const update = mutation({
       "job",
     );
     if (!job) return null;
+
+    // MED-3 (wave 3a): cap title/amount to prevent ledger inflation and UI DoS.
+    // `update` accepts a partial — guard each field only when actually passed.
+    if (args.title !== undefined) {
+      assertJobTitle(args.title);
+    }
+    if (args.titleJa !== undefined) {
+      assertJobTitleJa(args.titleJa);
+    }
+    if (args.yenAmount !== undefined) {
+      assertJobYenAmount(args.yenAmount);
+    }
 
     const { jobId, ...updates } = args;
     const filteredUpdates = Object.fromEntries(

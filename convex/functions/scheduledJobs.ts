@@ -5,6 +5,7 @@ import { creditApprovedJob } from "./wallets";
 import { deleteJobInstanceAndProof } from "./jobInstances";
 import { assertOwnedBy, assertOwnedByOrNull } from "../lib/auth";
 import { recurrenceMatchesDateMonIndexed } from "../lib/recurrence";
+import { assertIsoDate } from "../lib/dateValidation";
 
 const priorityValidator = v.union(v.literal("mustDo"), v.literal("optional"));
 
@@ -74,6 +75,12 @@ export const create = mutation({
   returns: v.id("scheduledJobs"),
   handler: async (ctx, args) => {
     const user = await getCurrentUser(ctx);
+
+    // MED-4 (wave 3a): validate the ISO date shape before any DB read/write
+    // so a malformed `args.date` fails fast rather than poisoning the
+    // `by_child_date` index with an unparseable key.
+    assertIsoDate(args.date, "date");
+
     const [job, child] = await Promise.all([
       ctx.db.get(args.jobId),
       ctx.db.get(args.childId),
@@ -107,6 +114,14 @@ export const createBatch = mutation({
   returns: v.array(v.id("scheduledJobs")),
   handler: async (ctx, args) => {
     const user = await getCurrentUser(ctx);
+
+    // MED-4 (wave 3a): validate every ISO date upfront in a single pass so a
+    // bad date in entry N doesn't partial-write entries 0..N-1.
+    for (let i = 0; i < args.entries.length; i++) {
+      const entry = args.entries[i]!; // safe: i bounded by args.entries.length
+      assertIsoDate(entry.date, `entries[${i}].date`);
+    }
+
     const now = Date.now();
     const ids = [];
     for (let i = 0; i < args.entries.length; i++) {
@@ -144,6 +159,13 @@ export const applyRecurringForWeek = mutation({
     }
 
     const user = await getCurrentUser(ctx);
+
+    // MED-4 (wave 3a): validate every weekDate upfront so a bad string
+    // can't reach the `by_child_date` index lookup or insert.
+    for (let i = 0; i < args.weekDates.length; i++) {
+      assertIsoDate(args.weekDates[i], `weekDates[${i}]`);
+    }
+
     const now = Date.now();
     const ids = [];
     let offset = 0;
@@ -202,6 +224,10 @@ export const quickAddForToday = mutation({
   returns: v.array(v.union(v.id("scheduledJobs"), v.id("jobInstances"))),
   handler: async (ctx, args) => {
     const user = await getCurrentUser(ctx);
+
+    // MED-4 (wave 3a): validate ISO date upfront before any DB read/write.
+    assertIsoDate(args.date, "date");
+
     const job = assertOwnedBy(await ctx.db.get(args.jobId), user._id, "job");
 
     const now = Date.now();

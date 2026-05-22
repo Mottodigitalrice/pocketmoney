@@ -11,6 +11,12 @@ export default defineSchema({
     imageUrl: v.optional(v.string()),
     captainCodeEnabled: v.optional(v.boolean()),
     luckyChestMaxAmount: v.optional(v.number()),
+    // MED-1 (wave 3a): timestamp of the last `luckyChests.open` attempt by
+    // this user (across all children). Used to enforce a 5-second per-user
+    // cooldown that prevents rapid button-mashing on the kid dashboard.
+    // Optional/additive — pre-existing rows have undefined → no cooldown
+    // on first open, which is the desired UX.
+    lastLuckyChestAttemptAt: v.optional(v.number()),
     createdAt: v.number(),
   })
     .index("by_clerk_id", ["clerkId"])

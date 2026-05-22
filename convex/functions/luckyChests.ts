@@ -6,6 +6,7 @@ import { getCurrentUser } from "./users";
 import { creditBonus } from "./wallets";
 import { assertOwnedBy } from "../lib/auth";
 import { pickLuckyChestAmount } from "../lib/luckyChestMath";
+import { LUCKY_CHEST_COOLDOWN_MS } from "../lib/inputValidation";
 
 const luckyChestDocValidator = v.object({
   _id: v.id("luckyChests"),
@@ -145,6 +146,26 @@ export const open = mutation({
     const user = await getCurrentUser(ctx);
     assertOwnedBy(await ctx.db.get(args.childId), user._id, "child");
 
+    // MED-1 (wave 3a): per-user button-mash cooldown. Week-level
+    // idempotency (the `by_child_week` unique lookup below at line ~178)
+    // remains the security boundary that guarantees one open per week.
+    // This cooldown is purely a UX guard against rapid double-tap on a
+    // flaky network — it throws a distinct structured error so the client
+    // can show a "wait a moment / 少し待ってからもう一度" toast instead of
+    // surfacing the harsher "already opened this week" copy.
+    const now = Date.now();
+    if (
+      user.lastLuckyChestAttemptAt !== undefined &&
+      now - user.lastLuckyChestAttemptAt < LUCKY_CHEST_COOLDOWN_MS
+    ) {
+      throw new Error("LUCKY_CHEST_COOLDOWN");
+    }
+    // Stamp the attempt timestamp BEFORE doing any DB writes / random work
+    // so even if downstream throws (e.g. lock-state changed mid-flight),
+    // the next call still observes the cooldown. Convex serializes
+    // mutations per document, so this patch+read sequence is safe.
+    await ctx.db.patch(user._id, { lastLuckyChestAttemptAt: now });
+
     const maxAmount = user.luckyChestMaxAmount ?? 100;
     if (maxAmount <= 0) {
       throw new Error("Lucky Chest max amount is not set");
@@ -171,13 +192,12 @@ export const open = mutation({
     }
 
     const amount = pickLuckyChestAmount(maxAmount);
-    const openedAt = Date.now();
     const chestId = await ctx.db.insert("luckyChests", {
       userId: user._id,
       childId: args.childId,
       weekStart,
       amount,
-      openedAt,
+      openedAt: now,
     });
 
     await creditBonus(ctx, {
