@@ -2,6 +2,75 @@
 
 All notable changes to Pirate Money. Format inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); the project does not follow strict semver until friends rollout.
 
+## [Unreleased] — 2026-05-23 — Autonomous Round 5 (waves 2-7)
+
+Local autonomous session ran 7 waves on this branch (`claude/autonomous-project-analysis-wW6I8`). All builder waves shipped real code; reviewer waves verified before promotion.
+
+### Security
+
+- Defense-in-depth validators across 4 MEDIUM gaps surfaced in Round-5 security re-audit (wave-3a, `a905519`):
+  - **MED-1** Lucky Chest open — 5-second per-user button-mash cooldown via additive optional `users.lastLuckyChestAttemptAt` (week-level idempotency remains the security boundary).
+  - **MED-2** Job rejection note — 500-char cap (pre-strip count to block NUL-bomb DoS) + ASCII control-char strip.
+  - **MED-3** Job library — title/titleJa 100-char caps; yenAmount integer ∈ [0, ¥1,000,000] cap.
+  - **MED-4** Scheduled-job date strings — ISO `YYYY-MM-DD` regex + round-trip parse (catches `2026-02-30`, non-leap `2026-02-29`, month 13).
+- Pure validators with 56 new unit tests in `convex/lib/{inputValidation,dateValidation}.ts`. Bilingual `mapConvexError` pipeline unchanged.
+
+### UX / Animations (wave-2a, `7102ba3`)
+
+- `prefers-reduced-motion` media block in `globals.css` neutralizes all 12 ambient infinite animations (`bob`, `wave-*`, `shimmer`, `pulse-gold`, `sparkle`, `treasure-glow`, `coin-spin`, `float-gentle`, `coin-float`, `scroll-hint`). Essential feedback animations (`scale-bounce`, `pm-rank-up-toast-enter`) intentionally preserved per WCAG 2.3.3 (reduce ≠ eliminate; motion-as-feedback is allowable).
+- **WeeklyTracker** — progress bar 1000ms → 300ms ease-out; `pulse-gold` celebration on 100% crossing with timeout cleanup.
+- **LuckyChest** — open success triggers a 12-coin burst overlay (2s) + `animate-scale-bounce` on the amount text.
+- **JobCard** — wrapped in `motion.div` with `layout` + slide-in/out + `useReducedMotion` guard; `KanbanBoard` uses `AnimatePresence mode="popLayout"` so column changes feel intentional.
+- **SiblingRankBoard** — `LayoutGroup` + per-row `motion.div layoutId` springs (stiffness 350, damping 30) for smooth reorder; reduced-motion drops to 100ms linear.
+- **RankUpToast** — `.pm-rank-up-toast` keyframe (cubic-bezier overshoot) — fills in the previously-defined-but-unused className.
+
+### A11y (wave-6a, `082d1e6`)
+
+- Hidden `role="status" aria-live="polite"` regions on LuckyChest open, WeeklyTracker 100%, and RankUpToast — screen readers now hear the celebration.
+- Focus-ring polish — `*:focus-visible` 2px gold box-shadow ring via CSS var `--pm-focus-ring` (overridable).
+- Icon-only buttons gained aria-labels — ParentHeader Home + Logout; GoalWishlist emoji picker tiles (aria-pressed + per-tile aria-label).
+- Decorative animation overlays (`LuckyChestCoinBurst`) marked `aria-hidden`.
+
+### Japanese typography (wave-6a, `082d1e6`)
+
+- `BudouXText` wraps applied to LuckyChest body strings (3 branches), WeeklyTracker progress + zero-hint, and ApprovalQueue first-day + caught-up empty states.
+
+### Performance (wave-4a, `a68f9ec`)
+
+- Parent dashboard tabs 3-6 (WeekPlanner, JobManager, ChildOverview, ChildManager, LuckyChestSettings) lazy-loaded via `next/dynamic({ ssr: false })` with `AppSkeleton` fallback. QuickAddToday + ApprovalQueue stay eager on the default tab.
+- `JobCard` wrapped in `React.memo` with an explicit 11-prop equality check (excludes `onStart` / `onComplete` closures that recreate per render — Convex mutations capture latest IDs from args, not closures).
+- `LanguageProvider` context value verified-memoized via `useMemo` + new regression tests.
+- `DolphinCelebration` already dynamic — verified, locked in a test.
+
+### Polish (wave-7a, `04e6dc5`)
+
+- **ApprovalQueue** — distinct first-day ("Ready for your crew's first job?", compass icon) vs caught-up ("All caught up!", anchor) empty states; derived from `jobInstances.some(i => i.status === "approved")` — no new Convex query needed.
+- **Parent dashboard** — smart default tab — `overview` when family has ≥1 approved instance, `quick_add` otherwise. URL `?tab=` override still wins (search-param bookmarks unaffected).
+- **TreasureHistoryCalendar** — zero-history renders the dimmed 7-day grid shell + centered overlay card with treasure-map icon + warmer "starts here" copy.
+
+### i18n (12 new keys × 2 locales)
+
+- `a11y_lucky_chest_opened`, `a11y_weekly_goal_reached`, `a11y_rank_up`, `a11y_logout`, `a11y_home`, `a11y_pick_emoji`
+- `approval_queue_first_day_title`, `approval_queue_first_day_body`, `approval_queue_caught_up_title`, `approval_queue_caught_up_body`
+- `treasure_history_empty_title`, `treasure_history_empty_body`
+
+### Tests
+
+- Backend: 240 → 296 (+56). MED validators + ISO date round-trip + control-char strip edge cases.
+- UI: 142 → 218 (+76). New surfaces: animation (9), perf boundaries (6), a11y audit (21), BonusDialogBody (6), ApprovalCard (8), ChildForm (9), LuckyChest (5), WithdrawalDialogBody (4), ApprovalQueue first-day + caught-up (3), TreasureHistoryCalendar (2 augment), parent-default-tab (4). Plus onboarding flake harden (wave-5b, `ab33c77`) — zero net but file runtime 15s → 1.2s via `vi.useFakeTimers`.
+- **Total: 359 → 514 (+155).** All green.
+
+### CI / repo hygiene
+
+- Lint zero, tsc zero across the entire diff.
+- Pre-commit hook (lint-staged + simple-git-hooks) shipped prior round; preserved.
+- No new dependencies, no peer-dep bumps, no schema-breaking changes (`users.lastLuckyChestAttemptAt` is additive optional).
+
+### Notes
+
+- Round-5 commit range on `Mottodigitalrice/pocketmoney`: `7817b76..04e6dc5` (7 commits).
+- Sentry stub from prior round remains zero-spend; no DSN set this round.
+
 ## [Unreleased] — 2026-05-22 — Autonomous polish session
 
 Cloud + local autonomous session ran wave-based execution on this branch. Local-session shipped real code per below; cloud-session shipped paint-by-numbers spec docs (see `projects/active/piratemoney/working-files/2026-05-21-*-specs/`).
