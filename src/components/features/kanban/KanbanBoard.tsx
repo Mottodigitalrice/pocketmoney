@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import dynamic from "next/dynamic";
+import { AnimatePresence } from "motion/react";
 import { usePocketMoney } from "@/hooks/use-pocket-money";
 import { useTranslation } from "@/hooks/use-translation";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -211,20 +212,24 @@ export function KanbanBoard({ childId }: KanbanBoardProps) {
             columnType="available"
             softEmpty
           >
-            {available.map((sj) => (
-              <JobCard
-                key={sj._id}
-                job={sj.job}
-                status="available"
-                {...(sj.parentNote !== undefined
-                  ? { parentNote: sj.parentNote }
-                  : {})}
-                {...(sj.priority !== undefined
-                  ? { priority: sj.priority }
-                  : {})}
-                onStart={() => handleStart(sj.jobId, sj._id)}
-              />
-            ))}
+            {/* Wave 2a polish: AnimatePresence with popLayout lets each card
+                slide/fade in + out as its status changes between columns. */}
+            <AnimatePresence mode="popLayout" initial={false}>
+              {available.map((sj) => (
+                <JobCard
+                  key={sj._id}
+                  job={sj.job}
+                  status="available"
+                  {...(sj.parentNote !== undefined
+                    ? { parentNote: sj.parentNote }
+                    : {})}
+                  {...(sj.priority !== undefined
+                    ? { priority: sj.priority }
+                    : {})}
+                  onStart={() => handleStart(sj.jobId, sj._id)}
+                />
+              ))}
+            </AnimatePresence>
           </KanbanColumn>
         </div>
 
@@ -237,17 +242,19 @@ export function KanbanBoard({ childId }: KanbanBoardProps) {
             columnType="doing"
             softEmpty
           >
-            {inProgress.map((inst) => (
-              <JobCard
-                key={inst._id}
-                job={inst.job}
-                status="in_progress"
-                instanceId={inst._id}
-                onComplete={(proofFile) =>
-                  handleComplete(inst._id, inst.jobId, proofFile)
-                }
-              />
-            ))}
+            <AnimatePresence mode="popLayout" initial={false}>
+              {inProgress.map((inst) => (
+                <JobCard
+                  key={inst._id}
+                  job={inst.job}
+                  status="in_progress"
+                  instanceId={inst._id}
+                  onComplete={(proofFile) =>
+                    handleComplete(inst._id, inst.jobId, proofFile)
+                  }
+                />
+              ))}
+            </AnimatePresence>
           </KanbanColumn>
         </div>
 
@@ -260,14 +267,16 @@ export function KanbanBoard({ childId }: KanbanBoardProps) {
             columnType="done"
             softEmpty
           >
-            {completed.map((inst) => (
-              <JobCard
-                key={inst._id}
-                job={inst.job}
-                status="completed"
-                instanceId={inst._id}
-              />
-            ))}
+            <AnimatePresence mode="popLayout" initial={false}>
+              {completed.map((inst) => (
+                <JobCard
+                  key={inst._id}
+                  job={inst.job}
+                  status="completed"
+                  instanceId={inst._id}
+                />
+              ))}
+            </AnimatePresence>
           </KanbanColumn>
         </div>
       </div>

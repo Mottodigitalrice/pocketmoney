@@ -4,7 +4,7 @@ import { usePocketMoney } from "@/hooks/use-pocket-money";
 import { CURRENCY } from "@/lib/constants";
 import dynamic from "next/dynamic";
 import { useTranslation } from "@/hooks/use-translation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { WalletJarBalances } from "@/components/features/shared/WalletJarBalances";
 
 // F21: chest animation only renders when the user taps the wallet card.
@@ -41,6 +41,44 @@ export function WeeklyTracker({ childId }: WeeklyTrackerProps) {
   const potential = getWeeklyPotential(childId);
   const percentage = potential > 0 ? Math.round((earned / potential) * 100) : 0;
 
+  // Wave 2a polish: pulse the progress bar when the kid first crosses 100%.
+  // We track the previous-render's percentage so re-renders below the
+  // threshold (e.g. locale toggles) don't re-fire the pulse. The 1500ms
+  // window matches the `animate-pulse-gold` keyframe loop (2s ease) so it
+  // gets one full visual pulse before disabling.
+  const [celebratingFull, setCelebratingFull] = useState(false);
+  const prevPercentRef = useRef<number>(percentage);
+  const celebrateTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    const prev = prevPercentRef.current;
+    prevPercentRef.current = percentage;
+    if (prev < 100 && percentage >= 100) {
+      // Defer the state write out of the effect body so we don't trigger a
+      // synchronous cascading render — matches the queueMicrotask pattern
+      // used by KanbanBoard's approval-celebration effect.
+      queueMicrotask(() => {
+        setCelebratingFull(true);
+      });
+      if (celebrateTimerRef.current) {
+        clearTimeout(celebrateTimerRef.current);
+      }
+      celebrateTimerRef.current = setTimeout(() => {
+        setCelebratingFull(false);
+        celebrateTimerRef.current = null;
+      }, 1500);
+    }
+  }, [percentage]);
+
+  useEffect(() => {
+    return () => {
+      if (celebrateTimerRef.current) {
+        clearTimeout(celebrateTimerRef.current);
+        celebrateTimerRef.current = null;
+      }
+    };
+  }, []);
+
   return (
     <>
       <div
@@ -71,9 +109,15 @@ export function WeeklyTracker({ childId }: WeeklyTrackerProps) {
                   </p>
                 </div>
               </div>
-              <div className="mt-2 h-3 overflow-hidden rounded-full bg-amber-950">
+              <div
+                className={`mt-2 h-3 overflow-hidden rounded-full bg-amber-950 ${
+                  celebratingFull ? "animate-pulse-gold" : ""
+                }`}
+                data-testid="weekly-tracker-progress"
+                data-celebrating={celebratingFull ? "true" : "false"}
+              >
                 <div
-                  className="h-full rounded-full bg-gradient-to-r from-amber-400 to-yellow-300 transition-all duration-1000"
+                  className="h-full rounded-full bg-gradient-to-r from-amber-400 to-yellow-300 transition-all duration-300 ease-out"
                   style={{ width: `${Math.min(percentage, 100)}%` }}
                 />
               </div>

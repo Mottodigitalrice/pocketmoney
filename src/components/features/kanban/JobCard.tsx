@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { motion, useReducedMotion } from "motion/react";
 import { Job, JobPriority, JobStatus } from "@/types";
 import { Button } from "@/components/ui/button";
 import { CURRENCY } from "@/lib/constants";
@@ -36,6 +37,14 @@ export function JobCard({
   const [retryable, setRetryable] = useState(false);
   const { t, locale } = useTranslation();
   const requiresPhotoProof = Boolean(job.requiresPhotoProof);
+  // Wave 2a polish: respect prefers-reduced-motion at the motion-prop level
+  // for slide/fade transitions. CSS handles the keyframe classes; the
+  // motion wrapper still needs an explicit hook to drop its own transitions
+  // since framer-motion ignores the CSS media query.
+  const prefersReducedMotion = useReducedMotion();
+  const motionTransition = prefersReducedMotion
+    ? { duration: 0 }
+    : { duration: 0.25, ease: "easeOut" as const };
 
   const handleAction = async () => {
     if (status === "in_progress" && requiresPhotoProof && !proofFile) {
@@ -73,11 +82,16 @@ export function JobCard({
   };
 
   return (
-    <div
+    <motion.div
       data-testid="job-card"
       data-job-id={job._id}
       data-instance-id={instanceId}
       data-status={status}
+      layout
+      initial={{ opacity: 0, x: -16 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: 16 }}
+      transition={motionTransition}
       className={`animate-bob group relative overflow-hidden rounded-2xl border-2 bg-white/90 p-4 shadow-lg backdrop-blur-sm transition-all duration-300 hover:shadow-xl ${
         bouncing ? "animate-scale-bounce" : ""
       } ${
@@ -198,6 +212,6 @@ export function JobCard({
           <span className="font-semibold">{t("job_waiting")}</span>
         </div>
       )}
-    </div>
+    </motion.div>
   );
 }

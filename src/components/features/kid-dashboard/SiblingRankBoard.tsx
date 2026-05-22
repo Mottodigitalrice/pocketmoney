@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { Trophy } from "lucide-react";
+import { LayoutGroup, motion, useReducedMotion } from "motion/react";
 import { usePocketMoney } from "@/hooks/use-pocket-money";
 import { useTranslation } from "@/hooks/use-translation";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -85,6 +86,15 @@ export function SiblingRankBoard({ childId }: SiblingRankBoardProps) {
     jobInstances,
     jobs,
   } = usePocketMoney();
+  // Wave 2a polish: respect prefers-reduced-motion for the layout-driven
+  // reorder spring. CSS media-query covers transition-duration, but the
+  // motion-layout engine needs its own opt-out. When reduced, we collapse
+  // the spring to a 100ms linear tween so the row still moves smoothly to
+  // its new spot but without the bouncy spring overshoot.
+  const prefersReducedMotion = useReducedMotion();
+  const rowTransition = prefersReducedMotion
+    ? { duration: 0.1, ease: "linear" as const }
+    : { type: "spring" as const, stiffness: 350, damping: 30 };
 
   // Toggle state: lifetime (default) vs weekly. Trailing sibling can flip
   // to see the fair-fight surface. Public on both views — sibling positions
@@ -242,72 +252,77 @@ export function SiblingRankBoard({ childId }: SiblingRankBoardProps) {
         </div>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2">
-        {rankedChildren.map(({ child, rank, total, weeklyTotal }, index) => {
-          const iconConfig = CHILD_ICON_CONFIG[child.icon as ChildIcon];
-          const isCurrentChild = child._id === childId;
-          // Weekly view shows the week-yen prominently; lifetime view keeps
-          // the existing wallet-total display. Bar still tracks rank progress
-          // in lifetime view; in weekly view the bar reflects relative weekly
-          // share so a kid who's #1 this week sees a full bar.
-          const topWeekly = rankedChildren[0]?.weeklyTotal ?? 0;
-          const weeklyBarPercent =
-            view === "weekly" && topWeekly > 0
-              ? Math.min(100, Math.round((weeklyTotal / topWeekly) * 100))
-              : rank.progress;
-          return (
-            <div
-              key={child._id}
-              data-testid={`rank-row-${child._id}`}
-              className={`rounded-xl border p-3 ${
-                isCurrentChild
-                  ? "border-amber-300/60 bg-amber-700/30"
-                  : "border-amber-700/20 bg-amber-900/25"
-              }`}
-            >
-              <div className="flex items-start gap-3">
-                <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-amber-950/60 text-sm font-extrabold text-amber-100">
-                  #{index + 1}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2">
-                    <span className="text-2xl">
-                      {iconConfig?.emoji ?? "👤"}
-                    </span>
-                    <p className="truncate font-extrabold text-amber-100">
-                      {child.name}
+      <LayoutGroup id="sibling-rank-board">
+        <div className="grid gap-3 sm:grid-cols-2">
+          {rankedChildren.map(({ child, rank, total, weeklyTotal }, index) => {
+            const iconConfig = CHILD_ICON_CONFIG[child.icon as ChildIcon];
+            const isCurrentChild = child._id === childId;
+            // Weekly view shows the week-yen prominently; lifetime view keeps
+            // the existing wallet-total display. Bar still tracks rank progress
+            // in lifetime view; in weekly view the bar reflects relative weekly
+            // share so a kid who's #1 this week sees a full bar.
+            const topWeekly = rankedChildren[0]?.weeklyTotal ?? 0;
+            const weeklyBarPercent =
+              view === "weekly" && topWeekly > 0
+                ? Math.min(100, Math.round((weeklyTotal / topWeekly) * 100))
+                : rank.progress;
+            return (
+              <motion.div
+                key={child._id}
+                layout
+                layoutId={`rank-row-${child._id}`}
+                transition={rowTransition}
+                data-testid={`rank-row-${child._id}`}
+                className={`rounded-xl border p-3 ${
+                  isCurrentChild
+                    ? "border-amber-300/60 bg-amber-700/30"
+                    : "border-amber-700/20 bg-amber-900/25"
+                }`}
+              >
+                <div className="flex items-start gap-3">
+                  <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-amber-950/60 text-sm font-extrabold text-amber-100">
+                    #{index + 1}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                      <span className="text-2xl">
+                        {iconConfig?.emoji ?? "👤"}
+                      </span>
+                      <p className="truncate font-extrabold text-amber-100">
+                        {child.name}
+                      </p>
+                    </div>
+                    <p className="mt-1 text-sm font-bold text-amber-200">
+                      {rank.rank}
                     </p>
                   </div>
-                  <p className="mt-1 text-sm font-bold text-amber-200">
-                    {rank.rank}
+                  <p className="shrink-0 text-right text-sm font-bold text-amber-100">
+                    {CURRENCY}
+                    {(view === "weekly" ? weeklyTotal : total).toLocaleString()}
                   </p>
                 </div>
-                <p className="shrink-0 text-right text-sm font-bold text-amber-100">
-                  {CURRENCY}
-                  {(view === "weekly" ? weeklyTotal : total).toLocaleString()}
-                </p>
-              </div>
 
-              <div className="mt-3 h-2 overflow-hidden rounded-full bg-amber-950">
-                <div
-                  className="h-full rounded-full bg-gradient-to-r from-amber-300 to-yellow-200"
-                  style={{ width: `${weeklyBarPercent}%` }}
-                />
-              </div>
-              <p className="mt-1 text-xs text-amber-200/70">
-                {view === "weekly"
-                  ? t("rank_toggle_weekly")
-                  : rank.nextRank
-                    ? t("rank_next", {
-                        rank: rank.nextRank,
-                        score: (rank.nextScore ?? 0).toLocaleString(),
-                      })
-                    : t("rank_max")}
-              </p>
-            </div>
-          );
-        })}
-      </div>
+                <div className="mt-3 h-2 overflow-hidden rounded-full bg-amber-950">
+                  <div
+                    className="h-full rounded-full bg-gradient-to-r from-amber-300 to-yellow-200"
+                    style={{ width: `${weeklyBarPercent}%` }}
+                  />
+                </div>
+                <p className="mt-1 text-xs text-amber-200/70">
+                  {view === "weekly"
+                    ? t("rank_toggle_weekly")
+                    : rank.nextRank
+                      ? t("rank_next", {
+                          rank: rank.nextRank,
+                          score: (rank.nextScore ?? 0).toLocaleString(),
+                        })
+                      : t("rank_max")}
+                </p>
+              </motion.div>
+            );
+          })}
+        </div>
+      </LayoutGroup>
 
       {/* G5: private kudos line — only renders for the current child, both
           views. Self-vs-self comparison; siblings never see it. */}

@@ -531,3 +531,71 @@
 .animate-scroll-hint {
   animation: scroll-hint 2s ease-in-out infinite;
 }
+
+/* ============================================
+   RANK-UP TOAST (sonner classNamed)
+   ============================================
+   The RankUpToast component fires `toast.success(..., { className: "pm-rank-up-toast" })`
+   into sonner's toast portal. Without a keyframe defined here the class is a
+   no-op. Springy pop on enter so the kid sees their rank-up land. */
+@keyframes pm-rank-up-toast-enter {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.pm-rank-up-toast {
+  animation: pm-rank-up-toast-enter 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)
+    forwards;
+}
+
+/* ============================================
+   PREFERS-REDUCED-MOTION
+   ============================================
+   Users with vestibular disorders / motion sickness get the same visual state
+   transitions (opacity/color/scale endpoints still apply) but the animation
+   itself collapses to a single instantaneous frame. We do NOT use `animation:
+   none` because some classes (e.g. `animate-scale-bounce`, `animate-wiggle`)
+   rely on the final keyframe to actually show content — killing the animation
+   would freeze them at scale(0). Instead we shrink duration to ~0 and clamp
+   iteration to 1 so the end-state lands immediately. */
+@media (prefers-reduced-motion: reduce) {
+  .animate-bob,
+  .animate-wave,
+  .animate-wave-slow,
+  .animate-wave-slowest,
+  .animate-shimmer,
+  .animate-pulse-gold,
+  .animate-sparkle,
+  .animate-float-gentle,
+  .animate-coin-float,
+  .animate-coin-spin,
+  .animate-scroll-hint,
+  .animate-treasure-glow {
+    animation-iteration-count: 1 !important;
+    animation-duration: 0.01ms !important;
+  }
+
+  .animate-wiggle,
+  .animate-coin-rain,
+  .animate-dolphin-jump,
+  .animate-splash,
+  .animate-scale-bounce,
+  .animate-float-up,
+  .pm-rank-up-toast {
+    animation-duration: 0.01ms !important;
+  }
+
+  /* Tailwind `transition-*` utilities collapse to near-instant updates so the
+     visual state still flips, just without motion. */
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+  }
+}
