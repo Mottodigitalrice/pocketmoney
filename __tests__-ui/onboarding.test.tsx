@@ -13,8 +13,8 @@
  * mock `convex/react` per-test so we can control mutation outcomes, mock
  * `next/navigation` to spy on the post-save redirect.
  */
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, fireEvent, screen } from "@testing-library/react";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { render, fireEvent, screen, act } from "@testing-library/react";
 import { LanguageProvider } from "@/components/providers/LanguageProvider";
 
 // Hoisted spies so vi.mock factories can reference them.
@@ -133,6 +133,11 @@ beforeEach(() => {
 describe("OnboardingPage — H3 fixes", () => {
   // 3.2 — skip-jobs path: empty custom jobs list still advances + saves.
   it("3.2 — allows advancing past StepAddJobs with zero custom jobs (skip path clears the list)", async () => {
+    // flake harden: React 19 hydration jitter caused 250ms real-time wait; fake timers stabilize
+    // Only fake setTimeout — leaving microtask/queueMicrotask/requestAnimationFrame
+    // real so React 19's scheduler isn't disrupted.
+    vi.useFakeTimers({ toFake: ["setTimeout"] });
+
     // mutationSpies (resolved defaults from beforeEach) cover all three.
     const {
       createChild: createChildSpy,
@@ -144,13 +149,22 @@ describe("OnboardingPage — H3 fixes", () => {
 
     // StepWelcome → StepAddChildren.
     fireEvent.click(screen.getByText(/Get Started/));
-    // Real setTimeout in goToStep needs to elapse — flush via tick.
-    await new Promise((r) => setTimeout(r, 250));
+    // flake harden: advance fake timers past the goToStep 200ms fade.
+    // Wrap in act() so the React 19 scheduler flushes the setStep + setVisible
+    // state updates triggered by the timer callback before the next assertion.
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(250);
+    });
 
     fillFirstChild();
     // Hit Next on StepAddChildren.
     fireEvent.click(screen.getByText("Next"));
-    await new Promise((r) => setTimeout(r, 250));
+    // flake harden: advance fake timers past the goToStep 200ms fade.
+    // Wrap in act() so the React 19 scheduler flushes the setStep + setVisible
+    // state updates triggered by the timer callback before the next assertion.
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(250);
+    });
 
     // StepAddJobs is now showing. Use the skip link — clears the seeded
     // single empty job.
@@ -161,14 +175,21 @@ describe("OnboardingPage — H3 fixes", () => {
     const nextBtn = screen.getByTestId("onboarding-jobs-next");
     expect(nextBtn).not.toBeDisabled();
     fireEvent.click(nextBtn);
-    await new Promise((r) => setTimeout(r, 250));
+    // flake harden: advance fake timers past the goToStep 200ms fade.
+    // Wrap in act() so the React 19 scheduler flushes the setStep + setVisible
+    // state updates triggered by the timer callback before the next assertion.
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(250);
+    });
 
     // StepDone visible — locate the start-adventure CTA.
     const startBtn = screen.getByText(/Start Your Adventure/);
     fireEvent.click(startBtn);
 
-    // Flush all microtasks for the async handleComplete loop.
-    await new Promise((r) => setTimeout(r, 50));
+    // flake harden: flush async handleComplete loop microtasks.
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(50);
+    });
 
     // seedDefaults must have run regardless — that's the whole point of the
     // skip path. createJob must NOT have run (no custom jobs to create).
@@ -178,39 +199,42 @@ describe("OnboardingPage — H3 fixes", () => {
     expect(createChildSpy).toHaveBeenCalledTimes(1);
     // Router was pushed to /.
     expect(routerPushSpy).toHaveBeenCalledWith("/");
+
+    vi.useRealTimers();
   });
 
-  it(
-    "3.2 — StepAddJobs subtitle copy mentions the 20 built-in chores fallback",
-    async () => {
-      // Use the same async-step pattern as the H3 3.7 test (which is
-      // stable) — fireEvent + raw setTimeout flushes between each step.
-      // Then findByText polls + retries with an 8s safety belt so the
-      // 5s default testing-library timeout can't race React 19's slower
-      // hydration flush on OnboardingPageInner.
-      renderOnboarding();
+  it("3.2 — StepAddJobs subtitle copy mentions the 20 built-in chores fallback", async () => {
+    // Use the same async-step pattern as the H3 3.7 test (which is
+    // stable) — fireEvent + raw setTimeout flushes between each step.
+    // Then findByText polls + retries with an 8s safety belt so the
+    // 5s default testing-library timeout can't race React 19's slower
+    // hydration flush on OnboardingPageInner.
+    renderOnboarding();
 
-      // StepWelcome → StepAddChildren.
-      fireEvent.click(screen.getByText(/Get Started/));
-      await new Promise((r) => setTimeout(r, 250));
+    // StepWelcome → StepAddChildren.
+    fireEvent.click(screen.getByText(/Get Started/));
+    await new Promise((r) => setTimeout(r, 250));
 
-      // StepAddChildren → StepAddJobs.
-      fillFirstChild();
-      fireEvent.click(screen.getByText("Next"));
-      await new Promise((r) => setTimeout(r, 250));
+    // StepAddChildren → StepAddJobs.
+    fillFirstChild();
+    fireEvent.click(screen.getByText("Next"));
+    await new Promise((r) => setTimeout(r, 250));
 
-      // Skip-jobs explanatory copy should now be visible on StepAddJobs.
-      await screen.findByText(
-        /skip this and we'll set up 20 starter chores/i,
-        {},
-        { timeout: 8000 },
-      );
-    },
-    15000,
-  );
+    // Skip-jobs explanatory copy should now be visible on StepAddJobs.
+    await screen.findByText(
+      /skip this and we'll set up 20 starter chores/i,
+      {},
+      { timeout: 8000 },
+    );
+  }, 15000);
 
   // 3.7 — silent save errors are now surfaced.
   it("3.7 — when createChild throws, StepDone shows the translated error + retry button", async () => {
+    // flake harden: React 19 hydration jitter caused 250ms real-time wait; fake timers stabilize
+    // Only fake setTimeout — leaving microtask/queueMicrotask/requestAnimationFrame
+    // real so React 19's scheduler isn't disrupted.
+    vi.useFakeTimers({ toFake: ["setTimeout"] });
+
     // Override createChild to reject with a network-flavored error so
     // mapConvexError classifies it as NETWORK → error_network copy.
     const networkErr = new Error("Failed to fetch");
@@ -226,19 +250,36 @@ describe("OnboardingPage — H3 fixes", () => {
     renderOnboarding();
 
     fireEvent.click(screen.getByText(/Get Started/));
-    await new Promise((r) => setTimeout(r, 250));
+    // flake harden: advance fake timers past the goToStep 200ms fade.
+    // Wrap in act() so the React 19 scheduler flushes the setStep + setVisible
+    // state updates triggered by the timer callback before the next assertion.
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(250);
+    });
     fillFirstChild();
     fireEvent.click(screen.getByText("Next"));
-    await new Promise((r) => setTimeout(r, 250));
+    // flake harden: advance fake timers past the goToStep 200ms fade.
+    // Wrap in act() so the React 19 scheduler flushes the setStep + setVisible
+    // state updates triggered by the timer callback before the next assertion.
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(250);
+    });
     // Skip jobs.
     fireEvent.click(screen.getByTestId("onboarding-skip-jobs"));
     fireEvent.click(screen.getByTestId("onboarding-jobs-next"));
-    await new Promise((r) => setTimeout(r, 250));
+    // flake harden: advance fake timers past the goToStep 200ms fade.
+    // Wrap in act() so the React 19 scheduler flushes the setStep + setVisible
+    // state updates triggered by the timer callback before the next assertion.
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(250);
+    });
 
     // StepDone — trigger the failing save.
     fireEvent.click(screen.getByText(/Start Your Adventure/));
-    // Let the rejected promise propagate and React re-render.
-    await new Promise((r) => setTimeout(r, 50));
+    // flake harden: flush rejected-promise propagation + React re-render microtasks.
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(50);
+    });
 
     // The error alert renders with the translated title.
     const errorBox = screen.getByTestId("onboarding-save-error");
@@ -256,30 +297,55 @@ describe("OnboardingPage — H3 fixes", () => {
     // time. We don't need to assert success here; just that the retry wires
     // back to the same save path.
     fireEvent.click(retryBtn);
-    await new Promise((r) => setTimeout(r, 50));
+    // flake harden: flush retry-attempt async tick.
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(50);
+    });
     expect(createChildSpy).toHaveBeenCalledTimes(2);
 
     // Router was NEVER pushed because both attempts failed.
     expect(routerPushSpy).not.toHaveBeenCalled();
 
     consoleErrSpy.mockRestore();
+    vi.useRealTimers();
   });
 
   it("3.7 — no error UI is shown on the happy path (clean StepDone)", async () => {
+    // flake harden: React 19 hydration jitter caused 250ms real-time wait; fake timers stabilize
+    // Only fake setTimeout — leaving microtask/queueMicrotask/requestAnimationFrame
+    // real so React 19's scheduler isn't disrupted.
+    vi.useFakeTimers({ toFake: ["setTimeout"] });
     // mutationSpies defaults are all resolved-undefined.
     renderOnboarding();
 
     fireEvent.click(screen.getByText(/Get Started/));
-    await new Promise((r) => setTimeout(r, 250));
+    // flake harden: advance fake timers past the goToStep 200ms fade.
+    // Wrap in act() so the React 19 scheduler flushes the setStep + setVisible
+    // state updates triggered by the timer callback before the next assertion.
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(250);
+    });
     fillFirstChild();
     fireEvent.click(screen.getByText("Next"));
-    await new Promise((r) => setTimeout(r, 250));
+    // flake harden: advance fake timers past the goToStep 200ms fade.
+    // Wrap in act() so the React 19 scheduler flushes the setStep + setVisible
+    // state updates triggered by the timer callback before the next assertion.
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(250);
+    });
     fireEvent.click(screen.getByTestId("onboarding-skip-jobs"));
     fireEvent.click(screen.getByTestId("onboarding-jobs-next"));
-    await new Promise((r) => setTimeout(r, 250));
+    // flake harden: advance fake timers past the goToStep 200ms fade.
+    // Wrap in act() so the React 19 scheduler flushes the setStep + setVisible
+    // state updates triggered by the timer callback before the next assertion.
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(250);
+    });
 
     // Pre-click: no error rendered.
     expect(screen.queryByTestId("onboarding-save-error")).toBeNull();
+
+    vi.useRealTimers();
   });
 });
 
@@ -289,11 +355,26 @@ describe("OnboardingPage — H3 fixes", () => {
 // reorganization can't silently drop them. They render StepAddChildren via the
 // welcome → children flow (same path as the H3 tests above).
 describe("OnboardingPage — S1 (R4) StepAddChildren copy", () => {
+  // flake harden: fake timers for every test in this describe — the
+  // gotoStepChildren helper crosses one goToStep boundary, so we deterministically
+  // advance time rather than wall-clock waiting 250ms.
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   // Helper: get into StepAddChildren and let the float-up animation settle.
   async function gotoStepChildren() {
     renderOnboarding();
     fireEvent.click(screen.getByText(/Get Started/));
-    await new Promise((r) => setTimeout(r, 250));
+    // flake harden: advance fake timers past the goToStep 200ms fade.
+    // Wrap in act() so the React 19 scheduler flushes the setStep + setVisible
+    // state updates triggered by the timer callback before the next assertion.
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(250);
+    });
   }
 
   it("3.1 — kid-name hint is visible on the children step", async () => {
@@ -333,25 +414,21 @@ describe("OnboardingPage — S1 (R4) StepAddChildren copy", () => {
 
 // S1 (R4) — StepAddJobs copy refinements (F10 3.3)
 describe("OnboardingPage — S1 (R4) StepAddJobs copy", () => {
-  it(
-    "3.3 — yen tip is visible under the yen input on the job form card",
-    async () => {
-      renderOnboarding();
-      fireEvent.click(screen.getByText(/Get Started/));
-      await new Promise((r) => setTimeout(r, 250));
-      fillFirstChild();
-      fireEvent.click(screen.getByText("Next"));
-      await new Promise((r) => setTimeout(r, 250));
+  it("3.3 — yen tip is visible under the yen input on the job form card", async () => {
+    renderOnboarding();
+    fireEvent.click(screen.getByText(/Get Started/));
+    await new Promise((r) => setTimeout(r, 250));
+    fillFirstChild();
+    fireEvent.click(screen.getByText("Next"));
+    await new Promise((r) => setTimeout(r, 250));
 
-      // Now on StepAddJobs with the default seeded job card; tip should
-      // render. findByText polls (8s safety belt) so React 19's hydration
-      // can flush even on slow thread-pool scheduling — getByText raced.
-      await screen.findByText(
-        /¥50–¥300 per chore is typical/i,
-        {},
-        { timeout: 8000 },
-      );
-    },
-    15000,
-  );
+    // Now on StepAddJobs with the default seeded job card; tip should
+    // render. findByText polls (8s safety belt) so React 19's hydration
+    // can flush even on slow thread-pool scheduling — getByText raced.
+    await screen.findByText(
+      /¥50–¥300 per chore is typical/i,
+      {},
+      { timeout: 8000 },
+    );
+  }, 15000);
 });
