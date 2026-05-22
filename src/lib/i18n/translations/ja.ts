@@ -745,6 +745,18 @@ const ja = {
   landing_final_body:
     "無料で使えます。2分でセットアップ。クレジットカードは不要です。",
   landing_final_cta: "家族の冒険をはじめる",
+
+  // Wave 6 — Accessibility / screen-reader announcements.
+  // 隠れた aria-live 領域に表示し、視覚的な祝福演出と同じフィードバックを
+  // スクリーンリーダー利用者にも届ける。
+  a11y_lucky_chest_opened: "ラッキーチェスト開封!¥{{amount}}ゲット!",
+  a11y_weekly_goal_reached: "今週の目標達成!",
+  a11y_rank_up: "{{nextRank}}にランクアップ!",
+
+  // Wave 6 — icon-only button labels.
+  a11y_logout: "ログアウト",
+  a11y_home: "ホーム",
+  a11y_pick_emoji: "絵文字 {{emoji}} をえらぶ",
 } as const;
 
 export default ja;

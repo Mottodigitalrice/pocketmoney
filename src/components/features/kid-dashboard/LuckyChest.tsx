@@ -177,6 +177,25 @@ export function LuckyChest({ childId }: LuckyChestProps) {
       className="mx-4 rounded-2xl border border-yellow-300/30 bg-yellow-950/25 p-4 backdrop-blur-sm sm:mx-8"
     >
       {justOpened && <LuckyChestCoinBurst />}
+      {/* Wave 6 — screen-reader announcement for the chest-open celebration.
+          The visual reward beat is the coin-burst overlay + bounce on the
+          amount; this hidden polite live region carries the same beat to
+          assistive tech. Rendered only when `justOpened` so it announces
+          exactly once per local open (sibling-driven `status.opened` doesn't
+          flip `justOpened`, see comment on the state above). */}
+      {justOpened && (
+        <div
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
+          className="sr-only"
+          data-testid="lucky-chest-a11y-announce"
+        >
+          {t("a11y_lucky_chest_opened", {
+            amount: status.openedAmount?.toLocaleString() ?? "0",
+          })}
+        </div>
+      )}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex min-w-0 items-start gap-3">
           <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-yellow-400/20 text-yellow-100">
@@ -191,18 +210,30 @@ export function LuckyChest({ childId }: LuckyChestProps) {
               {t("lucky_chest_title")}
             </h2>
             <p className="mt-1 text-sm text-yellow-100/75">
-              {status.opened
-                ? t("lucky_chest_opened", {
+              {/* Wave 6 JP audit — these strings are full sentences in JA
+                  (kid-readable hiragana) that span multiple phrases. Wrap
+                  each branch in BudouXText so the browser only breaks on
+                  文節 boundaries in narrow card widths. */}
+              {status.opened ? (
+                <BudouXText
+                  text={t("lucky_chest_opened", {
                     amount: status.openedAmount?.toLocaleString() ?? "0",
-                  })
-                : status.unlocked
-                  ? t("lucky_chest_unlocked", {
-                      amount: status.maxAmount.toLocaleString(),
-                    })
-                  : t("lucky_chest_locked", {
-                      done: status.mustDoApproved,
-                      total: status.mustDoTotal,
-                    })}
+                  })}
+                />
+              ) : status.unlocked ? (
+                <BudouXText
+                  text={t("lucky_chest_unlocked", {
+                    amount: status.maxAmount.toLocaleString(),
+                  })}
+                />
+              ) : (
+                <BudouXText
+                  text={t("lucky_chest_locked", {
+                    done: status.mustDoApproved,
+                    total: status.mustDoTotal,
+                  })}
+                />
+              )}
             </p>
             {error && (
               <p

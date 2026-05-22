@@ -6,6 +6,7 @@ import dynamic from "next/dynamic";
 import { useTranslation } from "@/hooks/use-translation";
 import { useEffect, useRef, useState } from "react";
 import { WalletJarBalances } from "@/components/features/shared/WalletJarBalances";
+import { BudouXText } from "@/components/shared/BudouXText";
 
 // F21: chest animation only renders when the user taps the wallet card.
 // Lazy-load the motion + canvas bundle until then.
@@ -81,6 +82,21 @@ export function WeeklyTracker({ childId }: WeeklyTrackerProps) {
 
   return (
     <>
+      {/* Wave 6 — a11y: when the kid crosses 100% for the week, the visual
+          pulse-gold ring on the progress bar carries the celebration. Mirror
+          that beat to assistive tech via a hidden polite live region. Same
+          one-shot semantics as `celebratingFull` (clears after 1500ms). */}
+      {celebratingFull && (
+        <div
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
+          className="sr-only"
+          data-testid="weekly-tracker-a11y-announce"
+        >
+          {t("a11y_weekly_goal_reached")}
+        </div>
+      )}
       <div
         className="mx-4 cursor-pointer sm:mx-8"
         onClick={() => setShowTreasure(true)}
@@ -122,10 +138,12 @@ export function WeeklyTracker({ childId }: WeeklyTrackerProps) {
                 />
               </div>
               <p className="mt-1 text-xs text-amber-300">
-                {t("weekly_progress", {
-                  earned: earned.toLocaleString(),
-                  total: potential.toLocaleString(),
-                })}
+                <BudouXText
+                  text={t("weekly_progress", {
+                    earned: earned.toLocaleString(),
+                    total: potential.toLocaleString(),
+                  })}
+                />
               </p>
               {/* S3 (R4) — F10 6.5: first-day ¥0 nudge. Fires only when there
                   IS something to earn (potential > 0) but nothing has landed
@@ -135,7 +153,7 @@ export function WeeklyTracker({ childId }: WeeklyTrackerProps) {
                   className="mt-1 text-xs font-medium text-amber-200/90"
                   data-testid="weekly-tracker-zero-hint"
                 >
-                  {t("weekly_tracker_zero_hint")}
+                  <BudouXText>{t("weekly_tracker_zero_hint")}</BudouXText>
                 </p>
               )}
               <div className="mt-3">

@@ -260,6 +260,13 @@ export function GoalWishlist({ childId }: GoalWishlistProps) {
                 key={option}
                 type="button"
                 onClick={() => setEmoji(option)}
+                // Wave 6 a11y — these tiles are emoji-only, so without an
+                // aria-label a screen reader announces only the emoji glyph
+                // (locale-dependent, often poorly). aria-pressed exposes the
+                // toggle state so the user hears "selected" / "not selected".
+                aria-label={t("a11y_pick_emoji", { emoji: option })}
+                aria-pressed={emoji === option}
+                data-testid={`goal-emoji-${option}`}
                 className={`flex size-11 items-center justify-center rounded-xl border text-xl transition-all ${
                   emoji === option
                     ? "border-sky-200 bg-sky-500/30"

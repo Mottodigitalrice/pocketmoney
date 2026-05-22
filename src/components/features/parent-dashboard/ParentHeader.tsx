@@ -43,9 +43,15 @@ function ParentHeaderInner() {
       <div className="flex flex-wrap items-center gap-3">
         <Link
           href="/"
+          // Wave 6 a11y — text label is hidden on <sm so screen readers and
+          // anyone reading via voice/keyboard would otherwise only hear the
+          // emoji glyph. Explicit aria-label guarantees a real announcement.
+          aria-label={t("a11y_home")}
           className="flex items-center gap-2 text-amber-300/80 transition-colors hover:text-amber-200"
         >
-          <span className="text-2xl">🏠</span>
+          <span className="text-2xl" aria-hidden="true">
+            🏠
+          </span>
           <span className="hidden text-sm font-medium sm:inline">
             {t("parent_home")}
           </span>
@@ -71,9 +77,15 @@ function ParentHeaderInner() {
         </div>
         <button
           onClick={handleLogout}
+          // Wave 6 a11y — same hidden-on-mobile text label problem; the
+          // door emoji alone is meaningless to assistive tech. Give the
+          // button a deterministic accessible name in every viewport.
+          aria-label={t("a11y_logout")}
           className="flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1.5 text-sm font-medium text-amber-300/80 transition-all hover:bg-white/20 hover:text-amber-200 active:scale-95"
         >
-          <span className="text-base">🚪</span>
+          <span className="text-base" aria-hidden="true">
+            🚪
+          </span>
           <span className="hidden sm:inline">{t("auth_logout")}</span>
         </button>
       </div>
@@ -116,9 +128,15 @@ function ParentHeaderInnerWithoutClerk() {
       <div className="flex flex-wrap items-center gap-3">
         <Link
           href="/"
+          // Wave 6 a11y — text label is hidden on <sm so screen readers and
+          // anyone reading via voice/keyboard would otherwise only hear the
+          // emoji glyph. Explicit aria-label guarantees a real announcement.
+          aria-label={t("a11y_home")}
           className="flex items-center gap-2 text-amber-300/80 transition-colors hover:text-amber-200"
         >
-          <span className="text-2xl">🏠</span>
+          <span className="text-2xl" aria-hidden="true">
+            🏠
+          </span>
           <span className="hidden text-sm font-medium sm:inline">
             {t("parent_home")}
           </span>
@@ -144,9 +162,15 @@ function ParentHeaderInnerWithoutClerk() {
         </div>
         <button
           onClick={handleLogout}
+          // Wave 6 a11y — same hidden-on-mobile text label problem; the
+          // door emoji alone is meaningless to assistive tech. Give the
+          // button a deterministic accessible name in every viewport.
+          aria-label={t("a11y_logout")}
           className="flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1.5 text-sm font-medium text-amber-300/80 transition-all hover:bg-white/20 hover:text-amber-200 active:scale-95"
         >
-          <span className="text-base">🚪</span>
+          <span className="text-base" aria-hidden="true">
+            🚪
+          </span>
           <span className="hidden sm:inline">{t("auth_logout")}</span>
         </button>
       </div>

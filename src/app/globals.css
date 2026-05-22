@@ -599,3 +599,24 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ============================================
+   FOCUS RING (Wave 6 a11y)
+   ============================================
+   Keyboard-navigated focus needs a high-contrast indicator on every
+   interactive element. Tailwind v4's default ring is muted; we override
+   with a 2px gold ring matched to the pirate/treasure palette so the
+   kid + parent surfaces both have a visible, branded focus state.
+
+   `:focus-visible` (NOT `:focus`) so we don't paint the ring when the
+   user is mouse-clicking — only on keyboard / accessibility traversal.
+   `box-shadow` (not `outline`) because outline can be clipped by
+   `overflow:hidden` containers (we have many — cards, dialogs, kanban).
+   `border-radius: inherit` so the ring follows rounded corners on
+   rounded buttons / cards. */
+*:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--pm-focus-ring, var(--gold, #ffd700));
+  outline-offset: 2px;
+  border-radius: inherit;
+}

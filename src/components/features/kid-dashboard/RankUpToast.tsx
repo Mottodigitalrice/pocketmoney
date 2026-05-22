@@ -25,7 +25,7 @@
  * className. Ranks stay English in both locales (per F18 plan).
  */
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { motion } from "motion/react";
 import type { PirateRank } from "@/types";
@@ -82,6 +82,15 @@ export function RankUpToast({ childId, currentRank }: RankUpToastProps) {
   // Track the rank we've already reacted to in *this session* so React
   // strict-mode double-invokes or rapid re-renders don't fire twice.
   const lastFiredFor = useRef<PirateRank | null>(null);
+  // Wave 6 — a11y: when we fire a rank-up toast, also flash a hidden polite
+  // live region. sonner's toast container has `role="status"` so most
+  // assistive tech announces it, but the toast's structure (title +
+  // description in two nodes) can announce as one fragmented utterance.
+  // This dedicated live region gives a single clean announcement and
+  // doesn't depend on sonner's portal being in the a11y tree at toast time.
+  const [announceRank, setAnnounceRank] = useState<PirateRank | null>(null);
+  // Single shared timer for the announce flash so unmount cleans up cleanly.
+  const cleanupTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (!currentRank) return;
@@ -113,6 +122,19 @@ export function RankUpToast({ childId, currentRank }: RankUpToastProps) {
         className: "pm-rank-up-toast",
         duration: 5000,
       });
+      // Mirror to the polite live region. Defer the state write out of the
+      // effect body via queueMicrotask so we don't trigger a synchronous
+      // cascading render (matches the pattern used by WeeklyTracker's
+      // celebrate effect). Clear after 5s so the same key can re-announce
+      // later if the kid actually ranks up again on the same mount.
+      queueMicrotask(() => {
+        setAnnounceRank(currentRank);
+      });
+      if (cleanupTimer.current) clearTimeout(cleanupTimer.current);
+      cleanupTimer.current = setTimeout(() => {
+        setAnnounceRank(null);
+        cleanupTimer.current = null;
+      }, 5000);
     }
 
     // Either way (up OR sideways/down) — sync localStorage so the next
@@ -121,15 +143,45 @@ export function RankUpToast({ childId, currentRank }: RankUpToastProps) {
     lastFiredFor.current = currentRank;
   }, [childId, currentRank, t]);
 
-  // Render an invisible motion wrapper purely to keep the celebratory
-  // animation primitives co-located. The toast itself is portal'd by sonner.
+  useEffect(() => {
+    return () => {
+      if (cleanupTimer.current) {
+        clearTimeout(cleanupTimer.current);
+        cleanupTimer.current = null;
+      }
+    };
+  }, []);
+
   return (
-    <motion.div
-      aria-hidden
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 0 }}
-      transition={{ duration: 0 }}
-      style={{ position: "absolute", width: 0, height: 0, overflow: "hidden" }}
-    />
+    <>
+      {/* Wave 6 — hidden polite live region. Renders only when a rank-up
+          just fired (announceRank !== null). One clean utterance, no
+          double-announce. */}
+      {announceRank && (
+        <div
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
+          className="sr-only"
+          data-testid="rank-up-a11y-announce"
+        >
+          {t("a11y_rank_up", { nextRank: announceRank })}
+        </div>
+      )}
+      {/* Invisible motion wrapper purely to keep the celebratory animation
+          primitives co-located. The toast itself is portal'd by sonner. */}
+      <motion.div
+        aria-hidden
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 0 }}
+        transition={{ duration: 0 }}
+        style={{
+          position: "absolute",
+          width: 0,
+          height: 0,
+          overflow: "hidden",
+        }}
+      />
+    </>
   );
 }

@@ -713,6 +713,20 @@ const en = {
   landing_final_body:
     "Free to use. Set up in 2 minutes. No credit card needed.",
   landing_final_cta: "Start Your Family's Adventure",
+
+  // Wave 6 — Accessibility / screen-reader announcements.
+  // These are surfaced via hidden aria-live regions on celebration moments —
+  // a chest open, a weekly-goal-100% pulse, a rank-up — so screen-reader
+  // users get the same feedback as sighted users (who get the coin-burst,
+  // pulse-gold, and toast).
+  a11y_lucky_chest_opened: "Lucky Chest opened — earned ¥{{amount}}!",
+  a11y_weekly_goal_reached: "Weekly goal reached!",
+  a11y_rank_up: "Rank up to {{nextRank}}!",
+
+  // Wave 6 — icon-only button labels.
+  a11y_logout: "Log out",
+  a11y_home: "Home",
+  a11y_pick_emoji: "Pick emoji {{emoji}}",
 } as const;
 
 export default en;
