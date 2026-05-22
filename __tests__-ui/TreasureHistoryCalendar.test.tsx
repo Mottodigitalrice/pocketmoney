@@ -138,8 +138,10 @@ describe("TreasureHistoryCalendar", () => {
     expect(container).toHaveTextContent("¥100");
   });
 
-  it("renders the empty-state copy when there's no approved history", () => {
-    const { container } = renderWithProviders(
+  // Wave 7 — F10 6.7: zero-history now renders the calendar grid SHELL
+  // beneath a centered empty-state overlay with the 🗺️ icon + warmer copy.
+  it("renders the grid SHELL + 🗺️ overlay when there's no approved history", () => {
+    const { container, getByTestId } = renderWithProviders(
       <TreasureHistoryCalendar childId={CHILD_ID} />,
       {
         contextValue: {
@@ -148,8 +150,35 @@ describe("TreasureHistoryCalendar", () => {
         },
       },
     );
-    // F11 empty title — match a distinctive fragment of `history_empty_title`.
-    expect(container).toHaveTextContent(/treasure log is empty/i);
+    // Grid shell still renders (all 7 weekday labels present).
+    expect(getByTestId("treasure-history-grid")).toBeInTheDocument();
+    const dayLabels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+    for (const label of dayLabels) {
+      expect(container).toHaveTextContent(new RegExp(label));
+    }
+    // Overlay renders with the new copy + 🗺️ icon.
+    const overlay = getByTestId("treasure-history-empty-overlay");
+    expect(overlay).toBeInTheDocument();
+    expect(overlay.textContent).toMatch(/🗺️/);
+    expect(container).toHaveTextContent(/treasure log starts here/i);
+    expect(container).toHaveTextContent(/finish a job/i);
+  });
+
+  it("does NOT render the empty overlay when there is at least one approved instance", () => {
+    const instances = [approved("a1", JOB_TIDY._id, "2026-05-12")];
+    const { container } = renderWithProviders(
+      <TreasureHistoryCalendar childId={CHILD_ID} />,
+      {
+        contextValue: {
+          ...DEFAULT_CTX_HELPERS,
+          getInstancesForChild: () => instances,
+        },
+      },
+    );
+    expect(
+      container.querySelector('[data-testid="treasure-history-empty-overlay"]'),
+    ).toBeNull();
+    expect(container).toHaveTextContent("Tidy room");
   });
 
   it("renders the day cards with the job's icon + title for each approved instance", () => {

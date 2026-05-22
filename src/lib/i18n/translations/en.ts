@@ -451,6 +451,14 @@ const en = {
   job_library_empty_cta: "+ Add Your First Job",
   approvals_empty_title: "Nothing waiting — kids are caught up!",
   approvals_empty_hint: "Finished chores will show up here for you to review.",
+  // Wave 7 — F10 5.3: distinguish first-day vs recurring caught-up. The legacy
+  // `approvals_empty_*` keys above stay for callers that haven't migrated yet;
+  // ApprovalQueue itself now branches on `hasEverHadApprovedInstance`.
+  approval_queue_first_day_title: "Ready for your crew's first job?",
+  approval_queue_first_day_body:
+    "Approved jobs will appear here. Add a job + assign it to a kid to get started.",
+  approval_queue_caught_up_title: "All caught up!",
+  approval_queue_caught_up_body: "Check back when the crew finishes more jobs.",
   quick_add_empty_title: "No quick-add tasks today",
   quick_add_empty_hint:
     "Pick a chore above to add it to today, or use Planner for the rest of the week.",
@@ -475,6 +483,12 @@ const en = {
   goals_empty_hint: "Pick something cool to save for!",
   history_empty_title: "Your treasure log is empty",
   history_empty_hint: "Finish a chore and it'll show up here — keep going!",
+  // Wave 7 — F10 6.7: zero-history shell renders the calendar GRID with an
+  // overlay 🗺️ icon + warmer "your adventure starts here" copy. Replaces the
+  // bare history_empty_* text-only state for the truly-empty case.
+  treasure_history_empty_title: "Your treasure log starts here",
+  treasure_history_empty_body:
+    "Finish a job to mark your first day on the calendar.",
   // S3 (R4) — F10 6.9: warmer tone. Frames the empty state as "your captain
   // hasn't sailed there yet" instead of telling the kid to nag.
   upcoming_empty_title: "Nothing planned yet",

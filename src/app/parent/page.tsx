@@ -109,17 +109,38 @@ function ParentPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const tabParam = searchParams.get("tab");
-  const activeTab: Tab = isTab(tabParam) ? tabParam : DEFAULT_TAB;
+
+  const { t } = useTranslation();
+  const {
+    familyChildren,
+    addChild,
+    editChild,
+    deleteChild,
+    isLoading,
+    jobInstances,
+  } = usePocketMoney();
+
+  // Wave 7 — F10 5.18 (Option A): when the family has at least one approved
+  // job (lifetime), default to the Overview tab — the "status snapshot" view
+  // most relevant for a parent who's been using the app. Brand-new families
+  // (zero approvals ever) still land on Quick Add because their first job is
+  // a creation step, not a review step.
+  //
+  // Wave 6's `?tab=` search-param override still wins via `isTab(tabParam)`
+  // below. Wave 4's lazy-loading of Overview's children (LuckyChestSettings +
+  // ChildOverview) still kicks in because the imports are eager but the
+  // sub-components are dynamic at the JSX site.
+  const hasApprovedInstance = jobInstances.some(
+    (instance) => instance.status === "approved",
+  );
+  const smartDefaultTab: Tab = hasApprovedInstance ? "overview" : DEFAULT_TAB;
+  const activeTab: Tab = isTab(tabParam) ? tabParam : smartDefaultTab;
 
   const setActiveTab = (tab: Tab) => {
     // `scroll: false` keeps the user's scroll position when toggling tabs.
     // `replace` (not `push`) so back-button doesn't accumulate tab-history.
     router.replace(`?tab=${tab}`, { scroll: false });
   };
-
-  const { t } = useTranslation();
-  const { familyChildren, addChild, editChild, deleteChild, isLoading } =
-    usePocketMoney();
 
   // G2: parent dashboard also benefits from a skeleton while Convex hydrates,
   // so the tabs/widgets aren't visibly empty before data arrives.

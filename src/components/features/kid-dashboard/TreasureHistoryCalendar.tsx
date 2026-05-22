@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { usePocketMoney } from "@/hooks/use-pocket-money";
 import { useTranslation } from "@/hooks/use-translation";
+import { BudouXText } from "@/components/shared/BudouXText";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CURRENCY, DAYS_OF_WEEK, DAYS_OF_WEEK_JA } from "@/lib/constants";
@@ -148,8 +149,22 @@ export function TreasureHistoryCalendar({
         </div>
       </div>
 
-      {hasAnyHistory ? (
-        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+      {/* Wave 7 — F10 6.7: always render the calendar grid (the "shell"),
+          even with zero history. When `hasAnyHistory` is false we overlay a
+          centered empty-state card on top so the screen feels like an
+          adventure-not-yet-started prompt rather than a void. The grid
+          underneath stays visible-but-muted so kids understand the shape of
+          what's coming. */}
+      <div className="relative">
+        <div
+          aria-hidden={!hasAnyHistory}
+          className={
+            hasAnyHistory
+              ? "grid gap-3 md:grid-cols-2 xl:grid-cols-4"
+              : "grid gap-3 opacity-30 md:grid-cols-2 xl:grid-cols-4"
+          }
+          data-testid="treasure-history-grid"
+        >
           {days.map((day) => (
             <div
               key={day.date}
@@ -201,15 +216,26 @@ export function TreasureHistoryCalendar({
             </div>
           ))}
         </div>
-      ) : (
-        <div className="flex flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-amber-300/20 bg-amber-950/30 px-6 py-10 text-center">
-          <span className="text-5xl">📜</span>
-          <p className="text-lg font-bold text-amber-100">
-            {t("history_empty_title")}
-          </p>
-          <p className="text-sm text-white/70">{t("history_empty_hint")}</p>
-        </div>
-      )}
+
+        {!hasAnyHistory && (
+          <div
+            data-testid="treasure-history-empty-overlay"
+            className="pointer-events-none absolute inset-0 flex items-center justify-center"
+          >
+            <div className="pointer-events-auto flex max-w-sm flex-col items-center gap-2 rounded-2xl border border-dashed border-amber-300/30 bg-amber-950/85 px-6 py-8 text-center shadow-2xl backdrop-blur-sm">
+              <span className="text-5xl" aria-hidden="true">
+                🗺️
+              </span>
+              <p className="text-lg font-bold text-amber-100">
+                <BudouXText>{t("treasure_history_empty_title")}</BudouXText>
+              </p>
+              <p className="text-sm text-white/80">
+                <BudouXText>{t("treasure_history_empty_body")}</BudouXText>
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

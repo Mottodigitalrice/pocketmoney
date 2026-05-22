@@ -164,8 +164,13 @@ function RejectNoteDialog({
 }
 
 export function ApprovalQueue() {
-  const { isLoading, getPendingApprovals, approveJob, rejectJob } =
-    usePocketMoney();
+  const {
+    isLoading,
+    getPendingApprovals,
+    approveJob,
+    rejectJob,
+    jobInstances,
+  } = usePocketMoney();
   const { t } = useTranslation();
   // S6 (R4) — track which instance is being rejected so the dialog knows
   // which one to attach its note to. null = dialog closed.
@@ -189,14 +194,39 @@ export function ApprovalQueue() {
   };
 
   if (pending.length === 0) {
+    // Wave 7 — F10 5.3: distinguish first-day (no kid has EVER had a job
+    // approved) from recurring caught-up. The `jobInstances` array is the
+    // family-wide list already fetched by the provider, so deriving
+    // `hasEverHadApprovedInstance` here costs nothing extra (no new query,
+    // no new prop, no new context field).
+    const hasEverHadApprovedInstance = jobInstances.some(
+      (instance) => instance.status === "approved",
+    );
+
+    const title = hasEverHadApprovedInstance
+      ? t("approval_queue_caught_up_title")
+      : t("approval_queue_first_day_title");
+    const body = hasEverHadApprovedInstance
+      ? t("approval_queue_caught_up_body")
+      : t("approval_queue_first_day_body");
+    const icon = hasEverHadApprovedInstance ? "⚓" : "🧭";
+    const testId = hasEverHadApprovedInstance
+      ? "approval-queue-empty-caught-up"
+      : "approval-queue-empty-first-day";
+
     return (
-      <div className="flex flex-col items-center justify-center rounded-2xl border border-amber-700/20 bg-amber-900/20 px-6 py-12 text-center">
-        <span className="mb-3 text-5xl">⚓</span>
+      <div
+        data-testid={testId}
+        className="flex flex-col items-center justify-center rounded-2xl border border-amber-700/20 bg-amber-900/20 px-6 py-12 text-center"
+      >
+        <span className="mb-3 text-5xl" aria-hidden="true">
+          {icon}
+        </span>
         <p className="text-lg font-semibold text-amber-200">
-          {t("approvals_empty_title")}
+          <BudouXText>{title}</BudouXText>
         </p>
         <p className="mt-1 text-sm text-amber-300/70">
-          <BudouXText>{t("approvals_empty_hint")}</BudouXText>
+          <BudouXText>{body}</BudouXText>
         </p>
       </div>
     );

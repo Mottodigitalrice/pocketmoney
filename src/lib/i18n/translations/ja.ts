@@ -473,6 +473,12 @@ const ja = {
   approvals_empty_title: "全部おわっています! 船長、おつかれさま。",
   approvals_empty_hint:
     "子どもがおしごとをおわらせると、ここにしょうにん待ちで出てきます。",
+  // Wave 7 — F10 5.3: first-day vs recurring caught-up.
+  approval_queue_first_day_title: "クルーの最初のジョブを待ってます",
+  approval_queue_first_day_body:
+    "承認済みジョブはここに表示されます。ジョブを追加してクルーに割り当てましょう。",
+  approval_queue_caught_up_title: "ぜんぶおわった！",
+  approval_queue_caught_up_body: "クルーが次のジョブを終えたら確認してね。",
   quick_add_empty_title: "今日のクイック追加はありません",
   quick_add_empty_hint:
     "上のおしごとをタップして今日に追加するか、よていタブで一週間ぶんを計画してください。",
@@ -499,6 +505,10 @@ const ja = {
   history_empty_title: "たからものれきしはまだからっぽ",
   history_empty_hint:
     "おしごとをひとつおわらせるとここにでてくるよ — がんばれ!",
+  // Wave 7 — F10 6.7: zero-history shell — kid-readable hiragana, warmer tone.
+  treasure_history_empty_title: "たからのキロクはここからスタート",
+  treasure_history_empty_body:
+    "ジョブをおわらせて、カレンダーにさいしょのしるしをつけよう。",
   // S3 (R4) — F10 6.9: warmer tone — passive "your captain hasn't planned
   // yet" rather than active "go nag them".
   upcoming_empty_title: "まだよていなし",
