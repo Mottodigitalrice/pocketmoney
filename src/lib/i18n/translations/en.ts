@@ -754,6 +754,15 @@ const en = {
   a11y_home: "Home",
   a11y_pick_emoji: "Pick emoji {{emoji}}",
 
+  // Wave 8b — bulk-approve
+  approval_select_all: "Select all ({{count}})",
+  approval_clear_selection: "Cancel selection",
+  approval_bulk_button: "Approve {{count}} selected",
+  approval_bulk_in_progress: "Approving {{current}} of {{total}}...",
+  approval_bulk_success: "Crew rewarded ¥{{amount}} total!",
+  approval_bulk_partial:
+    "Approved {{ok}} of {{total}}. {{failed}} need a closer look.",
+
   // Wave 8c — onboarding celebration
   onboarding_celebrate_title: "Welcome aboard, Captain {{familyName}}!",
   onboarding_celebrate_subtitle: "Your crew is ready. Set sail!",

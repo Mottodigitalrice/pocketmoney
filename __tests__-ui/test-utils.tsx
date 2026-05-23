@@ -71,7 +71,7 @@ export const DEFAULT_CONTEXT_VALUE: FullContext = {
   createOneOff: () => {},
   startJob: () => {},
   completeJob: noopAsync,
-  approveJob: () => {},
+  approveJob: noopAsync,
   rejectJob: () => {},
   withdrawFromWallet: noopAsync,
   awardBonus: noopAsync,

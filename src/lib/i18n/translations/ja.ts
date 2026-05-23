@@ -780,6 +780,15 @@ const ja = {
   a11y_home: "ホーム",
   a11y_pick_emoji: "絵文字 {{emoji}} をえらぶ",
 
+  // Wave 8b — bulk-approve
+  approval_select_all: "全部えらぶ ({{count}})",
+  approval_clear_selection: "えらぶのをやめる",
+  approval_bulk_button: "{{count}}件まとめて承認",
+  approval_bulk_in_progress: "{{current}} / {{total}} 件承認中…",
+  approval_bulk_success: "クルーに合計¥{{amount}}をプレゼント！",
+  approval_bulk_partial:
+    "{{ok}} / {{total}} 件承認しました。{{failed}} 件は確認が必要です。",
+
   // Wave 8c — onboarding celebration
   onboarding_celebrate_title: "{{familyName}}号、しゅっぱつ！",
   onboarding_celebrate_subtitle: "クルーのじゅんびOK！さあ、出航だ！",

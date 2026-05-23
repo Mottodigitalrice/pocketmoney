@@ -15,7 +15,7 @@
  *     Cancel + empty submits MUST NOT call rejectJob.
  */
 import { describe, it, expect, vi } from "vitest";
-import { renderWithProviders, fireEvent, screen } from "./test-utils";
+import { renderWithProviders, fireEvent, screen, waitFor } from "./test-utils";
 import { ApprovalQueue } from "@/components/features/parent-dashboard/ApprovalQueue";
 import type { Child, Job, JobInstance, JobInstanceWithJob } from "@/types";
 
@@ -272,6 +272,251 @@ describe("ApprovalQueue", () => {
       fireEvent.click(screen.getByTestId("reject-note-cancel"));
 
       expect(rejectJob).not.toHaveBeenCalled();
+    });
+  });
+
+  // Wave 8b — bulk-approve. Parent reviewing 5+ kids' weekly chores wants
+  // to multi-select instead of clicking Approve once per row. Tests cover
+  // the gating threshold (≥2 pending), the selection mechanics, the
+  // sequential mutation loop, in-flight UX, the success toast, and the
+  // partial-failure path.
+  describe("Wave 8b — bulk-approve", () => {
+    it("hides the select-all checkbox when only 1 pending instance", () => {
+      renderWithProviders(<ApprovalQueue />, {
+        contextValue: {
+          getPendingApprovals: () => [pendingInstance("inst-solo")],
+          getChildById: () => CHILD_A,
+        },
+      });
+      expect(
+        screen.queryByTestId("approval-queue-select-all"),
+      ).not.toBeInTheDocument();
+      // Bulk bar is also hidden because nothing is selected (and could
+      // not be — there's no checkbox to flip).
+      expect(
+        screen.queryByTestId("approval-queue-bulk-bar"),
+      ).not.toBeInTheDocument();
+    });
+
+    it("shows select-all + per-card checkboxes when ≥2 pending", () => {
+      renderWithProviders(<ApprovalQueue />, {
+        contextValue: {
+          getPendingApprovals: () => [
+            pendingInstance("inst-a"),
+            pendingInstance("inst-b"),
+            pendingInstance("inst-c"),
+          ],
+          getChildById: () => CHILD_A,
+        },
+      });
+      expect(
+        screen.getByTestId("approval-queue-select-all"),
+      ).toBeInTheDocument();
+      expect(screen.getAllByTestId("approval-card-checkbox")).toHaveLength(3);
+    });
+
+    it("select-all checkbox flips every card's checkbox", () => {
+      renderWithProviders(<ApprovalQueue />, {
+        contextValue: {
+          getPendingApprovals: () => [
+            pendingInstance("inst-a"),
+            pendingInstance("inst-b"),
+            pendingInstance("inst-c"),
+          ],
+          getChildById: () => CHILD_A,
+        },
+      });
+      fireEvent.click(screen.getByTestId("approval-queue-select-all-checkbox"));
+      const boxes = screen.getAllByTestId(
+        "approval-card-checkbox",
+      ) as HTMLInputElement[];
+      expect(boxes.every((b) => b.checked)).toBe(true);
+      // Bulk bar now shows with the count.
+      expect(
+        screen.getByTestId("approval-queue-bulk-approve"),
+      ).toHaveTextContent(/3 selected/);
+    });
+
+    it("toggling a single card's checkbox does NOT touch the others", () => {
+      renderWithProviders(<ApprovalQueue />, {
+        contextValue: {
+          getPendingApprovals: () => [
+            pendingInstance("inst-a"),
+            pendingInstance("inst-b"),
+            pendingInstance("inst-c"),
+          ],
+          getChildById: () => CHILD_A,
+        },
+      });
+      const boxes = screen.getAllByTestId(
+        "approval-card-checkbox",
+      ) as HTMLInputElement[];
+      fireEvent.click(boxes[1]!);
+      expect(boxes[0]!.checked).toBe(false);
+      expect(boxes[1]!.checked).toBe(true);
+      expect(boxes[2]!.checked).toBe(false);
+      expect(
+        screen.getByTestId("approval-queue-bulk-approve"),
+      ).toHaveTextContent(/1 selected/);
+    });
+
+    it("clicking bulk-approve calls approveJob once per selected instance", async () => {
+      const approveJob = vi.fn(() => Promise.resolve());
+      renderWithProviders(<ApprovalQueue />, {
+        contextValue: {
+          getPendingApprovals: () => [
+            pendingInstance("inst-a"),
+            pendingInstance("inst-b"),
+            pendingInstance("inst-c"),
+          ],
+          getChildById: () => CHILD_A,
+          approveJob,
+        },
+      });
+      // Select-all then fire bulk.
+      fireEvent.click(screen.getByTestId("approval-queue-select-all-checkbox"));
+      fireEvent.click(screen.getByTestId("approval-queue-bulk-approve"));
+
+      await waitFor(() => {
+        expect(approveJob).toHaveBeenCalledTimes(3);
+      });
+      expect(approveJob).toHaveBeenNthCalledWith(1, "inst-a");
+      expect(approveJob).toHaveBeenNthCalledWith(2, "inst-b");
+      expect(approveJob).toHaveBeenNthCalledWith(3, "inst-c");
+    });
+
+    it("shows a success toast + clears selection when every approval succeeds", async () => {
+      const approveJob = vi.fn(() => Promise.resolve());
+      renderWithProviders(<ApprovalQueue />, {
+        contextValue: {
+          getPendingApprovals: () => [
+            pendingInstance("inst-a"),
+            pendingInstance("inst-b"),
+          ],
+          getChildById: () => CHILD_A,
+          approveJob,
+        },
+      });
+      fireEvent.click(screen.getByTestId("approval-queue-select-all-checkbox"));
+      fireEvent.click(screen.getByTestId("approval-queue-bulk-approve"));
+
+      await waitFor(() => {
+        expect(
+          screen.getByTestId("approval-queue-bulk-result"),
+        ).toBeInTheDocument();
+      });
+      const result = screen.getByTestId("approval-queue-bulk-result");
+      expect(result).toHaveAttribute("data-failed-count", "0");
+      // Two instances at ¥200 each → ¥400 total.
+      expect(result).toHaveTextContent(/¥400/);
+
+      // Selection cleared → bulk bar gone (no in-flight either).
+      await waitFor(() => {
+        expect(
+          screen.queryByTestId("approval-queue-bulk-bar"),
+        ).not.toBeInTheDocument();
+      });
+    });
+
+    it("disables the bulk button + announces progress while in flight", async () => {
+      // Hand-rolled deferred promise so we can pause the loop between
+      // iterations and assert the UI mid-flight.
+      let resolveFirst: () => void = () => {};
+      const firstPromise = new Promise<void>((r) => {
+        resolveFirst = r;
+      });
+      const approveJob = vi
+        .fn()
+        // First call blocks until we manually resolve it.
+        .mockImplementationOnce(() => firstPromise)
+        .mockImplementation(() => Promise.resolve());
+
+      renderWithProviders(<ApprovalQueue />, {
+        contextValue: {
+          getPendingApprovals: () => [
+            pendingInstance("inst-a"),
+            pendingInstance("inst-b"),
+          ],
+          getChildById: () => CHILD_A,
+          approveJob,
+        },
+      });
+      fireEvent.click(screen.getByTestId("approval-queue-select-all-checkbox"));
+      const bulkBtn = screen.getByTestId(
+        "approval-queue-bulk-approve",
+      ) as HTMLButtonElement;
+      fireEvent.click(bulkBtn);
+
+      // Button disabled, progress copy visible.
+      await waitFor(() => {
+        expect(bulkBtn).toBeDisabled();
+      });
+      expect(bulkBtn).toHaveTextContent(/1 of 2/);
+      // aria-live region announces the same.
+      expect(screen.getByTestId("approval-queue-bulk-live")).toHaveTextContent(
+        /1 of 2/,
+      );
+
+      // Let the loop finish.
+      resolveFirst();
+      await waitFor(() => {
+        expect(
+          screen.getByTestId("approval-queue-bulk-result"),
+        ).toBeInTheDocument();
+      });
+    });
+
+    it("partial failure: surfaces failed count + highlights failed card + keeps it selected", async () => {
+      const approveJob = vi
+        .fn()
+        .mockImplementationOnce(() => Promise.resolve())
+        // Second instance fails with a Convex-shaped error.
+        .mockImplementationOnce(() =>
+          Promise.reject(new Error("already approved")),
+        )
+        .mockImplementation(() => Promise.resolve());
+
+      renderWithProviders(<ApprovalQueue />, {
+        contextValue: {
+          getPendingApprovals: () => [
+            pendingInstance("inst-a"),
+            pendingInstance("inst-b"),
+            pendingInstance("inst-c"),
+          ],
+          getChildById: () => CHILD_A,
+          approveJob,
+        },
+      });
+      fireEvent.click(screen.getByTestId("approval-queue-select-all-checkbox"));
+      fireEvent.click(screen.getByTestId("approval-queue-bulk-approve"));
+
+      await waitFor(() => {
+        expect(
+          screen.getByTestId("approval-queue-bulk-result"),
+        ).toBeInTheDocument();
+      });
+      const result = screen.getByTestId("approval-queue-bulk-result");
+      expect(result).toHaveAttribute("data-failed-count", "1");
+      expect(result).toHaveTextContent(/Approved 2 of 3/);
+
+      // Failed card highlighted via data-failed attribute.
+      const cards = screen.getAllByTestId("approval-card");
+      const failedCard = cards.find(
+        (c) => c.getAttribute("data-instance-id") === "inst-b",
+      );
+      expect(failedCard).toHaveAttribute("data-failed", "true");
+
+      // Failed instance stays selected for retry; successful ones cleared.
+      const boxesAfter = screen.getAllByTestId(
+        "approval-card-checkbox",
+      ) as HTMLInputElement[];
+      const failedBox = cards
+        .find((c) => c.getAttribute("data-instance-id") === "inst-b")
+        ?.querySelector(
+          '[data-testid="approval-card-checkbox"]',
+        ) as HTMLInputElement;
+      expect(failedBox.checked).toBe(true);
+      expect(boxesAfter.filter((b) => b.checked)).toHaveLength(1);
     });
   });
 });

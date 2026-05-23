@@ -122,7 +122,11 @@ interface PocketMoneyContextType {
   // Job instance lifecycle
   startJob: (jobId: string, childId: string, scheduledJobId?: string) => void;
   completeJob: (instanceId: string, proofFile?: File) => Promise<void>;
-  approveJob: (instanceId: string) => void;
+  // Wave 8b — returns a Promise so ApprovalQueue's bulk-approve flow can
+  // await each call individually + collect per-instance failures. Single
+  // callers (the per-card Approve button) can still call without awaiting —
+  // a discarded Promise is harmless.
+  approveJob: (instanceId: string) => Promise<void>;
   rejectJob: (instanceId: string, parentNote: string) => void;
   withdrawFromWallet: (input: {
     childId: string;
@@ -215,7 +219,7 @@ const fallbackContextValue: PocketMoneyContextType = {
   createOneOff: () => {},
   startJob: () => {},
   completeJob: async () => {},
-  approveJob: () => {},
+  approveJob: async () => {},
   rejectJob: () => {},
   withdrawFromWallet: async () => {},
   awardBonus: async () => {},
@@ -764,8 +768,10 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
   );
 
   const approveJob = useCallback(
-    (instanceId: string) => {
-      approveJobMutation({ instanceId: instanceId as Id<"jobInstances"> });
+    async (instanceId: string) => {
+      await approveJobMutation({
+        instanceId: instanceId as Id<"jobInstances">,
+      });
     },
     [approveJobMutation],
   );

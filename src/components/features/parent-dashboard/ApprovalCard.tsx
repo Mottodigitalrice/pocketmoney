@@ -16,12 +16,32 @@ interface ApprovalCardProps {
   instance: JobInstance & { job: Job };
   onApprove: () => void;
   onReject: () => void;
+  /**
+   * Wave 8b — bulk-approve. When `selectable` is true, the card shows a
+   * checkbox in the top-left so the parent can stage this instance for the
+   * bulk-approve action. `selected` reflects the queue's selection state;
+   * `onToggleSelected` flips it. When `dimmed` is true, the per-card
+   * Approve/Reject buttons are visually de-emphasized so the floating bulk
+   * action reads as the primary affordance. `failed` highlights the card
+   * after a partial-failure bulk run so the parent can spot which ones
+   * still need attention.
+   */
+  selectable?: boolean;
+  selected?: boolean;
+  onToggleSelected?: () => void;
+  dimmed?: boolean;
+  failed?: boolean;
 }
 
 export function ApprovalCard({
   instance,
   onApprove,
   onReject,
+  selectable = false,
+  selected = false,
+  onToggleSelected,
+  dimmed = false,
+  failed = false,
 }: ApprovalCardProps) {
   const { t, locale } = useTranslation();
   const { getChildById } = usePocketMoney();
@@ -62,10 +82,37 @@ export function ApprovalCard({
       data-instance-id={instance._id}
       data-child-id={instance.childId}
       data-job-id={instance.job._id}
-      className="overflow-hidden rounded-xl border border-amber-700/30 bg-amber-900/40 p-4 backdrop-blur-sm"
+      data-selected={selected ? "true" : undefined}
+      data-failed={failed ? "true" : undefined}
+      className={
+        "overflow-hidden rounded-xl border p-4 backdrop-blur-sm transition-colors " +
+        (failed
+          ? "border-red-500/60 bg-red-950/40"
+          : selected
+            ? "border-amber-400/70 bg-amber-900/60"
+            : "border-amber-700/30 bg-amber-900/40")
+      }
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3">
+          {selectable && (
+            // Wave 8b — bulk-approve selection checkbox. Native input so
+            // we inherit free keyboard support + a11y. 44×44 hit target
+            // matches the minimum-touch rule used elsewhere in the app.
+            // The visible job title sits immediately to the right, which
+            // screen readers announce as the checkbox's name via the
+            // surrounding <label> association — so we don't add a
+            // redundant aria-label here.
+            <label className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-lg hover:bg-amber-900/40">
+              <input
+                type="checkbox"
+                checked={selected}
+                onChange={onToggleSelected}
+                data-testid="approval-card-checkbox"
+                className="h-5 w-5 cursor-pointer accent-amber-500"
+              />
+            </label>
+          )}
           <span className="text-3xl">{instance.job.icon}</span>
           <div>
             <h3 className="font-bold text-amber-100">
@@ -117,7 +164,18 @@ export function ApprovalCard({
         </div>
       )}
 
-      <div className="mt-3 flex gap-2">
+      {/* Wave 8b — when `dimmed` is true, the floating bulk-action bar owns
+          the primary visual weight. We keep the buttons in the DOM (still
+          functional, still tab-reachable for any parent who prefers single
+          actions) but reduce their opacity so the eye lands on the bottom
+          bar first. */}
+      <div
+        className={
+          "mt-3 flex gap-2 transition-opacity " + (dimmed ? "opacity-50" : "")
+        }
+        data-testid="approval-card-actions"
+        data-dimmed={dimmed ? "true" : undefined}
+      >
         <Button
           onClick={onApprove}
           className="min-h-11 flex-1 rounded-lg bg-green-600 font-bold text-white hover:bg-green-700"
