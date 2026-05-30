@@ -47,6 +47,8 @@ function noopAsync() {
 
 export const DEFAULT_CONTEXT_VALUE: FullContext = {
   isLoading: false,
+  provisioningError: false,
+  retryProvisioning: () => {},
   userId: "test-user-id",
   captainCodeEnabled: false,
   luckyChestMaxAmount: 100,

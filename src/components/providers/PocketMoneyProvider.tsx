@@ -1,6 +1,14 @@
 "use client";
 
-import { createContext, useCallback, useMemo, ReactNode } from "react";
+import {
+  createContext,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  ReactNode,
+} from "react";
 import { useUser } from "@clerk/nextjs";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
@@ -59,6 +67,13 @@ function getWeekDates(date: Date = new Date()): string[] {
 
 interface PocketMoneyContextType {
   isLoading: boolean;
+  // True when the signed-in Clerk user could NOT be provisioned into Convex
+  // after MAX_PROVISION_ATTEMPTS (e.g. the Clerk→Convex auth handshake is
+  // broken). Lets the UI show an actionable error instead of an infinite
+  // loading screen. Always false in the no-data-provider fallback.
+  provisioningError: boolean;
+  // Reset attempts and retry provisioning the Convex user row.
+  retryProvisioning: () => void;
   userId: string | null;
   captainCodeEnabled: boolean;
   luckyChestMaxAmount: number;
@@ -193,8 +208,17 @@ const hasDataProviders = Boolean(
   process.env.NEXT_PUBLIC_CONVEX_URL,
 );
 
+// How many times we attempt to create the Convex `users` row before giving up
+// and surfacing `provisioningError`. The first attempt is immediate; the rest
+// back off exponentially. 5 attempts ≈ up to ~8s of transient-failure tolerance
+// (e.g. the upsert racing ahead of Convex receiving the Clerk auth token),
+// after which a persistent failure (broken handshake) stops spinning forever.
+const MAX_PROVISION_ATTEMPTS = 5;
+
 const fallbackContextValue: PocketMoneyContextType = {
   isLoading: false,
+  provisioningError: false,
+  retryProvisioning: () => {},
   userId: null,
   captainCodeEnabled: false,
   luckyChestMaxAmount: 100,
@@ -509,11 +533,136 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
   const createGoalMutation = useMutation(api.functions.goals.create);
   const openLuckyChestMutation = useMutation(api.functions.luckyChests.open);
 
+  // ── User provisioning (Clerk → Convex) ───────────────────────────────────
+  // On first sign-in there is no `users` row yet; it is created here by calling
+  // `upsertFromClerk`. This MUST succeed for the app to leave the loading
+  // state: `getCurrent` stays `null` and every family query stays `"skip"`
+  // (→ `undefined`) until the row exists. The previous fire-and-forget sync
+  // (a) marked itself done before the mutation resolved so it never retried,
+  // and (b) swallowed errors — so any failed Clerk→Convex auth handshake (e.g.
+  // a missing "convex" JWT template, which lands every request as
+  // `identityType: "unknown"` and makes `upsertFromClerk` throw
+  // "Not authenticated") left the user on an infinite, silent "Loading your
+  // crew" screen. We now retry with backoff and surface a terminal error.
+  const upsertFromClerk = useMutation(api.functions.users.upsertFromClerk);
+  // `provisionFailed` is only ever set from async callbacks (the retry timer /
+  // the mutation's catch) — never synchronously in the effect body — to satisfy
+  // react-hooks/set-state-in-effect and avoid cascading renders. The
+  // user-facing flag is derived below so it auto-clears the moment the row
+  // appears, without a setState-to-clear inside the effect.
+  const [provisionFailed, setProvisionFailed] = useState(false);
+  const [retryTick, setRetryTick] = useState(0);
+  const provisionAttemptsRef = useRef(0);
+
+  const retryProvisioning = useCallback(() => {
+    provisionAttemptsRef.current = 0;
+    setProvisionFailed(false);
+    setRetryTick((t) => t + 1);
+  }, []);
+
+  useEffect(() => {
+    // Not ready, or no signed-in Clerk user → nothing to provision.
+    if (!clerkLoaded || !user) return;
+    // Still fetching the user row → wait.
+    if (convexUser === undefined) return;
+    // Row already exists → provisioning is done.
+    if (convexUser !== null) {
+      provisionAttemptsRef.current = 0;
+      return;
+    }
+    // convexUser === null → the row does not exist yet.
+    if (provisionFailed) return; // terminal; wait for an explicit retry
+    if (provisionAttemptsRef.current >= MAX_PROVISION_ATTEMPTS) return;
+
+    let cancelled = false;
+    // `attempt` = number of prior *failed* upserts. It's incremented only in
+    // the catch below (never here), so a re-render that re-runs this effect —
+    // e.g. Clerk's `user` reference churning — just reschedules the timer
+    // rather than burning through the attempt budget.
+    const attempt = provisionAttemptsRef.current;
+    // First attempt is immediate; later attempts back off exponentially. The
+    // most common transient cause is the mutation racing ahead of Convex
+    // receiving the Clerk auth token.
+    const delayMs =
+      attempt === 0 ? 0 : Math.min(8000, 500 * 2 ** (attempt - 1));
+    const timer = setTimeout(() => {
+      if (cancelled) return;
+      const email =
+        user.primaryEmailAddress?.emailAddress ??
+        user.emailAddresses[0]?.emailAddress;
+      if (!email) {
+        // No email on the Clerk profile → cannot provision; fail loudly.
+        setProvisionFailed(true);
+        return;
+      }
+      upsertFromClerk(
+        stripUndefined({
+          email,
+          name: user.fullName || undefined,
+          imageUrl: user.imageUrl || undefined,
+        }),
+      )
+        .then(() => {
+          // Success: `getCurrent` reactively flips `convexUser` to the new row,
+          // which re-runs this effect into the `convexUser !== null` branch.
+        })
+        .catch((err) => {
+          if (cancelled) return;
+          console.error(
+            "[piratemoney] Failed to provision user (Clerk → Convex auth). " +
+              "The most likely cause is a missing/misconfigured Clerk 'convex' " +
+              "JWT template — Convex is receiving requests as " +
+              "identityType:'unknown'.",
+            err,
+          );
+          const failures = provisionAttemptsRef.current + 1;
+          provisionAttemptsRef.current = failures;
+          if (failures >= MAX_PROVISION_ATTEMPTS) {
+            setProvisionFailed(true);
+          } else {
+            // Trigger the next (backed-off) attempt.
+            setRetryTick((t) => t + 1);
+          }
+        });
+    }, delayMs);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+    // `retryTick` re-runs the effect for each backed-off retry; `convexUser`
+    // drives both the initial null and the post-success transition. The
+    // attempt counter lives in a ref so re-renders never reset or multiply it.
+  }, [
+    clerkLoaded,
+    user,
+    convexUser,
+    upsertFromClerk,
+    provisionFailed,
+    retryTick,
+  ]);
+
+  // User-facing flag: a provisioning failure only matters while the row is
+  // still missing. Deriving it (instead of storing) auto-clears the error the
+  // instant `convexUser` becomes a real row — no setState-in-effect required.
+  const provisioningError = provisionFailed && convexUser === null;
+
+  // `isLoading` is the gate behind the "Loading your crew" skeleton. It must
+  // bound itself: family queries are `"skip"` (→ `undefined`) until a user row
+  // exists, so we only wait on them once `userIdForQueries` is set. A failed
+  // provisioning (`provisioningError`) flips this false so the UI can show an
+  // actionable error rather than spinning forever.
+  const signedIn = !!user;
   const isLoading =
     !clerkLoaded ||
-    (!!user &&
-      (convexUser === undefined ||
-        rawChildren === undefined ||
+    // Signed in but the user row hasn't been fetched yet.
+    (signedIn && convexUser === undefined) ||
+    // Signed in, row doesn't exist yet, still trying to create it.
+    (signedIn && convexUser === null && !provisioningError) ||
+    // Row exists → wait on the family data queries.
+    (signedIn &&
+      userIdForQueries !== undefined &&
+      (rawChildren === undefined ||
         rawJobs === undefined ||
         rawInstances === undefined ||
         rawScheduledJobs === undefined ||
@@ -1100,6 +1249,8 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
   const value = useMemo(
     () => ({
       isLoading,
+      provisioningError,
+      retryProvisioning,
       userId: userIdForQueries ?? null,
       captainCodeEnabled,
       luckyChestMaxAmount,
@@ -1159,6 +1310,8 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
     }),
     [
       isLoading,
+      provisioningError,
+      retryProvisioning,
       userIdForQueries,
       captainCodeEnabled,
       luckyChestMaxAmount,

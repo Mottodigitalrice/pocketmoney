@@ -436,6 +436,13 @@ const en = {
   home_no_children: "No crew members yet",
   // H3 — friendlier loading state during convexUser provisioning race.
   home_loading_crew: "Loading your crew…",
+  // Shown when Clerk sign-in succeeded but the Convex user row could not be
+  // created after retries (e.g. broken Clerk→Convex auth handshake).
+  home_provisioning_error_title: "Couldn't board the ship",
+  home_provisioning_error_body:
+    "You're signed in, but we couldn't load your crew. This is usually a quick hiccup — give it another go.",
+  home_provisioning_error_retry: "Try Again",
+  home_provisioning_error_logout: "Log out & try a different account",
 
   // Auth
   auth_sign_in_title: "Welcome Back, Captain!",

@@ -453,6 +453,11 @@ const ja = {
   home_no_children: "まだクルーがいません",
   // H3 — friendlier loading state during convexUser provisioning race.
   home_loading_crew: "クルーをよみこみ中…",
+  home_provisioning_error_title: "船にのりこめませんでした",
+  home_provisioning_error_body:
+    "サインインはできましたが、クルーをよみこめませんでした。たいていは一時的なものです。もう一度おためしください。",
+  home_provisioning_error_retry: "もう一度ためす",
+  home_provisioning_error_logout: "ログアウトして別のアカウントでためす",
 
   // Auth
   auth_sign_in_title: "おかえり、船長!",

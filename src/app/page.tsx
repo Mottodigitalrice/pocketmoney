@@ -11,6 +11,7 @@ import { DolphinAvatar } from "@/components/features/avatars/DolphinAvatar";
 import { LanguageToggle } from "@/components/shared/LanguageToggle";
 import { MathChallenge } from "@/components/features/parent-dashboard/MathChallenge";
 import { AppSkeleton } from "@/components/features/shared/AppSkeleton";
+import { ProvisioningError } from "@/components/features/shared/ProvisioningError";
 import { useTranslation } from "@/hooks/use-translation";
 import { usePocketMoney } from "@/hooks/use-pocket-money";
 import { hasClerkEnv } from "@/lib/env";
@@ -45,8 +46,14 @@ export default function HomePage() {
 
 function HomePageInner() {
   const { t } = useTranslation();
-  const { familyChildren, isLoading, userId, captainCodeEnabled } =
-    usePocketMoney();
+  const {
+    familyChildren,
+    isLoading,
+    userId,
+    captainCodeEnabled,
+    provisioningError,
+    retryProvisioning,
+  } = usePocketMoney();
   const router = useRouter();
   const { signOut } = useClerk();
   const [mathOpen, setMathOpen] = useState(false);
@@ -76,6 +83,15 @@ function HomePageInner() {
 
     router.push(ROUTES.parent);
   };
+
+  // Sign-in worked but the Convex user row couldn't be created after retries
+  // (broken Clerk → Convex auth handshake). Show an actionable error instead
+  // of an infinite skeleton.
+  if (provisioningError) {
+    return (
+      <ProvisioningError onRetry={retryProvisioning} onLogout={handleLogout} />
+    );
+  }
 
   // G2: AppSkeleton replaces the `...` text gate so initial Convex hydration
   // shows a polished shell instead of a blank screen.
