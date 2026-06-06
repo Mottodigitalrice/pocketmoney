@@ -13,7 +13,11 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          # Node 22+ required: the UI test script passes
+          # `NODE_OPTIONS=--no-experimental-webstorage` (jsdom localStorage
+          # fix), a flag that doesn't exist on Node 20 and aborts `npm test`
+          # with "is not allowed in NODE_OPTIONS". Match the dev environment.
+          node-version: "22"
           cache: "npm"
       - run: npm ci
       - run: npm run lint
