@@ -88,9 +88,11 @@ export const findOrphanedProofs = query({
     const allStorage = await ctx.db.system.query("_storage").collect();
 
     // Collect every storage ID referenced by THIS family's jobInstances.
+    // QA-2026-06-06 (G3): use the `by_user` index instead of a full-table
+    // `.filter()` scan.
     const myInstances = await ctx.db
       .query("jobInstances")
-      .filter((q) => q.eq(q.field("userId"), user._id))
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
       .collect();
 
     const referencedIds = myInstances
@@ -162,9 +164,10 @@ export const deleteOrphanedProofs = mutation({
 
     // Re-derive the current orphan set (same logic as findOrphanedProofs;
     // duplicated because a mutation cannot call a query in the same txn).
+    // QA-2026-06-06 (G3): index scan, not a full-table `.filter()`.
     const myInstances = await ctx.db
       .query("jobInstances")
-      .filter((q) => q.eq(q.field("userId"), user._id))
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
       .collect();
     const referencedIds = new Set(
       myInstances
@@ -183,8 +186,14 @@ export const deleteOrphanedProofs = mutation({
 
       try {
         await ctx.storage.delete(storageId);
-      } catch {
+      } catch (err) {
         // Stay idempotent — re-running after a partial failure is supported.
+        // QA-2026-06-06 (F10): log instead of fully swallowing so ops has a
+        // signal when storage deletes fail (vs. the file simply being gone).
+        console.warn(
+          `[audit.deleteOrphanedProofs] storage.delete failed for ${storageId}:`,
+          err,
+        );
       }
       deletedIds.push(storageId);
     }

@@ -21,6 +21,18 @@ const JOB_TITLE_JA_MAX_LEN = 100;
 const JOB_YEN_AMOUNT_MIN = 0;
 const JOB_YEN_AMOUNT_MAX = 1_000_000;
 
+// QA-2026-06-06 (Wave 1): money-mutation integer + bound guards.
+// Yen is integer-only — every credit/debit must be a whole number. We reject
+// fractional amounts rather than silently `Math.round`-ing them, because a
+// silent round means the ledger and the parent's intent disagree without
+// anyone noticing. `PAYOUT_YEN_AMOUNT_MAX` mirrors `JOB_YEN_AMOUNT_MAX`.
+const PAYOUT_YEN_AMOUNT_MAX = 1_000_000;
+// Mirror of `MAX_LUCKY_CHEST_CAP` in `convex/lib/luckyChestMath.ts`. Locked in
+// lockstep by a test so the setter can never store a value that `open`'s
+// `pickLuckyChestAmount` would reject (which would surface a raw error to the
+// kid). Keep the two constants equal.
+const LUCKY_CHEST_MAX_CAP = 10_000;
+
 // MED-1: anti-button-mash cooldown between successive `luckyChests.open`
 // calls per user. NOT a security boundary — week-level idempotency
 // (`luckyChests.by_child_week` unique lookup) is the real guard. This is
@@ -124,6 +136,96 @@ export function assertJobYenAmount(input: number): void {
   }
 }
 
+/**
+ * QA-2026-06-06: assert a money amount is a strictly-positive whole-yen
+ * integer within `[1, PAYOUT_YEN_AMOUNT_MAX]`. Used by `transactions.withdraw`
+ * and `wallets.awardBonus` so a fractional or absurd amount is rejected
+ * up-front (NOT silently rounded). Throws the stable `AMOUNT_NOT_INTEGER`
+ * code on a non-integer / non-finite input, `AMOUNT_OUT_OF_BOUNDS` otherwise.
+ */
+export function assertPositiveYenAmount(
+  input: number,
+  label: string = "amount",
+): void {
+  if (!Number.isFinite(input) || !Number.isInteger(input)) {
+    throw new Error(`AMOUNT_NOT_INTEGER: ${label}`);
+  }
+  if (input < 1 || input > PAYOUT_YEN_AMOUNT_MAX) {
+    throw new Error(`AMOUNT_OUT_OF_BOUNDS: ${label}`);
+  }
+}
+
+/**
+ * QA-2026-06-06 (F2): assert the per-family Lucky Chest max payout is a whole
+ * integer in `[0, LUCKY_CHEST_MAX_CAP]`. `0` is allowed and means "disabled"
+ * (the `open` mutation treats `<= 0` as not-set). The upper bound MUST equal
+ * `pickLuckyChestAmount`'s cap so `open` can never throw an out-of-bounds
+ * error to the kid. Throws `LUCKY_CHEST_MAX_OUT_OF_BOUNDS`.
+ */
+export function assertLuckyChestMaxAmount(input: number): void {
+  if (
+    !Number.isFinite(input) ||
+    !Number.isInteger(input) ||
+    input < 0 ||
+    input > LUCKY_CHEST_MAX_CAP
+  ) {
+    throw new Error("LUCKY_CHEST_MAX_OUT_OF_BOUNDS");
+  }
+}
+
+// QA-2026-06-06 (F9): child + goal field bounds. The UI already validates
+// these, so the backend guards are defense-in-depth against a malicious or
+// buggy client. All throw the generic `INPUT_OUT_OF_BOUNDS: <label>` code
+// (mapped to the existing `error_validation` toast) — a precise per-field
+// message is the UI's job; the backend only enforces the bound.
+const CHILD_NAME_MAX_LEN = 40;
+const CHILD_ICON_MAX_LEN = 32;
+const CHILD_AGE_MIN = 0;
+const CHILD_AGE_MAX = 25;
+const GOAL_TITLE_MAX_LEN = 100;
+const GOAL_EMOJI_MAX_LEN = 16;
+
+/** Non-empty (after trim) name within the length cap. */
+export function assertChildName(input: string): void {
+  if (input.trim().length === 0 || input.length > CHILD_NAME_MAX_LEN) {
+    throw new Error("INPUT_OUT_OF_BOUNDS: child name");
+  }
+}
+
+/** Non-empty avatar key within the length cap. */
+export function assertChildIcon(input: string): void {
+  if (input.length === 0 || input.length > CHILD_ICON_MAX_LEN) {
+    throw new Error("INPUT_OUT_OF_BOUNDS: child icon");
+  }
+}
+
+/** Whole-number age in `[0, 25]`. Guards the `rankMultiplier = oldest/age`
+ *  division and rejects fractional / absurd ages. */
+export function assertChildAge(input: number): void {
+  if (
+    !Number.isFinite(input) ||
+    !Number.isInteger(input) ||
+    input < CHILD_AGE_MIN ||
+    input > CHILD_AGE_MAX
+  ) {
+    throw new Error("INPUT_OUT_OF_BOUNDS: child age");
+  }
+}
+
+/** Non-empty (after trim) goal title within the length cap. */
+export function assertGoalTitle(input: string): void {
+  if (input.trim().length === 0 || input.length > GOAL_TITLE_MAX_LEN) {
+    throw new Error("INPUT_OUT_OF_BOUNDS: goal title");
+  }
+}
+
+/** Non-empty goal emoji within the length cap. */
+export function assertGoalEmoji(input: string): void {
+  if (input.length === 0 || input.length > GOAL_EMOJI_MAX_LEN) {
+    throw new Error("INPUT_OUT_OF_BOUNDS: goal emoji");
+  }
+}
+
 /** Exported for tests + downstream visibility. */
 export const __testing__ = {
   PARENT_NOTE_MAX_LEN,
@@ -131,4 +233,12 @@ export const __testing__ = {
   JOB_TITLE_JA_MAX_LEN,
   JOB_YEN_AMOUNT_MIN,
   JOB_YEN_AMOUNT_MAX,
+  PAYOUT_YEN_AMOUNT_MAX,
+  LUCKY_CHEST_MAX_CAP,
+  CHILD_NAME_MAX_LEN,
+  CHILD_ICON_MAX_LEN,
+  CHILD_AGE_MIN,
+  CHILD_AGE_MAX,
+  GOAL_TITLE_MAX_LEN,
+  GOAL_EMOJI_MAX_LEN,
 };

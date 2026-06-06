@@ -33,6 +33,9 @@ import {
 import { resizeImageForProof, uploadProofWithRetry } from "@/lib/photo-proof";
 import { stripUndefined } from "@/lib/utils";
 import { calculateRank } from "../../../convex/lib/rankMath";
+import { toast } from "sonner";
+import { useTranslation } from "@/hooks/use-translation";
+import { mapConvexError } from "@/lib/convex-errors";
 
 // Helper to get today's date as YYYY-MM-DD in local timezone
 function getLocalDateString(date: Date = new Date()): string {
@@ -298,6 +301,20 @@ export function PocketMoneyProvider({ children }: { children: ReactNode }) {
 
 function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
   const { user, isLoaded: clerkLoaded } = useUser();
+  const { t } = useTranslation();
+
+  // QA-2026-06-06 (F8): centralized failure toast for fire-and-forget
+  // mutations. Several parent-dashboard actions (edit/delete job, schedule,
+  // remove/clear schedule, start job, reject, child CRUD, recurring apply)
+  // previously swallowed rejections silently — the user saw nothing when a
+  // write failed. We surface a mapped, translated toast instead. Success paths
+  // are unchanged; this only fires on the previously-silent rejection path.
+  const notifyError = useCallback(
+    (err: unknown) => {
+      toast.error(mapConvexError(err, t).message);
+    },
+    [t],
+  );
 
   // Get the Convex user record
   const convexUser = useQuery(
@@ -674,11 +691,15 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
   const setCaptainCodeEnabled = useCallback(
     async (enabled: boolean) => {
       if (!userIdForQueries) return;
-      await setCaptainCodeEnabledMutation({
-        enabled,
-      });
+      try {
+        await setCaptainCodeEnabledMutation({
+          enabled,
+        });
+      } catch (err) {
+        notifyError(err);
+      }
     },
-    [userIdForQueries, setCaptainCodeEnabledMutation],
+    [userIdForQueries, setCaptainCodeEnabledMutation, notifyError],
   );
 
   // Job library mutations
@@ -722,16 +743,16 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
           requiresPhotoProof: updates.requiresPhotoProof,
           recurrence: updates.recurrence,
         }),
-      );
+      ).catch(notifyError);
     },
-    [updateJobMutation],
+    [updateJobMutation, notifyError],
   );
 
   const deleteJob = useCallback(
     (id: string) => {
-      removeJobMutation({ jobId: id as Id<"jobs"> });
+      removeJobMutation({ jobId: id as Id<"jobs"> }).catch(notifyError);
     },
-    [removeJobMutation],
+    [removeJobMutation, notifyError],
   );
 
   // Scheduling mutations
@@ -748,9 +769,9 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
         childId: childId as Id<"children">,
         date,
         priority,
-      });
+      }).catch(notifyError);
     },
-    [userIdForQueries, createScheduledJobMutation],
+    [userIdForQueries, createScheduledJobMutation, notifyError],
   );
 
   const scheduleJobBatch = useCallback(
@@ -770,18 +791,18 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
           date: e.date,
           priority: e.priority ?? "optional",
         })),
-      });
+      }).catch(notifyError);
     },
-    [userIdForQueries, createScheduledJobBatchMutation],
+    [userIdForQueries, createScheduledJobBatchMutation, notifyError],
   );
 
   const removeScheduledJob = useCallback(
     (scheduledJobId: string) => {
       removeScheduledJobMutation({
         scheduledJobId: scheduledJobId as Id<"scheduledJobs">,
-      });
+      }).catch(notifyError);
     },
-    [removeScheduledJobMutation],
+    [removeScheduledJobMutation, notifyError],
   );
 
   const clearScheduledDay = useCallback(
@@ -789,9 +810,9 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
       clearScheduledDayMutation({
         childId: childId as Id<"children">,
         date,
-      });
+      }).catch(notifyError);
     },
-    [clearScheduledDayMutation],
+    [clearScheduledDayMutation, notifyError],
   );
 
   const applyRecurringJobsForWeek = useCallback(
@@ -862,10 +883,15 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
           childId: childId as Id<"children">,
           date: getLocalDateString(),
           priority: "optional",
-        });
+        }).catch(notifyError);
       }
     },
-    [userIdForQueries, createJobMutation, createScheduledJobMutation],
+    [
+      userIdForQueries,
+      createJobMutation,
+      createScheduledJobMutation,
+      notifyError,
+    ],
   );
 
   // Job instance mutations
@@ -878,9 +904,9 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
           childId: childId as Id<"children">,
           scheduledJobId: scheduledJobId as Id<"scheduledJobs"> | undefined,
         }),
-      );
+      ).catch(notifyError);
     },
-    [userIdForQueries, startJobMutation],
+    [userIdForQueries, startJobMutation, notifyError],
   );
 
   const completeJob = useCallback(
@@ -930,9 +956,9 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
       rejectJobMutation({
         instanceId: instanceId as Id<"jobInstances">,
         parentNote,
-      });
+      }).catch(notifyError);
     },
-    [rejectJobMutation],
+    [rejectJobMutation, notifyError],
   );
 
   const withdrawFromWallet = useCallback(
@@ -1012,9 +1038,9 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
   const addChild = useCallback(
     (name: string, icon: string) => {
       if (!userIdForQueries) return;
-      createChildMutation({ name, icon });
+      createChildMutation({ name, icon }).catch(notifyError);
     },
-    [userIdForQueries, createChildMutation],
+    [userIdForQueries, createChildMutation, notifyError],
   );
 
   const editChild = useCallback(
@@ -1023,16 +1049,18 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
         childId: childId as Id<"children">,
         name,
         icon,
-      });
+      }).catch(notifyError);
     },
-    [updateChildMutation],
+    [updateChildMutation, notifyError],
   );
 
   const deleteChild = useCallback(
     (childId: string) => {
-      removeChildMutation({ childId: childId as Id<"children"> });
+      removeChildMutation({ childId: childId as Id<"children"> }).catch(
+        notifyError,
+      );
     },
-    [removeChildMutation],
+    [removeChildMutation, notifyError],
   );
 
   // Derived data helpers

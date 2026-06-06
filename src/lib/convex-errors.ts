@@ -42,6 +42,9 @@ export type ErrorCode =
   | "JOB_TITLE_TOO_LONG"
   | "JOB_TITLE_JA_TOO_LONG"
   | "JOB_YEN_AMOUNT_OUT_OF_BOUNDS"
+  | "AMOUNT_NOT_INTEGER"
+  | "AMOUNT_OUT_OF_BOUNDS"
+  | "LUCKY_CHEST_MAX_OUT_OF_BOUNDS"
   | "INVALID_DATE_FORMAT"
   | "OWNERSHIP"
   | "VALIDATION"
@@ -105,6 +108,18 @@ const CODE_META: Record<
   },
   JOB_YEN_AMOUNT_OUT_OF_BOUNDS: {
     key: "error_job_yen_amount_out_of_bounds",
+    severity: "validation",
+  },
+  AMOUNT_NOT_INTEGER: {
+    key: "error_amount_not_integer",
+    severity: "validation",
+  },
+  AMOUNT_OUT_OF_BOUNDS: {
+    key: "error_amount_out_of_bounds",
+    severity: "validation",
+  },
+  LUCKY_CHEST_MAX_OUT_OF_BOUNDS: {
+    key: "error_lucky_chest_max_out_of_bounds",
     severity: "validation",
   },
   INVALID_DATE_FORMAT: {
@@ -182,6 +197,16 @@ function classify(raw: string): ErrorCode {
   if (/JOB_YEN_AMOUNT_OUT_OF_BOUNDS/.test(raw)) {
     return "JOB_YEN_AMOUNT_OUT_OF_BOUNDS";
   }
+  // QA-2026-06-06 money guards. LUCKY_CHEST_MAX before the generic AMOUNT
+  // checks; AMOUNT_OUT_OF_BOUNDS must come AFTER JOB_YEN_AMOUNT_OUT_OF_BOUNDS
+  // above (that string also contains "AMOUNT_OUT_OF_BOUNDS").
+  if (/LUCKY_CHEST_MAX_OUT_OF_BOUNDS/.test(raw)) {
+    return "LUCKY_CHEST_MAX_OUT_OF_BOUNDS";
+  }
+  if (/AMOUNT_NOT_INTEGER/.test(raw)) return "AMOUNT_NOT_INTEGER";
+  if (/AMOUNT_OUT_OF_BOUNDS/.test(raw)) return "AMOUNT_OUT_OF_BOUNDS";
+  // F9 child/goal field bounds — reuse the generic validation toast.
+  if (/INPUT_OUT_OF_BOUNDS/.test(raw)) return "VALIDATION";
   // INVALID_DATE_FORMAT is thrown with a label suffix (`INVALID_DATE_FORMAT: <label>`).
   if (/INVALID_DATE_FORMAT/.test(raw)) return "INVALID_DATE_FORMAT";
 

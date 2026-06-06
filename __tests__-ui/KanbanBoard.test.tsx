@@ -161,7 +161,9 @@ describe("KanbanBoard", () => {
     expect(container).not.toHaveTextContent(/Complete jobs to see/i);
     expect(container).not.toHaveTextContent(/Pick a job to start/i);
     // Soft placeholders render in the empty columns only.
-    expect(getByTestId("kanban-column-soft-empty-available")).toBeInTheDocument();
+    expect(
+      getByTestId("kanban-column-soft-empty-available"),
+    ).toBeInTheDocument();
     expect(getByTestId("kanban-column-soft-empty-done")).toBeInTheDocument();
     expect(queryByTestId("kanban-column-soft-empty-doing")).toBeNull();
   });

@@ -28,6 +28,14 @@ export default defineConfig({
     include: ["__tests__-ui/**/*.test.tsx"],
     exclude: ["node_modules/**", ".next/**", "convex/_generated/**"],
     setupFiles: ["./__tests__-ui/setup.ts"],
+    // QA-2026-06-06 (G1): the default 5s testTimeout is too tight when ~35
+    // jsdom suites run in parallel — heavy per-suite environment setup
+    // intermittently pushed individual tests past 5s and flaked the gate
+    // (GoalWishlist empty-state, KanbanBoard tablist-aria), even though each
+    // passes in ~2.5s in isolation. Give real work headroom so CI is
+    // deterministic.
+    testTimeout: 20_000,
+    hookTimeout: 20_000,
     // Node v25 enables the Web Storage API by default, which collides with
     // jsdom's own localStorage implementation and ends up serving a stub
     // missing `clear()` / `setItem()`. The `test:ui` script in package.json

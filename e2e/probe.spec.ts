@@ -19,12 +19,10 @@ test("authenticated parent can reach /parent without redirect", async ({
 
   // Robust assertion: the parent tab bar always renders one of the tab buttons.
   // Use a flexible matcher so this is resilient to copy changes.
-  const anyParentTab = page
-    .getByRole("button")
-    .filter({
-      hasText:
-        /quick|approv|plan|job|overview|child|追加|承認|計画|仕事|概要|子供/i,
-    });
+  const anyParentTab = page.getByRole("button").filter({
+    hasText:
+      /quick|approv|plan|job|overview|child|追加|承認|計画|仕事|概要|子供/i,
+  });
 
   await expect(anyParentTab.first()).toBeVisible({ timeout: 15_000 });
 });

@@ -5,7 +5,10 @@ import type { MutationCtx, QueryCtx } from "../_generated/server";
 import { getCurrentUser } from "./users";
 import { creditBonus } from "./wallets";
 import { assertOwnedBy } from "../lib/auth";
-import { pickLuckyChestAmount } from "../lib/luckyChestMath";
+import {
+  pickLuckyChestAmount,
+  clampLuckyChestMax,
+} from "../lib/luckyChestMath";
 import { LUCKY_CHEST_COOLDOWN_MS } from "../lib/inputValidation";
 
 const luckyChestDocValidator = v.object({
@@ -103,7 +106,8 @@ export const getStatusForFamily = query({
       .query("children")
       .withIndex("by_user", (q) => q.eq("userId", user._id))
       .collect();
-    const maxAmount = user.luckyChestMaxAmount ?? 100;
+    // QA-2026-06-06 (F2): clamp legacy/out-of-range stored values at read.
+    const maxAmount = clampLuckyChestMax(user.luckyChestMaxAmount ?? 100);
     const weekStart = args.weekDates[0]!; // safe: length checked above
 
     return await Promise.all(
@@ -166,7 +170,10 @@ export const open = mutation({
     // mutations per document, so this patch+read sequence is safe.
     await ctx.db.patch(user._id, { lastLuckyChestAttemptAt: now });
 
-    const maxAmount = user.luckyChestMaxAmount ?? 100;
+    // QA-2026-06-06 (F2): clamp at read so a legacy stored value > 10_000
+    // (written before the setter enforced the cap) can never make
+    // `pickLuckyChestAmount` throw a raw out-of-bounds error to the kid.
+    const maxAmount = clampLuckyChestMax(user.luckyChestMaxAmount ?? 100);
     if (maxAmount <= 0) {
       throw new Error("Lucky Chest max amount is not set");
     }
