@@ -4,6 +4,7 @@ import { getCurrentUser } from "./users";
 import { ensureWalletsForChild } from "./wallets";
 import { assertOwnedBy } from "../lib/auth";
 import { overdraftErrorOrNull } from "../lib/withdrawGuard";
+import { assertPositiveYenAmount } from "../lib/inputValidation";
 
 const jarValidator = v.union(
   v.literal("spend"),
@@ -93,9 +94,11 @@ export const withdraw = mutation({
   },
   returns: v.id("transactions"),
   handler: async (ctx, args) => {
-    if (args.amount <= 0) {
-      throw new Error("Withdrawal amount must be positive");
-    }
+    // QA-2026-06-06 (F1a): reject fractional / non-finite / out-of-range
+    // amounts BEFORE touching the ledger. Previously only `amount <= 0` was
+    // checked, so a `10.5` withdrawal wrote a non-integer balance and broke
+    // the integer-yen ledger invariant.
+    assertPositiveYenAmount(args.amount, "withdrawal");
 
     const user = await getCurrentUser(ctx);
     assertOwnedBy(await ctx.db.get(args.childId), user._id, "child");

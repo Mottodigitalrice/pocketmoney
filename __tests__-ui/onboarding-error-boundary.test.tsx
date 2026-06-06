@@ -47,7 +47,10 @@ describe("onboarding/error.tsx — segment boundary", () => {
 
   it("renders the Error ID line when error.digest is present", () => {
     renderWithProviders(
-      <OnboardingError error={makeError("onboarding-def456")} reset={() => {}} />,
+      <OnboardingError
+        error={makeError("onboarding-def456")}
+        reset={() => {}}
+      />,
     );
     const wrap = screen.getByTestId("error-digest");
     expect(screen.getByText(/Error ID:/i)).toBeInTheDocument();
@@ -65,9 +68,7 @@ describe("onboarding/error.tsx — segment boundary", () => {
   it("calls the reset prop when Try Again is clicked", async () => {
     const reset = vi.fn();
     const user = userEvent.setup();
-    renderWithProviders(
-      <OnboardingError error={makeError()} reset={reset} />,
-    );
+    renderWithProviders(<OnboardingError error={makeError()} reset={reset} />);
     await user.click(screen.getByRole("button", { name: /try again/i }));
     expect(reset).toHaveBeenCalledTimes(1);
   });

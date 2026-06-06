@@ -74,8 +74,13 @@ export async function deleteJobInstanceAndProof(
   if (instance.proofStorageId && !instance.proofDeletedAt) {
     try {
       await ctx.storage.delete(instance.proofStorageId);
-    } catch {
+    } catch (err) {
       // Instance deletion should stay idempotent if storage was already removed.
+      // QA-2026-06-06 (F10): log instead of fully swallowing so ops has a signal.
+      console.warn(
+        `[jobInstances.deleteJobInstanceAndProof] storage.delete failed for ${instance.proofStorageId}:`,
+        err,
+      );
     }
   }
 
@@ -345,8 +350,13 @@ export const cleanupApprovedPhotoProofs = internalMutation({
 
       try {
         await ctx.storage.delete(instance.proofStorageId);
-      } catch {
+      } catch (err) {
         // Keep cleanup idempotent if storage was already removed manually.
+        // QA-2026-06-06 (F10): log instead of fully swallowing for ops signal.
+        console.warn(
+          `[jobInstances.cleanupApprovedPhotoProofs] storage.delete failed for ${instance.proofStorageId}:`,
+          err,
+        );
       }
 
       await ctx.db.patch(instance._id, {

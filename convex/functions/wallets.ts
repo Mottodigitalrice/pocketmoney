@@ -11,6 +11,7 @@ import {
   hasTransactionInWeek,
   weeksToBackfill,
 } from "../lib/cronMath";
+import { assertPositiveYenAmount } from "../lib/inputValidation";
 
 const jars = ["spend", "save", "give"] as const;
 type Jar = (typeof jars)[number];
@@ -222,6 +223,58 @@ export const ensureForChild = mutation({
 });
 
 /**
+ * QA-2026-06-06 (F3): ledger reconciliation / repair-diagnostic query.
+ *
+ * For every wallet in the calling family, compare the stored `balance` against
+ * the signed sum of the wallet's transactions (the ledger). A healthy wallet
+ * has `drift === 0`. A non-zero `drift` means the balance and the ledger
+ * disagree — the signal that something credited/debited the balance without a
+ * matching transaction (or vice-versa). Read-only: it reports, it does not
+ * repair, so a parent/operator can inspect before acting.
+ *
+ * Every money mutation tags its transaction with `walletId`, so summing
+ * `by_wallet` is the authoritative ledger for a wallet.
+ */
+export const reconcile = query({
+  args: {},
+  returns: v.array(
+    v.object({
+      walletId: v.id("wallets"),
+      childId: v.id("children"),
+      jar: jarValidator,
+      balance: v.number(),
+      ledgerSum: v.number(),
+      drift: v.number(),
+    }),
+  ),
+  handler: async (ctx) => {
+    const user = await getCurrentUser(ctx);
+    const wallets = await ctx.db
+      .query("wallets")
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
+      .collect();
+
+    const rows = [];
+    for (const wallet of wallets) {
+      const txs = await ctx.db
+        .query("transactions")
+        .withIndex("by_wallet", (q) => q.eq("walletId", wallet._id))
+        .collect();
+      const ledgerSum = txs.reduce((sum, tx) => sum + tx.amount, 0);
+      rows.push({
+        walletId: wallet._id,
+        childId: wallet.childId,
+        jar: wallet.jar,
+        balance: wallet.balance,
+        ledgerSum,
+        drift: wallet.balance - ledgerSum,
+      });
+    }
+    return rows;
+  },
+});
+
+/**
  * Migrate legacy approved-job earnings into the 3-jar wallet system.
  *
  * Per-child idempotency contract:
@@ -368,15 +421,16 @@ export const awardBonus = mutation({
   },
   returns: v.null(),
   handler: async (ctx, args) => {
-    if (args.amount <= 0) {
-      throw new Error("Bonus amount must be positive");
-    }
+    // QA-2026-06-06 (F1b): reject fractional / out-of-range bonuses instead of
+    // silently `Math.round`-ing them. A silent round credits an amount the
+    // parent never chose; rejecting surfaces the mistake instead.
+    assertPositiveYenAmount(args.amount, "bonus");
 
     const { user } = await assertChildOwner(ctx, args.childId);
     await creditBonus(ctx, {
       userId: user._id,
       childId: args.childId,
-      amount: Math.round(args.amount),
+      amount: args.amount,
       ...(args.note !== undefined ? { note: args.note } : {}),
     });
     return null;
@@ -391,8 +445,17 @@ export const awardBonus = mutation({
  * The idempotency check is the predicate from `cronMath.hasTransactionInWeek`.
  * Re-running the same (wallet, week) is a no-op.
  *
- * Returns `true` if a credit was made, `false` if skipped (already credited,
+ * Returns the credited amount (¥), or `0` if skipped (already credited,
  * zero balance, or interest rounds to ¥0).
+ *
+ * QA-2026-06-06 (F4): this helper now MUTATES `wallet.balance` in place after
+ * a successful credit. The caller may invoke it several times for the same
+ * `wallet` object (multi-week backfill); `creditWallet` writes the ABSOLUTE
+ * `currentBalance + amount`, so if the in-memory balance were left stale each
+ * subsequent week would overwrite the prior week's credit — inserting N
+ * interest transactions while the balance only ever reflected one. Keeping the
+ * running balance in sync makes the credits compound correctly and keeps the
+ * wallet balance equal to the signed sum of its transactions.
  *
  * @internal — called from the cron handler and `runInterestForWeek`.
  */
@@ -400,21 +463,21 @@ async function creditWeekIfMissing(
   ctx: MutationCtx,
   wallet: Doc<"wallets">,
   weekStartMs: number,
-): Promise<boolean> {
-  if (wallet.jar !== "save" || wallet.balance <= 0) return false;
+): Promise<number> {
+  if (wallet.jar !== "save" || wallet.balance <= 0) return 0;
 
   const txs = await ctx.db
     .query("transactions")
     .withIndex("by_wallet", (q) => q.eq("walletId", wallet._id))
     .collect();
 
-  if (hasTransactionInWeek(txs, weekStartMs, "interest")) return false;
+  if (hasTransactionInWeek(txs, weekStartMs, "interest")) return 0;
 
   // Preserve EXACT F2 formula: balance * 10% APR / 52 weeks, floored.
   const amount = Math.floor(
     (wallet.balance * SAVE_INTEREST_APR) / WEEKS_PER_YEAR,
   );
-  if (amount <= 0) return false;
+  if (amount <= 0) return 0;
 
   await creditWallet(ctx, {
     userId: wallet.userId,
@@ -429,7 +492,10 @@ async function creditWeekIfMissing(
     // place it unambiguously inside [weekStart, weekStart+7d).
     createdAt: weekStartMs,
   });
-  return true;
+  // Keep the in-memory balance in lockstep with the DB write so subsequent
+  // weeks in this same backfill run compute + persist on the running total.
+  wallet.balance += amount;
+  return amount;
 }
 
 /**
@@ -464,11 +530,14 @@ export const creditWeeklySaveInterest = internalMutation({
 
       for (const iso of weekStarts) {
         const weekStartMs = new Date(iso).getTime();
-        const before = wallet.balance;
-        const did = await creditWeekIfMissing(ctx, wallet, weekStartMs);
-        if (did) {
+        // `creditWeekIfMissing` returns the amount it credited (0 if skipped)
+        // and updates `wallet.balance` in place so the next week compounds on
+        // the running total. Accumulate the ACTUAL credited amount — never a
+        // recompute from a now-stale balance.
+        const amount = await creditWeekIfMissing(ctx, wallet, weekStartMs);
+        if (amount > 0) {
           creditsApplied += 1;
-          credited += Math.floor((before * SAVE_INTEREST_APR) / WEEKS_PER_YEAR);
+          credited += amount;
         }
       }
     }
@@ -509,8 +578,8 @@ export const runInterestForWeek = mutation({
 
     for (const wallet of familyWallets) {
       if (wallet.jar !== "save") continue;
-      const did = await creditWeekIfMissing(ctx, wallet, weekStartMs);
-      if (did) credited.add(wallet.childId);
+      const amount = await creditWeekIfMissing(ctx, wallet, weekStartMs);
+      if (amount > 0) credited.add(wallet.childId);
       else skipped.add(wallet.childId);
     }
 

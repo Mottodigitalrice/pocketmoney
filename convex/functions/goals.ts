@@ -2,6 +2,11 @@ import { v } from "convex/values";
 import { mutation, query } from "../_generated/server";
 import { getCurrentUser } from "./users";
 import { assertOwnedBy } from "../lib/auth";
+import {
+  assertPositiveYenAmount,
+  assertGoalTitle,
+  assertGoalEmoji,
+} from "../lib/inputValidation";
 
 const goalStatusValidator = v.union(
   v.literal("active"),
@@ -59,9 +64,12 @@ export const create = mutation({
   },
   returns: v.id("goals"),
   handler: async (ctx, args) => {
-    if (args.targetAmount <= 0) {
-      throw new Error("Goal target must be positive");
-    }
+    // QA-2026-06-06 (F9): target must be a positive whole-yen integer in range
+    // (was only `<= 0`-guarded, so a fractional or absurd target slipped
+    // through); title/emoji bounded as defense-in-depth.
+    assertPositiveYenAmount(args.targetAmount, "goal target");
+    assertGoalTitle(args.title);
+    assertGoalEmoji(args.emoji);
 
     const user = await getCurrentUser(ctx);
     assertOwnedBy(await ctx.db.get(args.childId), user._id, "child");

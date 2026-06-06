@@ -544,6 +544,11 @@ const ja = {
     "日本語のタイトルが長すぎます。100文字以下にしてください。",
   error_job_yen_amount_out_of_bounds:
     "ジョブの金額は¥0から¥1,000,000の間にしてください。",
+  error_amount_not_integer: "金額は1円きざみで入力してね（小数は使えません）。",
+  error_amount_out_of_bounds:
+    "金額が範囲外です。¥1から¥1,000,000の整数で入力してください。",
+  error_lucky_chest_max_out_of_bounds:
+    "ラッキーチェストの上限は¥1から¥10,000の整数にしてください。",
   error_invalid_date_format:
     "日付の形式が正しくありません。YYYY-MM-DD形式(例:2026-05-23)にしてください。",
   error_ownership: "それはあなたのクルーのものではありません。",

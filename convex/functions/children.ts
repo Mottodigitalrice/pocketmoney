@@ -10,6 +10,11 @@ import {
   CHILD_CASCADE_TABLES,
   type ChildCascadeTable,
 } from "../lib/childCascade";
+import {
+  assertChildName,
+  assertChildIcon,
+  assertChildAge,
+} from "../lib/inputValidation";
 
 const childDocValidator = v.object({
   _id: v.id("children"),
@@ -45,6 +50,13 @@ export const create = mutation({
   },
   returns: v.id("children"),
   handler: async (ctx, args) => {
+    // QA-2026-06-06 (F9): bound name/icon/age (defense-in-depth; the UI
+    // validates too). `assertChildAge` also stops a fractional/absurd age
+    // from poisoning the `rankMultiplier` division below.
+    assertChildName(args.name);
+    assertChildIcon(args.icon);
+    if (args.age !== undefined) assertChildAge(args.age);
+
     const user = await getCurrentUser(ctx);
     const siblings = await ctx.db
       .query("children")
@@ -81,6 +93,11 @@ export const update = mutation({
   },
   returns: v.null(),
   handler: async (ctx, args) => {
+    // QA-2026-06-06 (F9): validate any field actually supplied in the patch.
+    if (args.name !== undefined) assertChildName(args.name);
+    if (args.icon !== undefined) assertChildIcon(args.icon);
+    if (args.age !== undefined) assertChildAge(args.age);
+
     const user = await getCurrentUser(ctx);
     const child = assertOwnedByOrNull(
       await ctx.db.get(args.childId),

@@ -524,6 +524,11 @@ const en = {
     "Japanese job title is too long. Keep it under 100 characters.",
   error_job_yen_amount_out_of_bounds:
     "Job amount must be between ¥0 and ¥1,000,000.",
+  error_amount_not_integer: "Amounts must be whole yen — no decimals.",
+  error_amount_out_of_bounds:
+    "That amount is out of range. Use a whole number between ¥1 and ¥1,000,000.",
+  error_lucky_chest_max_out_of_bounds:
+    "Lucky Chest max must be a whole number from ¥1 to ¥10,000.",
   error_invalid_date_format:
     "Date format is invalid. Use YYYY-MM-DD (e.g., 2026-05-23).",
   error_ownership: "That doesn't belong to your crew.",

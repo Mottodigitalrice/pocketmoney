@@ -1,6 +1,7 @@
 import { v } from "convex/values";
 import { mutation, query } from "../_generated/server";
 import type { MutationCtx, QueryCtx } from "../_generated/server";
+import { assertLuckyChestMaxAmount } from "../lib/inputValidation";
 
 const userDocValidator = v.object({
   _id: v.id("users"),
@@ -151,12 +152,15 @@ export const setLuckyChestMaxAmount = mutation({
   returns: v.null(),
   handler: async (ctx, args) => {
     const user = await getCurrentUser(ctx);
-    if (args.amount < 0) {
-      throw new Error("Lucky Chest max must be zero or higher");
-    }
+    // QA-2026-06-06 (F2): validate to a whole integer in [0, 10_000]. The
+    // upper bound mirrors `pickLuckyChestAmount`'s cap, so `luckyChests.open`
+    // can never throw an out-of-bounds error to the kid. Previously this
+    // accepted any number and silently `Math.round`-ed it, letting a parent
+    // store e.g. 50_000 and break the kid's chest-open flow.
+    assertLuckyChestMaxAmount(args.amount);
 
     await ctx.db.patch(user._id, {
-      luckyChestMaxAmount: Math.round(args.amount),
+      luckyChestMaxAmount: args.amount,
     });
     return null;
   },

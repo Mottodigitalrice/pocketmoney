@@ -53,4 +53,22 @@ export function pickLuckyChestAmount(
   return Math.floor(rng() * maxAmount) + 1;
 }
 
+/**
+ * QA-2026-06-06 (F2 hardening): clamp a stored/read `luckyChestMaxAmount` into
+ * the safe range so `pickLuckyChestAmount` can NEVER throw out-of-bounds — even
+ * for a legacy value persisted before the setter enforced the cap.
+ *
+ * - non-finite / <= 0 → `0` (treated as "disabled / not set" by `open`)
+ * - otherwise → `min(floor(value), MAX_LUCKY_CHEST_CAP)`
+ *
+ * Read-time defense in depth: the `setLuckyChestMaxAmount` mutation rejects
+ * out-of-range NEW writes, but rows written before that guard shipped may still
+ * hold e.g. 50000. `luckyChests.open` / `getStatusForFamily` pass the read
+ * value through here so the kid never sees a raw error.
+ */
+export function clampLuckyChestMax(value: number): number {
+  if (!Number.isFinite(value) || value <= 0) return 0;
+  return Math.min(Math.floor(value), MAX_LUCKY_CHEST_CAP);
+}
+
 export const __testing__ = { MAX_LUCKY_CHEST_CAP };
