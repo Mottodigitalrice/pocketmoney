@@ -6,8 +6,11 @@ import { useUser } from "@clerk/nextjs";
 import { useMutation, useQuery } from "convex/react";
 import { useReducedMotion } from "motion/react";
 import { api } from "../../../convex/_generated/api";
-import { CHILD_ICON_CONFIG } from "@/lib/constants";
+import { CHILD_ICON_CONFIG, ROUTES } from "@/lib/constants";
 import { hasAppDataEnv } from "@/lib/env";
+import { useContext } from "react";
+import { PocketMoneyContext } from "@/components/providers/PocketMoneyProvider";
+import { stripUndefined } from "@/lib/utils";
 import { LanguageToggle } from "@/components/shared/LanguageToggle";
 import { BudouXText } from "@/components/shared/BudouXText";
 import { OnboardingCompleteCelebration } from "@/components/features/onboarding/OnboardingCompleteCelebration";
@@ -773,6 +776,17 @@ function OnboardingPageInner() {
   const createChild = useMutation(api.functions.children.create);
   const createJob = useMutation(api.functions.jobs.create);
   const seedDefaults = useMutation(api.functions.jobs.seedDefaults);
+  // Self-provision the Convex `users` row if the provider hasn't yet — removes
+  // the hidden dependency on PocketMoneyProvider having already created it.
+  const upsertFromClerk = useMutation(api.functions.users.upsertFromClerk);
+
+  // Already-provisioned family data, sourced from the shared provider so the
+  // already-onboarded guard below can avoid a second query. Read the context
+  // directly (not the throwing `usePocketMoney` hook) so the page still mounts
+  // outside a provider — the guard simply no-ops in that case.
+  const pocketMoney = useContext(PocketMoneyContext);
+  const familyChildren = pocketMoney?.familyChildren ?? [];
+  const isLoading = pocketMoney?.isLoading ?? false;
 
   // Local state
   const [step, setStep] = useState(0);
@@ -817,15 +831,55 @@ function OnboardingPageInner() {
     };
   }, []);
 
+  // Already-onboarded guard: a parent who already has a provisioned row AND at
+  // least one child should never sit in onboarding — that's how duplicate
+  // children get created and how a re-onboarding loop starts. Redirect them
+  // home. Guarded against the celebrating/saving window so we don't race the
+  // post-completion redirect (which itself routes home).
+  useEffect(() => {
+    if (isSaving || isCelebrating) return;
+    if (!isLoading && convexUser?._id && familyChildren.length > 0) {
+      router.push(ROUTES.home);
+    }
+  }, [
+    isLoading,
+    convexUser?._id,
+    familyChildren.length,
+    isSaving,
+    isCelebrating,
+    router,
+  ]);
+
   // Complete onboarding: save children + jobs, then redirect.
   // H3 — punchlist 3.7: any failure here is mapped through `mapConvexError`
   // so the parent sees a translated, actionable message + a retry button.
   const handleComplete = useCallback(async () => {
-    if (!convexUser?._id) return;
-
     setSaveError(null);
     setIsSaving(true);
     try {
+      // Self-provision: if the provider hasn't created the Convex `users` row
+      // yet (or the page loaded before it did), create it here instead of
+      // silently bailing. `getCurrent` reactively flips `convexUser` to the new
+      // row, but the child/job mutations below are self-owned by the Clerk
+      // identity so they don't need to wait for that round-trip. Only a genuine
+      // provisioning failure aborts the flow (surfaced via mapConvexError).
+      if (!convexUser?._id) {
+        const email =
+          user?.primaryEmailAddress?.emailAddress ??
+          user?.emailAddresses[0]?.emailAddress;
+        if (!email) {
+          // No email on the Clerk profile → cannot provision.
+          throw new Error("Not authenticated");
+        }
+        await upsertFromClerk(
+          stripUndefined({
+            email,
+            name: user?.fullName || undefined,
+            imageUrl: user?.imageUrl || undefined,
+          }),
+        );
+      }
+
       // Create all children
       for (const child of localChildren) {
         if (child.name.trim() && child.icon) {
@@ -879,6 +933,8 @@ function OnboardingPageInner() {
     }
   }, [
     convexUser,
+    user,
+    upsertFromClerk,
     localChildren,
     localJobs,
     createChild,

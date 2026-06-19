@@ -36,6 +36,7 @@ import { calculateRank } from "../../../convex/lib/rankMath";
 import { toast } from "sonner";
 import { useTranslation } from "@/hooks/use-translation";
 import { mapConvexError } from "@/lib/convex-errors";
+import { convexClientAvailable } from "@/components/providers/convex-provider";
 
 // Helper to get today's date as YYYY-MM-DD in local timezone
 function getLocalDateString(date: Date = new Date()): string {
@@ -77,6 +78,16 @@ interface PocketMoneyContextType {
   provisioningError: boolean;
   // Reset attempts and retry provisioning the Convex user row.
   retryProvisioning: () => void;
+  // True when the user row is provisioned but the family data queries are STILL
+  // unresolved after `MAX_LOAD_MS` (e.g. a broken Convex WebSocket means
+  // `useQuery` never settles). Lets the home page swap an infinite skeleton for
+  // an actionable retry. Always false in the no-data-provider fallback.
+  loadTimedOut: boolean;
+  // Recover a stuck load by reloading the page. The ConvexReactClient is built
+  // once at module load, so a broken client (e.g. corrupted URL → dead
+  // WebSocket) can only be rebuilt by re-running the module — i.e. a full
+  // reload. Nothing short of that re-subscribes.
+  retryLoad: () => void;
   userId: string | null;
   captainCodeEnabled: boolean;
   luckyChestMaxAmount: number;
@@ -206,10 +217,14 @@ export const PocketMoneyContext = createContext<PocketMoneyContextType | null>(
   null,
 );
 
-const hasDataProviders = Boolean(
-  process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY &&
-  process.env.NEXT_PUBLIC_CONVEX_URL,
-);
+// `hasDataProviders` MUST agree with the client the ConvexClientProvider
+// actually built: `convexClientAvailable` is false for a truthy-but-invalid URL
+// (e.g. missing scheme), which `makeConvexClient()` rejects. Keying off the raw
+// env var instead would render the inner provider with no Convex client
+// ancestor, so every `useQuery` would throw into the error boundary.
+const hasDataProviders =
+  Boolean(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY?.trim()) &&
+  convexClientAvailable;
 
 // How many times we attempt to create the Convex `users` row before giving up
 // and surfacing `provisioningError`. The first attempt is immediate; the rest
@@ -218,10 +233,19 @@ const hasDataProviders = Boolean(
 // after which a persistent failure (broken handshake) stops spinning forever.
 const MAX_PROVISION_ATTEMPTS = 5;
 
+// How long (ms) we wait for the family data queries to resolve AFTER the user
+// row exists before declaring the load timed-out. A corrupted Convex URL builds
+// a broken WebSocket client whose `useQuery` calls never settle, leaving the
+// home page on an infinite skeleton with no escape; after this bound we expose
+// `loadTimedOut` so the UI can offer a retry instead of spinning forever.
+const MAX_LOAD_MS = 15000;
+
 const fallbackContextValue: PocketMoneyContextType = {
   isLoading: false,
   provisioningError: false,
   retryProvisioning: () => {},
+  loadTimedOut: false,
+  retryLoad: () => {},
   userId: null,
   captainCodeEnabled: false,
   luckyChestMaxAmount: 100,
@@ -687,6 +711,52 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
         rawTransactions === undefined ||
         rawGoals === undefined ||
         rawLuckyChestStatuses === undefined));
+
+  // ── Load-timeout escape hatch ─────────────────────────────────────────────
+  // Provisioning is bounded by `MAX_PROVISION_ATTEMPTS`, but the *family data*
+  // load after the row exists had no bound: a broken Convex WebSocket (e.g. a
+  // corrupted `NEXT_PUBLIC_CONVEX_URL`) leaves every `useQuery` permanently
+  // `undefined`, so `isLoading` stays true forever and the home page shows an
+  // infinite skeleton. We arm a timer the moment we're signed in, the row is
+  // provisioned, and we're still loading; if it fires before loading clears we
+  // flip `loadTimedOutRaw`. Recovery is a full page reload (see `retryLoad`)
+  // because the only fix for a broken module-level Convex client is rebuilding
+  // it, which requires re-running the module.
+  //
+  // Mirroring the provisioning pattern above, the raw flag is only ever set
+  // from the async timer callback — never synchronously in the effect body —
+  // to satisfy react-hooks/set-state-in-effect. The user-facing `loadTimedOut`
+  // is *derived* so it auto-clears the instant we're no longer waiting (the
+  // data arrived) without a setState-to-clear inside the effect.
+  const rowProvisioned = userIdForQueries !== undefined;
+  // Only meaningful to time-out the family-data wait, i.e. once the row exists.
+  const waitingOnFamilyData = signedIn && rowProvisioned && isLoading;
+
+  const [loadTimedOutRaw, setLoadTimedOutRaw] = useState(false);
+
+  // A full reload re-runs the module, which rebuilds the module-level Convex
+  // client (the `ConvexReactClient` is constructed once at import time). That is
+  // the ONLY way to recover a broken client — bumping React state cannot
+  // re-subscribe a dead WebSocket or swap in a fresh client.
+  const retryLoad = useCallback(() => {
+    if (typeof window !== "undefined") window.location.reload();
+  }, []);
+
+  useEffect(() => {
+    if (!waitingOnFamilyData) return;
+    if (loadTimedOutRaw) return; // already timed out; wait for an explicit retry
+    const timer = setTimeout(() => {
+      setLoadTimedOutRaw(true);
+    }, MAX_LOAD_MS);
+    return () => clearTimeout(timer);
+    // `waitingOnFamilyData` drives entering the wait. Leaving the wait is
+    // handled by deriving the flag below.
+  }, [waitingOnFamilyData, loadTimedOutRaw]);
+
+  // Derived: a timeout only matters while we're still actually waiting. The
+  // moment the family data resolves (`waitingOnFamilyData` → false) this clears
+  // on its own — no setState-in-effect required.
+  const loadTimedOut = loadTimedOutRaw && waitingOnFamilyData;
 
   const setCaptainCodeEnabled = useCallback(
     async (enabled: boolean) => {
@@ -1279,6 +1349,8 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
       isLoading,
       provisioningError,
       retryProvisioning,
+      loadTimedOut,
+      retryLoad,
       userId: userIdForQueries ?? null,
       captainCodeEnabled,
       luckyChestMaxAmount,
@@ -1340,6 +1412,8 @@ function PocketMoneyProviderInner({ children }: { children: ReactNode }) {
       isLoading,
       provisioningError,
       retryProvisioning,
+      loadTimedOut,
+      retryLoad,
       userIdForQueries,
       captainCodeEnabled,
       luckyChestMaxAmount,

@@ -23,6 +23,7 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:debug": "playwright test --debug",
+    "wipe:clerk": "node scripts/clerk-wipe.mjs",
     "deploy": "vercel --prod",
     "deploy:preview": "vercel",
     "prepare": "simple-git-hooks || true"

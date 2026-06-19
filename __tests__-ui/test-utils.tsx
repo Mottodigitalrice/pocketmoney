@@ -49,6 +49,8 @@ export const DEFAULT_CONTEXT_VALUE: FullContext = {
   isLoading: false,
   provisioningError: false,
   retryProvisioning: () => {},
+  loadTimedOut: false,
+  retryLoad: () => {},
   userId: "test-user-id",
   captainCodeEnabled: false,
   luckyChestMaxAmount: 100,
