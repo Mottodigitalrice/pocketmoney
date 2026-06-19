@@ -41,6 +41,13 @@ vi.mock("convex/react", () => ({
   useMutation: vi.fn(() => vi.fn().mockResolvedValue(undefined)),
   useConvexAuth: vi.fn(() => ({ isAuthenticated: true, isLoading: false })),
   useAction: vi.fn(() => vi.fn().mockResolvedValue(undefined)),
+  // `convex-provider.tsx` (now in the import chain via PocketMoneyProvider's
+  // `convexClientAvailable` import) constructs a `ConvexReactClient` at
+  // module-load. A no-op stub keeps that import from blowing up; the tests never
+  // exercise the client itself.
+  ConvexReactClient: class {
+    constructor() {}
+  },
 }));
 
 vi.mock("@clerk/nextjs", () => ({

@@ -53,6 +53,8 @@ function HomePageInner() {
     captainCodeEnabled,
     provisioningError,
     retryProvisioning,
+    loadTimedOut,
+    retryLoad,
   } = usePocketMoney();
   const router = useRouter();
   const { signOut } = useClerk();
@@ -91,6 +93,15 @@ function HomePageInner() {
     return (
       <ProvisioningError onRetry={retryProvisioning} onLogout={handleLogout} />
     );
+  }
+
+  // The family data load is bounded by MAX_LOAD_MS in the provider. If the row
+  // is provisioned but the queries never resolve (e.g. a broken Convex
+  // WebSocket from a corrupted NEXT_PUBLIC_CONVEX_URL), `loadTimedOut` flips so
+  // we can offer a retry instead of an infinite skeleton. Reuses the
+  // ProvisioningError surface (retry re-arms the load timer; logout escapes).
+  if (loadTimedOut) {
+    return <ProvisioningError onRetry={retryLoad} onLogout={handleLogout} />;
   }
 
   // G2: AppSkeleton replaces the `...` text gate so initial Convex hydration
