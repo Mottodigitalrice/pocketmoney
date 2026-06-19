@@ -10,6 +10,7 @@
 
 import type * as __smoke___cross_tenant from "../__smoke__/cross_tenant.js";
 import type * as crons from "../crons.js";
+import type * as functions_admin from "../functions/admin.js";
 import type * as functions_audit from "../functions/audit.js";
 import type * as functions_children from "../functions/children.js";
 import type * as functions_e2e from "../functions/e2e.js";
@@ -42,6 +43,7 @@ import type {
 declare const fullApi: ApiFromModules<{
   "__smoke__/cross_tenant": typeof __smoke___cross_tenant;
   crons: typeof crons;
+  "functions/admin": typeof functions_admin;
   "functions/audit": typeof functions_audit;
   "functions/children": typeof functions_children;
   "functions/e2e": typeof functions_e2e;

@@ -5,23 +5,41 @@ import { ConvexProviderWithClerk } from "convex/react-clerk";
 import { useAuth } from "@clerk/nextjs";
 import { ReactNode } from "react";
 
-// Build the Convex client defensively. A misconfigured deploy can land a
-// whitespace- or newline-corrupted URL in `NEXT_PUBLIC_CONVEX_URL` (e.g.
+// Sanitize a raw `NEXT_PUBLIC_CONVEX_URL`. A misconfigured deploy can land a
+// whitespace- or newline-corrupted URL in the env var (e.g.
 // `"https://...convex.cloud\n"`). Because such a string is truthy, the old
 // `url ? new ConvexReactClient(url) : null` happily built a *broken* client
-// with a bad WebSocket endpoint — every `useQuery` then hung forever. We trim
-// and validate the URL so a corrupted value falls back to the safe no-client
-// path instead, and log it (dev-visible) so the failure is observable.
-function makeConvexClient(): ConvexReactClient | null {
-  const raw = process.env.NEXT_PUBLIC_CONVEX_URL?.trim();
-  if (!raw) return null;
+// with a bad WebSocket endpoint — every `useQuery` then hung forever.
+//
+// PURE + side-effect-free (no logging) so it is cleanly unit-testable: returns
+// the trimmed URL if it parses as a valid absolute URL, else `null`. The
+// invalid-but-present logging stays in `makeConvexClient` below.
+export function sanitizeConvexUrl(raw: string | undefined): string | null {
+  const trimmed = raw?.trim();
+  if (!trimmed) return null;
   try {
-    new URL(raw);
+    new URL(trimmed);
   } catch {
-    console.error("Invalid NEXT_PUBLIC_CONVEX_URL:", JSON.stringify(raw));
     return null;
   }
-  return new ConvexReactClient(raw);
+  return trimmed;
+}
+
+// Build the Convex client defensively, falling back to the safe no-client path
+// when the URL is corrupted, and logging (dev-visible) so the failure is
+// observable when an invalid-but-present value was supplied.
+function makeConvexClient(): ConvexReactClient | null {
+  const trimmed = process.env.NEXT_PUBLIC_CONVEX_URL?.trim();
+  const url = sanitizeConvexUrl(trimmed);
+  if (!url) {
+    // Only an invalid-but-present value is worth flagging — an absent/empty
+    // var is the legitimate no-Convex configuration.
+    if (trimmed) {
+      console.error("Invalid NEXT_PUBLIC_CONVEX_URL:", JSON.stringify(trimmed));
+    }
+    return null;
+  }
+  return new ConvexReactClient(url);
 }
 
 const convex = makeConvexClient();
