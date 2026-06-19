@@ -2,6 +2,22 @@
 
 All notable changes to Pirate Money. Format inspired by [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); the project does not follow strict semver until friends rollout.
 
+## [Unreleased] — 2026-06-20 — Home-load resilience + user-wipe tooling (PR #5)
+
+Autonomous session diagnosing "main page won't load after signup" on prod. Live env check found prod broken at several layers (404 alias, 62-day-stale 500-ing deploy, no Clerk env vars, and a **`NEXT_PUBLIC_CONVEX_URL` corrupted with a trailing newline**); the prod fixes are config + credentials (human-gated, see `RECOVERY-RUNBOOK.md`). This release is the code half.
+
+### Fixed
+
+- **Root cause of infinite skeleton:** `convex-provider.tsx` now `.trim()`s + `URL`-validates `NEXT_PUBLIC_CONVEX_URL` (and trims the Clerk publishable key) via a pure, unit-tested `sanitizeConvexUrl()`. A `\n`-suffixed/whitespace/invalid value falls back to the safe no-client path (with a dev-visible `console.error`) instead of building a broken `ConvexReactClient` whose queries hang forever. `PocketMoneyProvider.hasDataProviders` now gates on the validated client so an invalid-but-truthy URL can't drive `useQuery` to throw.
+
+### Added
+
+- **Home load-timeout escape hatch** — `PocketMoneyProvider` exposes `loadTimedOut`/`retryLoad`; after 15s of a stuck load (row provisioned but family queries unresolved) `page.tsx` renders a retry/logout card before `AppSkeleton`. Retry does a full reload (the only way to rebuild a module-level client). The home page can no longer hang on an infinite skeleton.
+- **Onboarding hardening** — an already-onboarded redirect guard (no re-onboarding loop / duplicate children) and self-provision via `upsertFromClerk` instead of the silent early-return when the Convex user row is missing.
+- **User-wipe tooling** (running is human-gated) — `convex/functions/admin.ts` `clearAllUsers` internalMutation (dry-run unless `confirm:true`, modeled on `_smokeTeardown`, deletes 8 user-scoped tables in dependency order + proof-storage blobs) and `scripts/clerk-wipe.mjs` (Clerk Backend REST via fetch, dry-run unless `--yes`).
+- **Regression guard** — `e2e/signup-to-home.spec.ts` (signup → onboarding → home; asserts the character grid renders and is not skeleton/error/onboarding-bounce). Unit test for `sanitizeConvexUrl` (incl. the exact `\n` regression) + convex-test integration test for `clearAllUsers` (dry-run non-destructive; real wipe zeroes users). +9 tests → **570 passing** (326 backend + 244 UI).
+- **`RECOVERY-RUNBOOK.md`** — ordered prod-recovery + wipe steps for the human-gated half.
+
 ## [Unreleased] — 2026-05-23 — Autonomous Round 5 (waves 2-7)
 
 Local autonomous session ran 7 waves on this branch (`claude/autonomous-project-analysis-wW6I8`). All builder waves shipped real code; reviewer waves verified before promotion.
