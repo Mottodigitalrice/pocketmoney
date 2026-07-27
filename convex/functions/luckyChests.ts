@@ -10,6 +10,7 @@ import {
   clampLuckyChestMax,
 } from "../lib/luckyChestMath";
 import { LUCKY_CHEST_COOLDOWN_MS } from "../lib/inputValidation";
+import { assertMondayStartedWeek } from "../lib/dateValidation";
 
 const luckyChestDocValidator = v.object({
   _id: v.id("luckyChests"),
@@ -97,9 +98,10 @@ export const getStatusForFamily = query({
     }),
   ),
   handler: async (ctx, args) => {
-    if (args.weekDates.length !== 7) {
-      throw new Error("Expected a full week of dates");
-    }
+    // SEC-2026-07-18: require a canonical Monday-started, consecutive week so
+    // `weekStart` is a stable key (see assertMondayStartedWeek). A read-only
+    // query, but kept consistent with `open` so status and open agree.
+    assertMondayStartedWeek(args.weekDates);
 
     const user = await getCurrentUser(ctx);
     const children = await ctx.db
@@ -108,7 +110,7 @@ export const getStatusForFamily = query({
       .collect();
     // QA-2026-06-06 (F2): clamp legacy/out-of-range stored values at read.
     const maxAmount = clampLuckyChestMax(user.luckyChestMaxAmount ?? 100);
-    const weekStart = args.weekDates[0]!; // safe: length checked above
+    const weekStart = args.weekDates[0]!; // safe: validated above
 
     return await Promise.all(
       children.map(async (child) => {
@@ -143,9 +145,13 @@ export const open = mutation({
   },
   returns: v.union(luckyChestDocValidator, v.null()),
   handler: async (ctx, args) => {
-    if (args.weekDates.length !== 7) {
-      throw new Error("Expected a full week of dates");
-    }
+    // SEC-2026-07-18 (CRITICAL): the once-per-week guard below is keyed on
+    // `weekStart = weekDates[0]`. Previously only `length === 7` was checked,
+    // so a client could rotate/permute/pad the 7 dates to mint a different
+    // `weekStart` on every call and re-open the chest indefinitely. Requiring a
+    // canonical Monday-started, strictly-consecutive week makes `weekDates[0]`
+    // the single valid value for a given real week, so the guard is sound.
+    assertMondayStartedWeek(args.weekDates);
 
     const user = await getCurrentUser(ctx);
     assertOwnedBy(await ctx.db.get(args.childId), user._id, "child");
@@ -178,7 +184,7 @@ export const open = mutation({
       throw new Error("Lucky Chest max amount is not set");
     }
 
-    const weekStart = args.weekDates[0]!; // safe: length checked above
+    const weekStart = args.weekDates[0]!; // canonical Monday (validated above)
     // (d) Single-open-per-week guard. The `by_child_week` index on
     // `luckyChests` makes this lookup O(1); we throw a structured error
     // here so the frontend can distinguish "already opened" from other

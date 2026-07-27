@@ -40,13 +40,22 @@
  *      enable. Manual, owner-initiated invocation only — and in the dashboard
  *      the human is the final safety check.
  *
- *   4. Pattern note: `findOrphanedProofs` is a `query` because
- *      `ctx.db.system.query("_storage")` is only available in queries.
- *      `deleteOrphanedProofs` is a `mutation` (owner-triggered, NOT an
- *      `internalMutation`) and cannot enumerate `_storage` itself — the
- *      caller must invoke `findOrphanedProofs` first and pass the resulting
- *      array of storage IDs into `deleteOrphanedProofs`. The mutation then
- *      re-verifies each ID against the current orphan set before deleting.
+ *   4. Pattern note: `findOrphanedProofs` is an `internalQuery` and
+ *      `deleteOrphanedProofs` is an `internalMutation` — dashboard/CLI
+ *      (`npx convex run`) only, NEVER exposed on the public `api`. The
+ *      operator invokes `findOrphanedProofs` to list storage IDs, then passes
+ *      them into `deleteOrphanedProofs`.
+ *
+ * SEC-2026-07-18: these were previously `mutation`/`query` (public). Their
+ *      "orphan" set is derived relative to the CALLER's jobInstances
+ *      (`getCurrentUser`), so on a multi-family deployment any authenticated
+ *      family could enumerate and DELETE another family's proof blobs (their
+ *      storage is not referenced by the caller → treated as an orphan).
+ *      Making them internal removes that public attack surface. NOTE: the
+ *      caller-relative orphan logic is still wrong for a true deployment-wide
+ *      sweep and must be redesigned (check against ALL jobInstances, drop the
+ *      per-user scoping) before this tool is ever wired to a real operator
+ *      flow. It is currently unused.
  *
  * Storage-delete API: matches `cleanupApprovedPhotoProofs` in
  * `convex/functions/jobInstances.ts` — `await ctx.storage.delete(storageId)`,
@@ -54,7 +63,7 @@
  */
 
 import { v } from "convex/values";
-import { mutation, query } from "../_generated/server";
+import { internalMutation, internalQuery } from "../_generated/server";
 import type { Id } from "../_generated/dataModel";
 import { getCurrentUser } from "./users";
 import { findOrphansInList } from "../lib/orphanSweep";
@@ -75,7 +84,7 @@ const orphanRowValidator = v.object({
  * Owner-only — requires an authenticated session via `getCurrentUser`. No
  * args (the entire system table is scanned; do not call this in a hot path).
  */
-export const findOrphanedProofs = query({
+export const findOrphanedProofs = internalQuery({
   args: {},
   returns: v.array(orphanRowValidator),
   handler: async (ctx) => {
@@ -139,7 +148,7 @@ export const findOrphanedProofs = query({
  * See header comment for why this is acceptable for manual sweep but NOT
  * safe to auto-cron.
  */
-export const deleteOrphanedProofs = mutation({
+export const deleteOrphanedProofs = internalMutation({
   args: {
     confirm: v.boolean(),
     storageIds: v.array(v.id("_storage")),

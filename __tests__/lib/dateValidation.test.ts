@@ -1,5 +1,23 @@
 import { describe, it, expect } from "vitest";
-import { assertIsoDate, isIsoDate } from "../../convex/lib/dateValidation";
+import {
+  assertIsoDate,
+  isIsoDate,
+  assertMondayStartedWeek,
+} from "../../convex/lib/dateValidation";
+
+/** Build the canonical Mon→Sun week (7 UTC date strings) containing `iso`. */
+function mondayWeek(iso: string): string[] {
+  const d = new Date(`${iso}T00:00:00.000Z`);
+  const day = d.getUTCDay();
+  const toMonday = (day === 0 ? -6 : 1) - day;
+  const monday = new Date(d);
+  monday.setUTCDate(d.getUTCDate() + toMonday);
+  return Array.from({ length: 7 }, (_, i) => {
+    const x = new Date(monday);
+    x.setUTCDate(monday.getUTCDate() + i);
+    return x.toISOString().slice(0, 10);
+  });
+}
 
 /**
  * Wave 3a MED-4 ISO date validation contract tests.
@@ -113,5 +131,52 @@ describe("isIsoDate", () => {
     expect(isIsoDate(12345)).toBe(false);
     expect(isIsoDate(undefined)).toBe(false);
     expect(isIsoDate(null)).toBe(false);
+  });
+});
+
+describe("assertMondayStartedWeek", () => {
+  const week = mondayWeek("2026-06-03"); // Wed 2026-06-03 → Mon 2026-06-01…Sun 06-07
+
+  it("accepts a canonical Monday-started consecutive week", () => {
+    expect(() => assertMondayStartedWeek(week)).not.toThrow();
+    // sanity: element 0 really is a Monday
+    expect(new Date(`${week[0]}T00:00:00.000Z`).getUTCDay()).toBe(1);
+  });
+
+  it("rejects a rotated week (day 0 no longer Monday) — the forge vector", () => {
+    const rotated = [...week.slice(1), week[0]!];
+    expect(() => assertMondayStartedWeek(rotated)).toThrow(/INVALID_WEEK/);
+  });
+
+  it("rejects a padded / non-consecutive length-7 array", () => {
+    const padded = [week[0]!, "2026-07-01", ...week.slice(1, 6)];
+    expect(() => assertMondayStartedWeek(padded)).toThrow(/INVALID_WEEK/);
+  });
+
+  it("rejects a duplicated date (breaks strict consecutiveness)", () => {
+    const dup = [week[0]!, week[0]!, ...week.slice(1, 6)];
+    expect(() => assertMondayStartedWeek(dup)).toThrow(/INVALID_WEEK/);
+  });
+
+  it("rejects a Sunday-started week", () => {
+    const sunFirst = mondayWeek("2026-06-03");
+    const sunday = [sunFirst[6]!, ...mondayWeek("2026-06-10").slice(0, 6)];
+    expect(() => assertMondayStartedWeek(sunday)).toThrow(/must start on Monday/);
+  });
+
+  it("rejects wrong length", () => {
+    expect(() => assertMondayStartedWeek(week.slice(0, 6))).toThrow(/INVALID_WEEK/);
+    expect(() => assertMondayStartedWeek([...week, "2026-06-08"])).toThrow(/INVALID_WEEK/);
+  });
+
+  it("rejects an impossible date inside the week", () => {
+    const bad = [...week];
+    bad[3] = "2026-02-30";
+    expect(() => assertMondayStartedWeek(bad)).toThrow(/INVALID_/);
+  });
+
+  it("rejects non-array input", () => {
+    expect(() => assertMondayStartedWeek("2026-06-01")).toThrow(/INVALID_WEEK/);
+    expect(() => assertMondayStartedWeek(null)).toThrow(/INVALID_WEEK/);
   });
 });

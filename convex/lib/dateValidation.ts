@@ -79,3 +79,56 @@ export function isIsoDate(input: unknown): input is string {
     return false;
   }
 }
+
+const MS_PER_DAY = 86_400_000;
+
+/**
+ * Assert that `input` is a canonical Monday-started ISO week: exactly 7
+ * strictly-consecutive `YYYY-MM-DD` dates, where the first date is a Monday.
+ *
+ * ## Why this exists (SEC-2026-07-18)
+ *
+ * `luckyChests.open` / `getStatusForFamily` used `weekDates[0]` as the
+ * `by_child_week` single-open key while validating only `weekDates.length ===
+ * 7`. Because the whole array was attacker-controlled, a client could rotate /
+ * permute / pad the 7 dates so `weekDates[0]` differed on every call, minting
+ * a fresh Lucky Chest bonus each time (the once-per-week guard is keyed on that
+ * value). Requiring a canonical Monday-started, strictly-consecutive week
+ * collapses every real week to exactly ONE valid `weekDates[0]`, so the guard
+ * holds: any rotation makes day 0 a non-Monday, and any padding breaks
+ * consecutiveness — both rejected here.
+ *
+ * The Monday check reads the day-of-week of the calendar date itself (parsed at
+ * UTC midnight), so it is timezone-agnostic: "2026-05-11" is a Monday in every
+ * timezone. This matches the client's `getWeekDates()` contract, which always
+ * emits the local Monday's date first, followed by Tue…Sun.
+ *
+ * Throws `INVALID_WEEK: <label>` (with a specific suffix) on any violation.
+ */
+export function assertMondayStartedWeek(
+  input: unknown,
+  label: string = "weekDates",
+): asserts input is string[] {
+  if (!Array.isArray(input) || input.length !== 7) {
+    throw new Error(`INVALID_WEEK: ${label} must be 7 dates`);
+  }
+
+  const times: number[] = [];
+  for (let i = 0; i < 7; i++) {
+    // Reuse the ISO/impossible-date guard (rejects 2026-02-30, non-leap 2/29…).
+    assertIsoDate(input[i], `${label}[${i}]`);
+    times.push(new Date(`${input[i]}T00:00:00.000Z`).getTime());
+  }
+
+  // Day 0 must be a Monday (UTC day-of-week 1) — kills any rotation/permutation.
+  if (new Date(times[0]!).getUTCDay() !== 1) {
+    throw new Error(`INVALID_WEEK: ${label} must start on Monday`);
+  }
+
+  // Strictly consecutive calendar days — kills any padding/gaps/duplicates.
+  for (let i = 1; i < 7; i++) {
+    if (times[i]! - times[i - 1]! !== MS_PER_DAY) {
+      throw new Error(`INVALID_WEEK: ${label} must be 7 consecutive days`);
+    }
+  }
+}

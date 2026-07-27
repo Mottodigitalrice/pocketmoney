@@ -297,6 +297,15 @@ export const reconcile = query({
  *
  * Auth: only the calling parent operates on their own children
  * (`assertOwnedBy` via the `by_user` index on `children`).
+ *
+ * SEC-2026-07-18: this is an `internalMutation` (dashboard/CLI only), NOT
+ * public. It is a ONE-TIME pre-wallet→wallet backfill. On a normally-operating
+ * family, `earning` transactions were already credited to the wallet by
+ * `creditApprovedJob`, so `expected` (a split of lifetimeEarnings) minus prior
+ * `migration` txns (=0) would credit the whole balance a SECOND time (¥1000 job
+ * → 700/200/100 becomes 1400/400/200), and `reconcile()` can't detect it
+ * (migration txns inflate balance and ledger equally). Keeping it off the
+ * public `api` prevents any client (or accidental UI wiring) from invoking it.
  */
 const childMigrationDiffValidator = v.object({
   childId: v.id("children"),
@@ -318,7 +327,7 @@ const childMigrationDiffValidator = v.object({
   }),
 });
 
-export const migrateLegacyEarnings = mutation({
+export const migrateLegacyEarnings = internalMutation({
   args: {
     dryRun: v.optional(v.boolean()),
   },
